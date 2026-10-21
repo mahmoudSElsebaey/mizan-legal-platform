@@ -1,8 +1,8 @@
 # Mizan Legal — ميزان للمحاماة
 
-Bilingual legal-office platform foundation built with Next.js App Router, TypeScript, Tailwind CSS, and Supabase.
+Bilingual public website and legal-office platform foundation built with Next.js App Router, TypeScript, Tailwind CSS, and Supabase.
 
-> Phase 1 scaffold only. Authentication, database migrations, RLS policies, booking, portals, and chat are not implemented yet. The homepage uses illustrative copy and placeholder contact details.
+> Phase 2 public website routes are implemented with sample educational content and placeholder office details. Authentication, database migrations, RLS policies, booking, client/lawyer portals, and chat are not implemented yet. Confirm all legal content with the office before production use.
 
 ## Requirements
 - Node.js 20.9 or newer
@@ -14,7 +14,8 @@ Bilingual legal-office platform foundation built with Next.js App Router, TypeSc
 2. Run npm install.
 3. Copy .env.example to .env.local.
 4. Add the Supabase Project URL and publishable key to .env.local.
-5. Run npm run dev and open http://localhost:3000.
+5. Optionally set NEXT_PUBLIC_SITE_URL to the canonical public origin before deployment; keep it unset for local development.
+6. Run npm run dev and open http://localhost:3000.
 
 On Windows PowerShell:
 
@@ -22,7 +23,7 @@ On Windows PowerShell:
     npm install
     npm run dev
 
-The app redirects / to Arabic (/ar). Use /en for English. The language switch currently preserves the homepage, not deep links.
+The app redirects / to Arabic (/ar). Use /en for English. Public pages include /[locale]/office, /[locale]/lawyer, /[locale]/services, /[locale]/services/[slug], /[locale]/insights, and /[locale]/insights/[slug].
 
 ## Environment safety
 - Never commit .env.local.
