@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 import type { Locale } from "@/lib/i18n/config";
 
 type AuthMode = "login" | "register" | "forgot-password" | "reset-password";
+type DemoAccount = { label: string; email: string; password: string };
 
 const copy = {
   ar: {
@@ -27,13 +28,15 @@ const copy = {
   }
 } as const;
 
-export function AuthForm({ locale, mode }: { locale: Locale; mode: AuthMode }) {
+export function AuthForm({ locale, mode, demoAccounts = [] }: { locale: Locale; mode: AuthMode; demoAccounts?: DemoAccount[] }) {
   const router = useRouter();
   const t = copy[locale];
   const labels = t[mode];
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
+  const [emailValue, setEmailValue] = useState("");
+  const [passwordValue, setPasswordValue] = useState("");
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -114,13 +117,13 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: AuthMode }) {
         {mode !== "reset-password" && (
           <label className="block space-y-2 text-sm font-medium text-stone-700">
             {t.email}
-            <input name="email" type="email" autoComplete="email" required maxLength={254} className="w-full rounded-xl border border-stone-300 px-4 py-3 outline-none transition focus:border-amber-700 focus:ring-2 focus:ring-amber-100" />
+            <input name="email" type="email" autoComplete="email" value={emailValue} onChange={(event) => setEmailValue(event.target.value)} required maxLength={254} className="w-full rounded-xl border border-stone-300 px-4 py-3 outline-none transition focus:border-amber-700 focus:ring-2 focus:ring-amber-100" />
           </label>
         )}
         {mode !== "forgot-password" && (
           <label className="block space-y-2 text-sm font-medium text-stone-700">
             {t.password}
-            <input name="password" type="password" autoComplete={mode === "login" ? "current-password" : "new-password"} required minLength={8} maxLength={128} className="w-full rounded-xl border border-stone-300 px-4 py-3 outline-none transition focus:border-amber-700 focus:ring-2 focus:ring-amber-100" />
+            <input name="password" type="password" value={passwordValue} onChange={(event) => setPasswordValue(event.target.value)} autoComplete={mode === "login" ? "current-password" : "new-password"} required minLength={8} maxLength={128} className="w-full rounded-xl border border-stone-300 px-4 py-3 outline-none transition focus:border-amber-700 focus:ring-2 focus:ring-amber-100" />
           </label>
         )}
         {mode === "reset-password" && (
@@ -135,6 +138,28 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: AuthMode }) {
           {loading ? t.working : labels.submit}
         </button>
       </form>
+
+      {mode === "login" && demoAccounts.length > 0 && (
+        <div className="mt-6 rounded-2xl border border-amber-200 bg-amber-50/70 p-4">
+          <div className="mb-3">
+            <h2 className="font-semibold text-stone-900">{locale === "ar" ? "حسابات التجربة" : "Demo accounts"}</h2>
+            <p className="mt-1 text-xs leading-5 text-stone-600">{locale === "ar" ? "للتطوير المحلي فقط. اضغط على الحساب لملء بيانات الدخول." : "Local development only. Select an account to fill in its credentials."}</p>
+          </div>
+          <div className="grid gap-2 sm:grid-cols-2">
+            {demoAccounts.map((account) => (
+              <button
+                key={account.email}
+                type="button"
+                onClick={() => { setEmailValue(account.email); setPasswordValue(account.password); setError(""); setMessage(""); }}
+                className="rounded-xl border border-stone-200 bg-white px-3 py-3 text-start text-sm transition hover:border-amber-600 hover:bg-amber-50"
+              >
+                <span className="block font-semibold text-stone-900">{account.label}</span>
+                <span className="mt-1 block break-all text-xs text-stone-600">{account.email}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="mt-6 flex flex-wrap items-center justify-between gap-3 text-sm text-stone-600">
         <p>{labels.switchText} <Link className="font-semibold text-amber-800 underline-offset-4 hover:underline" href={`/${locale}/${mode === "login" ? "register" : "login"}`}>{labels.switchLabel}</Link></p>
