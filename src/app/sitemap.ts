@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { locales } from "@/lib/i18n/config";
 import { insightsContent, practiceAreas } from "@/lib/content/public-site";
-const siteUrl = "https://mizan-legal.example";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 export default function sitemap(): MetadataRoute.Sitemap {
   const routes = ["", "/office", "/lawyer", "/services", "/insights"];
   const localized = locales.flatMap((locale) => routes.map((route) => ({ url: siteUrl + "/" + locale + route, changeFrequency: route === "/insights" ? "weekly" as const : "monthly" as const, priority: route === "" ? 1 : 0.7 })));
