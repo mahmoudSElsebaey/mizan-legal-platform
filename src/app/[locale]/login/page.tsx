@@ -9,6 +9,15 @@ export default async function Page({ params }: { params: Promise<{ locale: strin
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
 
+  const demoPassword = process.env.NODE_ENV === "development" ? process.env.DEMO_SEED_PASSWORD : undefined;
+  const demoAccounts = demoPassword ? [
+    { label: locale === "ar" ? "عميل" : "Client", email: "mizan.demo.client@example.com", password: demoPassword },
+    { label: locale === "ar" ? "محامٍ" : "Lawyer", email: "mizan.demo.lawyer@example.com", password: demoPassword },
+    { label: locale === "ar" ? "مساعد" : "Assistant", email: "mizan.demo.assistant@example.com", password: demoPassword },
+    { label: locale === "ar" ? "مدير" : "Administrator", email: "mizan.demo.admin@example.com", password: demoPassword },
+    { label: locale === "ar" ? "مالك المكتب" : "Office owner", email: "mizan.demo.owner@example.com", password: demoPassword },
+  ] : [];
+
   return (
     <main className="min-h-[70vh] bg-stone-50 px-4 py-14 sm:py-20">
       <div className="mx-auto mb-6 max-w-md text-center">
@@ -16,7 +25,7 @@ export default async function Page({ params }: { params: Promise<{ locale: strin
           {locale === "ar" ? "العودة إلى الموقع" : "Back to website"}
         </a>
       </div>
-      <AuthForm locale={locale} mode="login" />
+      <AuthForm locale={locale} mode="login" demoAccounts={demoAccounts} />
     </main>
   );
 }
