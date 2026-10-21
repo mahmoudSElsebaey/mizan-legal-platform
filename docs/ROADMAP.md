@@ -2,7 +2,7 @@
 
 Each phase ends with a report of changed files, decisions, tests actually run, known issues, and next steps. Never claim a test, integration, or deployment succeeded unless it was performed.
 
-## Phase 0 — Planning (current)
+## Phase 0 — Planning (documentation drafted; final business review pending)
 - [x] Confirm repository and initial product direction.
 - [x] Draft architecture and proposed folder structure.
 - [x] Draft conceptual database model.
@@ -14,7 +14,7 @@ Each phase ends with a report of changed files, decisions, tests actually run, k
 
 **Exit gate:** no application scaffold, schema migration, or feature implementation until Phase 0 is reviewed and explicitly approved.
 
-## Phase 1 — Foundation and design system (not started)
+## Phase 1 — Foundation and design system (implemented; local checks pending)
 - Scaffold Next.js App Router + TypeScript.
 - Configure linting, formatting, tests, and environment validation.
 - Add Arabic/English locale routing and RTL/LTR.
@@ -22,11 +22,15 @@ Each phase ends with a report of changed files, decisions, tests actually run, k
 - Add Supabase client/server helpers without committing credentials.
 - Verify build and baseline checks.
 
-## Phase 2 — Public website
-- Responsive home and office pages.
-- Practice areas, services, lawyer profiles, contact details, articles/insights.
-- SEO metadata, sitemap, and loading/error/empty states.
-- Clearly mark placeholders until real office content is supplied.
+## Phase 2 — Public website (implementation started; validation pending)
+- [x] Responsive bilingual homepage and office page.
+- [x] Practice area directory and localized detail pages.
+- [x] Lawyer profile page with explicit placeholders for unverified credentials.
+- [x] Legal insights listing and educational article pages.
+- [x] SEO metadata, sitemap, and robots route.
+- [ ] Add/verify route-level loading, error, and not-found states.
+- [ ] Run typecheck, lint, and production build locally.
+- [ ] Review content and replace placeholder office details before launch.
 
 ## Phase 3 — Authentication and access control
 - Sign-in/up and password recovery.
