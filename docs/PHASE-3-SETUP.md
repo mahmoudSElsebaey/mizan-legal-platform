@@ -11,6 +11,24 @@
 - Supabase Auth callback at `/auth/callback`.
 - Server-protected account page at `/[locale]/dashboard`, which redirects unauthenticated users to sign-in.
 
+## Local demo accounts
+
+The repository includes an idempotent seed script at `scripts/seed-demo-users.mjs`. It creates or updates five dedicated demo users: client, lawyer, assistant, administrator, and office owner. It never deletes unrelated Auth users. The login page shows click-to-fill demo accounts only in `next dev`, and only when `DEMO_SEED_PASSWORD` is configured; the production login page does not render those credentials.
+
+1. Use a dedicated development/staging Supabase project. **Do not seed demo staff/owner accounts into the live production project.**
+2. In your local `.env.local`, add the server-only `SUPABASE_SERVICE_ROLE_KEY` from the Supabase dashboard and a strong `DEMO_SEED_PASSWORD` (at least 12 characters). Never prefix the service-role key with `NEXT_PUBLIC_`, commit it, or share it in chat.
+3. Remote projects are blocked by default. To deliberately seed a dedicated remote development/staging project in PowerShell, run:
+
+   ```powershell
+   $env:ALLOW_REMOTE_DEMO_SEED = "true"
+   npm run seed:demo
+   Remove-Item Env:ALLOW_REMOTE_DEMO_SEED
+   ```
+
+4. Start the app with `npm run dev`, open `/ar/login` or `/en/login`, and select a demo account to autofill its email and password.
+
+The shared password is read from your local environment, not stored in source control. These accounts have real authentication sessions and staff assignments in the connected Supabase project, so use them only in an isolated development/staging environment.
+
 ## Required Supabase Auth configuration
 
 In Supabase Dashboard → Authentication → URL Configuration, set the local site URL to `http://localhost:3000` for local development and add these redirect URLs:
