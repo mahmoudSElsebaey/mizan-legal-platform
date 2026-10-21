@@ -1,46 +1,39 @@
-# Mizan Legal
+# Mizan Legal — ميزان للمحاماة
 
-A bilingual (Arabic/English) legal office platform planned with Next.js, TypeScript, Tailwind CSS, and Supabase.
+Bilingual legal-office platform foundation built with Next.js App Router, TypeScript, Tailwind CSS, and Supabase.
 
-> **Current status: Phase 0 — Planning only.** No application code, database migrations, authentication flows, or deployment have been implemented yet. Phase 1 must not begin until the Phase 0 report is reviewed and explicitly approved.
+> Phase 1 scaffold only. Authentication, database migrations, RLS policies, booking, portals, and chat are not implemented yet. The homepage uses illustrative copy and placeholder contact details.
 
-## Product goals
+## Requirements
+- Node.js 20.9 or newer
+- npm
+- A Supabase project (needed when testing auth/data integration)
 
-- Present the law office and its services professionally.
-- Support Arabic and English, including RTL/LTR layouts.
-- Let prospective clients request and manage appointments.
-- Provide authenticated client and lawyer workspaces.
-- Organize cases, client-visible documents, and private conversations.
-- Provide role-aware administration and an auditable security model.
+## Local setup
+1. Clone this repository.
+2. Run npm install.
+3. Copy .env.example to .env.local.
+4. Add the Supabase Project URL and publishable key to .env.local.
+5. Run npm run dev and open http://localhost:3000.
 
-## Planned stack
+On Windows PowerShell:
 
-- Next.js App Router and TypeScript
-- Tailwind CSS and reusable accessible UI components
-- Supabase Postgres, Auth, Storage, and optionally Realtime
-- Zod for input validation
-- Automated tests for critical permissions and booking conflicts
+    Copy-Item .env.example .env.local
+    npm install
+    npm run dev
 
-No separate Express API is planned initially; use Next.js server-side code and Supabase where appropriate.
+The app redirects / to Arabic (/ar). Use /en for English. The language switch currently preserves the homepage, not deep links.
 
-## Project documents
+## Environment safety
+- Never commit .env.local.
+- Never expose a Supabase service_role or secret key in browser code or any NEXT_PUBLIC_* variable.
+- A publishable key is designed to be public, but database access must be protected by RLS before real user data is stored.
+- These helpers are scaffolding; no database schema or security policy has been applied.
 
-- [Phase 0 architecture and product plan](docs/PHASE-0-ARCHITECTURE.md)
-- [Proposed database model](docs/DATABASE-ERD.md)
-- [Security and access-control plan](docs/SECURITY-PLAN.md)
-- [Delivery roadmap and acceptance gates](docs/ROADMAP.md)
+## Commands
+- npm run dev — local development
+- npm run build — production build
+- npm run lint — ESLint
+- npm run typecheck — TypeScript checks
 
-## Environment variables (planned)
-
-Create a local `.env.local` file from these names. Never commit real credentials.
-
-```env
-NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
-```
-
-The publishable/anon key is intended for browser use, but it is not an authorization mechanism by itself. Row Level Security (RLS) and least-privilege policies are required. Never expose a service-role/secret key in client code or commit it to Git.
-
-## Phase gate
-
-The repository currently contains planning documentation only. Do not scaffold the application or create database migrations until the owner approves the Phase 0 report.
+See docs/PHASE-0-ARCHITECTURE.md, docs/DATABASE-ERD.md, docs/SECURITY-PLAN.md, docs/ROADMAP.md, and docs/PHASE-1-SETUP.md.
