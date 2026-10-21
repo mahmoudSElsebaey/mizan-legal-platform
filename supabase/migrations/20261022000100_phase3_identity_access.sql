@@ -153,24 +153,37 @@ using (
   or (select public.is_active_staff())
 );
 
+-- Owners can assign any staff role. Admins can only assign lawyer/assistant roles.
 create policy "staff_insert_owner_admin"
 on public.staff_members for insert
 to authenticated
 with check (
-  (select public.has_active_staff_role(array['owner', 'admin']::public.staff_role[]))
-  and (role <> 'owner' or (select public.has_active_staff_role(array['owner']::public.staff_role[])))
+  (
+    (select public.has_active_staff_role(array['owner']::public.staff_role[]))
+  )
+  or (
+    role in ('lawyer', 'assistant')
+    and (select public.has_active_staff_role(array['admin']::public.staff_role[]))
+  )
 );
 
+-- Admins may manage only lawyer/assistant rows and cannot promote anyone to admin/owner.
 create policy "staff_update_owner_admin"
 on public.staff_members for update
 to authenticated
 using (
-  (select public.has_active_staff_role(array['owner', 'admin']::public.staff_role[]))
-  and (role <> 'owner' or (select public.has_active_staff_role(array['owner']::public.staff_role[])))
+  (select public.has_active_staff_role(array['owner']::public.staff_role[]))
+  or (
+    role in ('lawyer', 'assistant')
+    and (select public.has_active_staff_role(array['admin']::public.staff_role[]))
+  )
 )
 with check (
-  (select public.has_active_staff_role(array['owner', 'admin']::public.staff_role[]))
-  and (role <> 'owner' or (select public.has_active_staff_role(array['owner']::public.staff_role[])))
+  (select public.has_active_staff_role(array['owner']::public.staff_role[]))
+  or (
+    role in ('lawyer', 'assistant')
+    and (select public.has_active_staff_role(array['admin']::public.staff_role[]))
+  )
 );
 
 create policy "staff_delete_owner_only"
