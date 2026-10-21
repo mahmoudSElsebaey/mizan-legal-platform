@@ -39,6 +39,7 @@ Each phase ends with a report of changed files, decisions, tests actually run, k
 - [x] Implement localized sign-in, registration, password recovery, and password update screens.
 - [x] Add the Supabase Auth callback handler for confirmation/recovery links.
 - [x] Add a server-protected account dashboard and sign-out control.
+- [x] Add localized homepage links to sign-in and registration.
 - [ ] Verify profile trigger behavior and role/RLS allow-deny behavior with real test accounts.
 - [ ] Run typecheck, lint, and production build locally; fix any issues.
 - [ ] Add automated role-based access tests and record actual results.
