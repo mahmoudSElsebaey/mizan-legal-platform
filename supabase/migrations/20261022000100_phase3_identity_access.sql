@@ -172,10 +172,13 @@ create policy "staff_update_owner_admin"
 on public.staff_members for update
 to authenticated
 using (
-  (select public.has_active_staff_role(array['owner']::public.staff_role[]))
-  or (
-    role in ('lawyer', 'assistant')
-    and (select public.has_active_staff_role(array['admin']::public.staff_role[]))
+  profile_id <> (select auth.uid())
+  and (
+    (select public.has_active_staff_role(array['owner']::public.staff_role[]))
+    or (
+      role in ('lawyer', 'assistant')
+      and (select public.has_active_staff_role(array['admin']::public.staff_role[]))
+    )
   )
 )
 with check (
@@ -190,7 +193,8 @@ create policy "staff_delete_owner_only"
 on public.staff_members for delete
 to authenticated
 using (
-  (select public.has_active_staff_role(array['owner']::public.staff_role[]))
+  profile_id <> (select auth.uid())
+  and (select public.has_active_staff_role(array['owner']::public.staff_role[]))
 );
 
 revoke all on public.staff_members from anon, authenticated;
