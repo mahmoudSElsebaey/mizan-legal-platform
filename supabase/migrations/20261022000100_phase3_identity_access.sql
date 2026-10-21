@@ -46,6 +46,8 @@ create trigger staff_members_set_updated_at
 before update on public.staff_members
 for each row execute function public.set_updated_at();
 
+revoke all on function public.set_updated_at() from public, anon, authenticated;
+
 -- Provision a basic profile for each newly created Auth user.
 -- Never copy role or staff status from user-controlled Auth metadata.
 create or replace function public.handle_new_auth_user()
@@ -112,11 +114,23 @@ grant execute on function public.is_active_staff() to authenticated;
 alter table public.profiles enable row level security;
 alter table public.staff_members enable row level security;
 
--- A user can read their own profile; active staff can read profiles for office workflows.
-create policy "profiles_select_own_or_active_staff"
+-- Users can read their own profile. Active staff can read profiles belonging to
+-- other active staff, but not every client's private profile by default.
+create policy "profiles_select_own_or_staff_directory"
 on public.profiles for select
 to authenticated
-using (id = (select auth.uid()) or (select public.is_active_staff()));
+using (
+  id = (select auth.uid())
+  or (
+    (select public.is_active_staff())
+    and exists (
+      select 1
+      from public.staff_members sm
+      where sm.profile_id = profiles.id
+        and sm.status = 'active'
+    )
+  )
+);
 
 -- Limit self-service profile edits to the user's own row.
 create policy "profiles_update_own"
