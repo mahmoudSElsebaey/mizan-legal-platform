@@ -32,13 +32,15 @@ Each phase ends with a report of changed files, decisions, tests actually run, k
 - [ ] Run typecheck, lint, and production build locally.
 - [ ] Review content and replace placeholder office details before launch.
 
-## Phase 3 — Authentication and access control (started; database migration not yet applied or tested)
-- [x] Draft initial profiles and staff-members schema migration with RLS policies.
-- [x] Document trusted first-owner bootstrap procedure.
-- [ ] Apply migration to the intended Supabase development project.
-- [ ] Verify Auth profile provisioning and role/RLS allow-deny behavior.
-- [ ] Implement sign-in/up and password recovery.
-- [ ] Implement safe session handling and protected server routes.
+## Phase 3 — Authentication and access control (implementation in progress; runtime checks pending)
+- [x] Draft and apply the profiles/staff-members migration in the intended Supabase project (user confirmed success).
+- [x] Confirm both tables have RLS enabled and policies are present.
+- [x] Document the trusted first-owner bootstrap procedure.
+- [x] Implement localized sign-in, registration, password recovery, and password update screens.
+- [x] Add the Supabase Auth callback handler for confirmation/recovery links.
+- [x] Add a server-protected account dashboard and sign-out control.
+- [ ] Verify profile trigger behavior and role/RLS allow-deny behavior with real test accounts.
+- [ ] Run typecheck, lint, and production build locally; fix any issues.
 - [ ] Add automated role-based access tests and record actual results.
 
 ## Phase 4 — Administration
