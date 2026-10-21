@@ -137,7 +137,7 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: AuthMode }) {
       </form>
 
       <div className="mt-6 flex flex-wrap items-center justify-between gap-3 text-sm text-stone-600">
-        <p>{labels.switchText} <Link className="font-semibold text-amber-800 underline-offset-4 hover:underline" href={`/${locale}/login`}>{labels.switchLabel}</Link></p>
+        <p>{labels.switchText} <Link className="font-semibold text-amber-800 underline-offset-4 hover:underline" href={`/${locale}/${mode === "login" ? "register" : "login"}`}>{labels.switchLabel}</Link></p>
         {mode === "login" && <Link className="font-medium text-amber-800 underline-offset-4 hover:underline" href={`/${locale}/forgot-password`}>{t.login.forgot}</Link>}
       </div>
       {mode === "login" && <p className="mt-5 text-xs leading-5 text-stone-500">{locale === "ar" ? "إنشاء الحساب لا يمنح صلاحيات موظف أو مدير؛ تتم إدارة صلاحيات المكتب بشكل منفصل وآمن." : "Creating an account does not grant staff or administrator access. Office roles are assigned separately and securely."}</p>}
