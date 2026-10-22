@@ -3,6 +3,30 @@
 
 begin;
 
+alter table public.profiles add column email text;
+update public.profiles p set email = u.email from auth.users u where u.id = p.id;
+create index profiles_email_idx on public.profiles(lower(email));
+
+create or replace function public.sync_auth_user_profile()
+returns trigger
+language plpgsql
+security definer
+set search_path = ''
+as $
+begin
+  update public.profiles
+  set email = new.email,
+      full_name = left(coalesce(new.raw_user_meta_data ->> 'full_name', full_name), 120),
+      locale = case when new.raw_user_meta_data ->> 'locale' = 'en' then 'en' else locale end
+  where id = new.id;
+  return new;
+end;
+$;
+revoke all on function public.sync_auth_user_profile() from public, anon, authenticated;
+create trigger on_auth_user_updated
+after update of email, raw_user_meta_data on auth.users
+for each row execute function public.sync_auth_user_profile();
+
 create table public.office_services (
   id uuid primary key default gen_random_uuid(),
   slug text not null unique check (slug ~ '^[a-z0-9]+(-[a-z0-9]+)*$' and char_length(slug) <= 80),
@@ -71,7 +95,8 @@ begin
 
   insert into public.audit_logs(actor_id, action, entity_table, entity_id, old_data, new_data)
   values (auth.uid(), tg_op, tg_table_name, row_id, before_row, after_row);
-  return coalesce(new, old);
+  if tg_op = 'DELETE' then return old; end if;
+  return new;
 end;
 $$;
 revoke all on function public.write_admin_audit_log() from public, anon, authenticated;
