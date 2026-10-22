@@ -50,7 +50,7 @@ end
 $$;
 
 -- A lawyer who is not assigned to a case cannot see its confidential workspace.
-do $
+do $phase8$
 begin
   if (select count(*) from public.cases
       where id='60000000-0000-4000-8000-000000000010') <> 0 then
@@ -67,7 +67,7 @@ begin
     raise exception 'Unrelated lawyer could read another conversation messages';
   end if;
 end
-$;
+$phase8$;
 reset role;
 
 -- Anonymous callers must not be able to query private appointments or conversations.
