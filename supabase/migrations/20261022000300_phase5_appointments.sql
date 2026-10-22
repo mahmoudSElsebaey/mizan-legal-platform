@@ -168,13 +168,13 @@ for each row execute function public.guard_appointment_booking();
 create or replace function public.get_active_lawyer_directory()
 returns table (profile_id uuid, full_name text)
 language sql stable security definer set search_path = ''
-as $
+as $directory$
   select p.id, p.full_name
   from public.profiles p
   join public.staff_members sm on sm.profile_id = p.id
   where sm.role = 'lawyer' and sm.status = 'active'
   order by p.full_name;
-$;
+$directory$;
 revoke all on function public.get_active_lawyer_directory() from public, anon;
 grant execute on function public.get_active_lawyer_directory() to authenticated;
 
