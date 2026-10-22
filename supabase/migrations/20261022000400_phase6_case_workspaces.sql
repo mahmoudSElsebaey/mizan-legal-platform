@@ -121,8 +121,8 @@ with check (
 
 create policy "cases_update_assigned_staff"
 on public.cases for update to authenticated
-using (select public.can_manage_case(id))
-with check (select public.can_manage_case(id));
+using ((select public.can_manage_case(id)))
+with check ((select public.can_manage_case(id)));
 
 create policy "case_events_read_visible_to_participant"
 on public.case_events for select to authenticated
