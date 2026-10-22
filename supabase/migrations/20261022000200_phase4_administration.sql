@@ -12,7 +12,7 @@ returns trigger
 language plpgsql
 security definer
 set search_path = ''
-as $
+as $$
 begin
   insert into public.profiles (id, email, full_name, locale)
   values (
@@ -24,7 +24,7 @@ begin
   on conflict (id) do nothing;
   return new;
 end;
-$;
+$$;
 revoke all on function public.handle_new_auth_user() from public, anon, authenticated;
 
 create or replace function public.sync_auth_user_profile()
@@ -32,7 +32,7 @@ returns trigger
 language plpgsql
 security definer
 set search_path = ''
-as $
+as $$
 begin
   update public.profiles
   set email = new.email,
@@ -41,7 +41,7 @@ begin
   where id = new.id;
   return new;
 end;
-$;
+$$;
 revoke all on function public.sync_auth_user_profile() from public, anon, authenticated;
 create trigger on_auth_user_updated
 after update of email, raw_user_meta_data on auth.users
