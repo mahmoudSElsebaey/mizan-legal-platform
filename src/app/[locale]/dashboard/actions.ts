@@ -12,6 +12,12 @@ const staffInput = z.object({
   role: z.enum(["owner", "admin", "lawyer", "assistant"]),
   status: z.enum(["pending", "active", "suspended"]),
 });
+const profileInput = z.object({
+  locale: z.string().refine(isLocale),
+  profileId: z.string().uuid(),
+  fullName: z.string().trim().min(1).max(120),
+  profileLocale: z.enum(["ar", "en"]),
+});
 const serviceInput = z.object({
   locale: z.string().refine(isLocale),
   id: z.string().uuid().optional(),
@@ -63,6 +69,17 @@ export async function saveStaffMember(formData: FormData) {
     : await supabase.from("staff_members").insert({ profile_id: profileId, ...values });
   if (result.error) go(locale, "staff", "save-failed");
   go(locale, "staff", "saved");
+}
+
+export async function saveClientProfile(formData: FormData) {
+  const parsed = profileInput.safeParse(Object.fromEntries(formData));
+  if (!parsed.success) throw new Error("Invalid profile input.");
+  const { locale, profileId, fullName, profileLocale } = parsed.data;
+  const { supabase, user } = await requireAdministrator(locale);
+  if (profileId === user.id) go(locale, "staff", "self-protected");
+  const { error } = await supabase.from("profiles").update({ full_name: fullName, locale: profileLocale }).eq("id", profileId);
+  if (error) go(locale, "staff", "profile-save-failed");
+  go(locale, "staff", "profile-saved");
 }
 
 export async function saveOfficeService(formData: FormData) {
