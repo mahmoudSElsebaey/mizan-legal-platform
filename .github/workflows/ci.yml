@@ -72,3 +72,7 @@ jobs:
         run: psql "postgresql://postgres:postgres@localhost:5432/mizan_test" -v ON_ERROR_STOP=1 -f supabase/migrations/20261022000400_phase6_case_workspaces.sql
       - name: Verify case privacy and document access rules
         run: psql "postgresql://postgres:postgres@localhost:5432/mizan_test" -v ON_ERROR_STOP=1 -f scripts/ci-phase6-smoke-test.sql
+      - name: Apply conversations and notifications migration
+        run: psql "postgresql://postgres:postgres@localhost:5432/mizan_test" -v ON_ERROR_STOP=1 -f supabase/migrations/20261022000500_phase7_conversations_notifications.sql
+      - name: Verify conversation privacy and notification delivery
+        run: psql "postgresql://postgres:postgres@localhost:5432/mizan_test" -v ON_ERROR_STOP=1 -f scripts/ci-phase7-smoke-test.sql
