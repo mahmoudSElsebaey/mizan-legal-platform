@@ -31,6 +31,11 @@ values
  ('60000000-0000-4000-8000-000000000010','60000000-0000-4000-8000-000000000001','internal.pdf','60000000-0000-4000-8000-000000000010/internal.pdf','application/pdf',100,false);
 reset role;
 
+-- Simulate the uploaded Storage objects; metadata and object policies must agree.
+insert into storage.objects(bucket_id,name) values
+ ('case-files','60000000-0000-4000-8000-000000000010/client.pdf'),
+ ('case-files','60000000-0000-4000-8000-000000000010/internal.pdf');
+
 -- The case client can see their case, client-visible events and documents only.
 select set_config('request.jwt.claim.sub','60000000-0000-4000-8000-000000000002',false);
 set role authenticated;
@@ -45,6 +50,16 @@ begin
  if (select count(*) from public.case_documents where case_id='60000000-0000-4000-8000-000000000010') <> 1 then
    raise exception 'Client could read internal documents or could not read visible documents';
  end if;
+ if (select count(*) from storage.objects where bucket_id='case-files' and name like '60000000-0000-4000-8000-000000000010/%') <> 1 then
+   raise exception 'Client could read internal Storage objects or could not read visible objects';
+ end if;
+ begin
+   insert into public.case_events(case_id,author_id,title,body,is_client_visible)
+   values ('60000000-0000-4000-8000-000000000010','60000000-0000-4000-8000-000000000002','Forbidden client note','Should not be accepted',false);
+   raise exception 'Client unexpectedly created a case event';
+ exception when insufficient_privilege then
+   null;
+ end;
 end
 $$;
 reset role;
@@ -63,6 +78,9 @@ begin
  if (select count(*) from public.case_documents where case_id='60000000-0000-4000-8000-000000000010') <> 0 then
    raise exception 'Unrelated client could read case documents';
  end if;
+ if (select count(*) from storage.objects where bucket_id='case-files' and name like '60000000-0000-4000-8000-000000000010/%') <> 0 then
+   raise exception 'Unrelated client could read case Storage objects';
+ end if;
 end
 $$;
 reset role;
@@ -77,6 +95,9 @@ begin
  end if;
  if (select count(*) from public.case_documents where case_id='60000000-0000-4000-8000-000000000010') <> 2 then
    raise exception 'Assigned lawyer could not read all case documents';
+ end if;
+ if (select count(*) from storage.objects where bucket_id='case-files' and name like '60000000-0000-4000-8000-000000000010/%') <> 2 then
+   raise exception 'Assigned lawyer could not read all case Storage objects';
  end if;
 end
 $$;
