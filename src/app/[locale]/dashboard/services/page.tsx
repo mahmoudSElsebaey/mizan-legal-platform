@@ -1,0 +1,43 @@
+import Link from "next/link";
+import { notFound, redirect } from "next/navigation";
+import { isLocale } from "@/lib/i18n/config";
+import { createClient } from "@/lib/supabase/server";
+import { deleteOfficeService, saveOfficeService, toggleOfficeService } from "../actions";
+
+export default async function ServicesAdminPage({ params, searchParams }: { params: Promise<{ locale: string }>; searchParams: Promise<{ result?: string }> }) {
+  const { locale } = await params; const { result } = await searchParams;
+  if (!isLocale(locale)) notFound();
+  const ar = locale === "ar"; const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect(`/${locale}/login`);
+  const { data: actor } = await supabase.from("staff_members").select("role,status").eq("profile_id", user.id).maybeSingle();
+  if (!actor || actor.status !== "active" || !["owner","admin"].includes(actor.role)) redirect(`/${locale}/dashboard`);
+  const { data: services, error } = await supabase.from("office_services").select("*").order("sort_order").limit(200);
+  const msg = result === "saved" ? (ar ? "تم حفظ الخدمة." : "Service saved.") : result === "deleted" ? (ar ? "تم حذف الخدمة." : "Service deleted.") : result ? (ar ? "تعذر تنفيذ العملية. راجع البيانات وصلاحيات قاعدة البيانات." : "Action failed. Check the data and database permissions.") : "";
+  return <main className="min-h-screen bg-[#f7f4ed] px-4 py-10 sm:py-14" dir={ar?"rtl":"ltr"}><div className="mx-auto max-w-6xl">
+    <Link href={`/${locale}/dashboard`} className="text-sm font-bold text-[#176b67] hover:underline">{ar?"← لوحة التحكم":"← Dashboard"}</Link>
+    <p className="mt-5 text-xs font-black tracking-[.18em] text-[#176b67]">MIZAN LEGAL / CONTENT</p><h1 className="mt-2 text-3xl font-black text-[#14263d] sm:text-4xl">{ar?"إدارة الخدمات القانونية":"Practice area management"}</h1>
+    <p className="mt-3 max-w-2xl leading-7 text-[#657184]">{ar?"أضف مجالات الممارسة باللغتين، ثم انشرها أو أخفها من الموقع العام.":"Manage bilingual practice-area content and control whether each item is publicly visible."}</p>
+    {msg && <p role="status" className="mt-5 rounded-xl border border-[#176b67]/20 bg-white p-4 text-sm font-semibold text-[#176b67]">{msg}</p>}
+    {error && <p role="alert" className="mt-5 rounded-xl bg-red-50 p-4 text-sm text-red-800">{ar?"تعذر تحميل الخدمات. طبّق ترحيل المرحلة الرابعة أولًا.":"Could not load services. Apply the Phase 4 migration first."}</p>}
+    <section className="mt-8 rounded-2xl border border-[#14263d]/10 bg-white p-5 sm:p-7"><h2 className="text-xl font-extrabold text-[#14263d]">{ar?"إضافة خدمة":"Add a service"}</h2>
+      <form action={saveOfficeService} className="mt-5 grid gap-4 sm:grid-cols-2"><input type="hidden" name="locale" value={locale}/>
+        <label className="text-sm font-semibold">{ar?"الرابط المختصر (بالإنجليزية)":"URL slug"}<input name="slug" required minLength={2} maxLength={80} pattern="[a-z0-9]+(-[a-z0-9]+)*" placeholder="civil-law" className="mt-2 w-full rounded-xl border border-[#14263d]/15 px-3 py-3" /></label>
+        <label className="text-sm font-semibold">{ar?"ترتيب العرض":"Display order"}<input name="sortOrder" type="number" min="0" max="10000" defaultValue="0" required className="mt-2 w-full rounded-xl border border-[#14263d]/15 px-3 py-3" /></label>
+        <label className="text-sm font-semibold">{ar?"العنوان بالعربية":"Arabic title"}<input name="titleAr" required minLength={2} maxLength={160} className="mt-2 w-full rounded-xl border border-[#14263d]/15 px-3 py-3" /></label>
+        <label className="text-sm font-semibold">{ar?"العنوان بالإنجليزية":"English title"}<input name="titleEn" required minLength={2} maxLength={160} className="mt-2 w-full rounded-xl border border-[#14263d]/15 px-3 py-3" /></label>
+        <label className="text-sm font-semibold">{ar?"الوصف بالعربية":"Arabic description"}<textarea name="descriptionAr" maxLength={2000} rows={3} className="mt-2 w-full rounded-xl border border-[#14263d]/15 px-3 py-3" /></label>
+        <label className="text-sm font-semibold">{ar?"الوصف بالإنجليزية":"English description"}<textarea name="descriptionEn" maxLength={2000} rows={3} className="mt-2 w-full rounded-xl border border-[#14263d]/15 px-3 py-3" /></label>
+        <div className="sm:col-span-2"><button className="rounded-xl bg-[#14263d] px-5 py-3 text-sm font-bold text-white hover:bg-[#176b67]" type="submit">{ar?"حفظ كمسودة":"Save as draft"}</button></div>
+      </form>
+    </section>
+    <section className="mt-8 space-y-4"><h2 className="text-xl font-extrabold text-[#14263d]">{ar?"الخدمات الحالية":"Existing services"} ({services?.length??0})</h2>
+      {(services??[]).map((service)=> <article key={service.id} className="rounded-2xl border border-[#14263d]/10 bg-white p-5 sm:p-6">
+        <div className="flex flex-wrap items-start justify-between gap-4"><div><p className="text-xs font-bold text-[#657184]">{service.slug} · #{service.sort_order}</p><h3 className="mt-2 text-lg font-extrabold text-[#14263d]">{service.title_ar} / {service.title_en}</h3><p className="mt-2 text-sm leading-6 text-[#657184]">{service.description_ar || service.description_en || (ar?"لا يوجد وصف":"No description")}</p></div><span className={service.is_published?"rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-800":"rounded-full bg-amber-50 px-3 py-1 text-xs font-bold text-amber-800"}>{service.is_published?(ar?"منشور":"Published"):(ar?"مسودة":"Draft")}</span></div>
+        <div className="mt-5 flex flex-wrap gap-3"><form action={toggleOfficeService}><input type="hidden" name="locale" value={locale}/><input type="hidden" name="id" value={service.id}/><input type="hidden" name="published" value={String(service.is_published)}/><button className="rounded-xl border border-[#14263d]/15 px-4 py-2.5 text-sm font-bold text-[#14263d] hover:border-[#176b67]" type="submit">{service.is_published?(ar?"إلغاء النشر":"Unpublish"):(ar?"نشر الخدمة":"Publish")}</button></form>
+        <form action={deleteOfficeService}><input type="hidden" name="locale" value={locale}/><input type="hidden" name="id" value={service.id}/><button className="rounded-xl border border-red-200 px-4 py-2.5 text-sm font-bold text-red-700 hover:bg-red-50" type="submit">{ar?"حذف":"Delete"}</button></form></div>
+      </article>)}
+      {(!services || services.length===0) && !error && <p className="rounded-2xl border border-dashed border-[#14263d]/20 p-8 text-center text-sm text-[#657184]">{ar?"لا توجد خدمات بعد. أضف أول خدمة من النموذج أعلاه.":"No services yet. Add your first practice area above."}</p>}
+    </section>
+  </div></main>;
+}
