@@ -241,4 +241,20 @@ grant update (status) on public.conversations to authenticated;
 grant insert (conversation_id,sender_id,body) on public.conversation_messages to authenticated;
 grant update (read_at) on public.notifications to authenticated;
 
+-- Expose only the minimal contact directory needed to start a conversation.
+-- Client accounts do not receive blanket SELECT access to profile emails.
+create or replace function public.list_contactable_staff()
+returns table(profile_id uuid, full_name text, role public.staff_role)
+language sql stable security definer set search_path = ''
+as $
+  select p.id, p.full_name, sm.role
+  from public.profiles p
+  join public.staff_members sm on sm.profile_id = p.id
+  where sm.status = 'active' and sm.role in ('lawyer','assistant')
+  order by p.full_name asc
+  limit 100;
+$;
+revoke all on function public.list_contactable_staff() from public, anon;
+grant execute on function public.list_contactable_staff() to authenticated;
+
 commit;
