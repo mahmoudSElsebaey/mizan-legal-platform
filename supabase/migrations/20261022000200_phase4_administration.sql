@@ -41,6 +41,14 @@ create table public.office_services (
   updated_at timestamptz not null default now()
 );
 
+insert into public.office_services (slug, title_ar, title_en, description_ar, description_en, is_published, sort_order)
+values
+  ('civil', 'القضايا المدنية', 'Civil matters', 'مساعدة قانونية في النزاعات المدنية والمطالبات وحماية الحقوق.', 'Guidance on civil disputes, claims, and protecting your rights.', true, 10),
+  ('business', 'قانون الشركات والأعمال', 'Business law', 'دعم قانوني يساعد أصحاب الأعمال على اتخاذ قرارات أكثر وضوحًا.', 'Practical legal support to help businesses make clearer decisions.', true, 20),
+  ('family', 'الأحوال الشخصية', 'Family matters', 'توجيه قانوني يحترم خصوصية المسائل الأسرية وحساسيتها.', 'Respectful guidance for sensitive personal and family matters.', true, 30),
+  ('contracts', 'صياغة ومراجعة العقود', 'Contracts', 'صياغة ومراجعة تساعد على فهم الالتزامات وتحديد المخاطر.', 'Drafting and review to clarify obligations and identify potential risks.', true, 40)
+on conflict (slug) do nothing;
+
 create table public.office_settings (
   key text primary key check (key ~ '^[a-z][a-z0-9_.-]{1,79}$'),
   value jsonb not null default '{}'::jsonb,
