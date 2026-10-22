@@ -39,7 +39,7 @@ async function requireUser(locale: string) {
   const { data: staff } = await supabase.from("staff_members").select("role,status").eq("profile_id", user.id).maybeSingle();
   return { supabase, user, staff };
 }
-function finish(locale: "ar" | "en", result: string) {
+function finish(locale: "ar" | "en", result: string): never {
   revalidatePath("/" + locale + "/dashboard");
   revalidatePath("/" + locale + "/dashboard/appointments");
   redirect("/" + locale + "/dashboard/appointments?result=" + result);

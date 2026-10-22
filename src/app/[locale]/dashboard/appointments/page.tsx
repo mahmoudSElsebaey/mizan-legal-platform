@@ -53,8 +53,8 @@ export default async function AppointmentsPage({params,searchParams}:{params:Pro
     supabase.rpc("get_active_lawyer_directory"),
     supabase.from("office_services").select("id,title_ar,title_en").eq("is_published",true).order("sort_order"),
   ]);
-  const lawyerNames = new Map((lawyers||[]).map((item)=>[item.profile_id,item.full_name]));
-  const serviceNames = new Map((services||[]).map((item)=>[item.id,ar?item.title_ar:item.title_en]));
+  const lawyerNames = new Map<string,string>((lawyers||[]).map((item: {profile_id:string;full_name:string})=>[item.profile_id,item.full_name] as [string,string]));
+  const serviceNames = new Map<string,string>((services||[]).map((item: {id:string;title_ar:string;title_en:string})=>[item.id,ar?item.title_ar:item.title_en] as [string,string]));
   const message = result && messages[result] ? messages[result][locale] : "";
   const field = "mt-2 w-full rounded-xl border border-[#14263d]/15 bg-white px-3 py-3 text-sm";
   const todayParts = new Intl.DateTimeFormat("en-CA",{timeZone:"Africa/Cairo",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date());

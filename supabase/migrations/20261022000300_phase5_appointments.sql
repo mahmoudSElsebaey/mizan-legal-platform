@@ -49,6 +49,17 @@ create table public.appointments (
   constraint appointment_valid_time check (ends_at > starts_at and ends_at - starts_at <= interval '2 hours')
 );
 
+-- The exclusion constraint is the final concurrency-safe guard; the trigger below
+-- adds schedule validation and a friendlier overlap message.
+create extension if not exists btree_gist;
+alter table public.appointments
+  add constraint appointments_no_overlapping_active
+  exclude using gist (
+    lawyer_id with =,
+    tstzrange(starts_at, ends_at, '[)') with &&
+  )
+  where (status in ('requested','approved','confirmed'));
+
 create index appointments_client_start_idx on public.appointments(client_id, starts_at desc);
 create index appointments_lawyer_start_idx on public.appointments(lawyer_id, starts_at);
 create index appointments_status_start_idx on public.appointments(status, starts_at);
