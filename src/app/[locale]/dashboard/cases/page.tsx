@@ -44,14 +44,15 @@ export default async function CasesPage({params,searchParams}:{params:Promise<{l
   const admin=active&&["owner","admin"].includes(staff?.role||"");
   const staffCanWork=active&&["owner","admin","lawyer","assistant"].includes(staff?.role||"");
   const caseIds=(cases||[]).map(c=>c.id);
-  const [{data:events},{data:documents},{data:profiles},{data:assignments}] = await Promise.all([
+  const [{data:events},{data:documents},{data:profiles},{data:assignments},{data:staffMemberships}] = await Promise.all([
     caseIds.length ? supabase.from("case_events").select("id,case_id,author_id,title,body,is_client_visible,created_at").in("case_id",caseIds).order("created_at",{ascending:false}).limit(300) : Promise.resolve({data:[]}),
     caseIds.length ? supabase.from("case_documents").select("id,case_id,original_name,mime_type,size_bytes,is_client_visible,created_at").in("case_id",caseIds).order("created_at",{ascending:false}).limit(200) : Promise.resolve({data:[]}),
     admin ? supabase.from("profiles").select("id,full_name,email").order("created_at",{ascending:false}).limit(200) : Promise.resolve({data:[]}),
-    admin ? supabase.from("staff_members").select("profile_id,role,status").eq("status","active").in("role",["lawyer","assistant"]) : Promise.resolve({data:[]})
+    admin ? supabase.from("staff_members").select("profile_id,role,status").eq("status","active").in("role",["lawyer","assistant"]) : Promise.resolve({data:[]}),
+    admin ? supabase.from("staff_members").select("profile_id") : Promise.resolve({data:[]})
   ]);
   const profileById=new Map((profiles||[]).map(p=>[p.id,p]));
-  const staffById=new Map((assignments||[]).map(p=>[p.profile_id,p]));
+  const staffById=new Map((staffMemberships||[]).map(p=>[p.profile_id,true]));
   const t=(ar?{
     heading:"ملفات القضايا",intro:"مساحة عمل خاصة لملفات القضايا، التحديثات، والمستندات المصرح بها.",
     back:"لوحة التحكم",empty:"لا توجد قضايا متاحة لهذا الحساب حتى الآن.",error:"تعذر تحميل القضايا. تأكد من تطبيق ترحيل المرحلة السادسة.",
