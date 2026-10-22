@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { isLocale } from "@/lib/i18n/config";
 import { createClient } from "@/lib/supabase/server";
-import { saveStaffMember } from "../actions";
+import { saveClientProfile, saveStaffMember } from "../actions";
 
 type SearchParams = Promise<{ result?: string }>;
 export default async function StaffManagementPage({ params, searchParams }: { params: Promise<{ locale: string }>; searchParams: SearchParams }) {
@@ -30,7 +30,9 @@ export default async function StaffManagementPage({ params, searchParams }: { pa
     saved: { ar: "تم حفظ التغييرات.", en: "Changes saved." },
     "save-failed": { ar: "تعذر الحفظ. راجع الصلاحيات أو تأكد من تطبيق ترحيل المرحلة الرابعة.", en: "Save failed. Check permissions and confirm the Phase 4 migration was applied." },
     forbidden: { ar: "المدير لا يمكنه تعيين مالك أو مدير آخر.", en: "Administrators cannot assign an owner or another administrator." },
-    "self-protected": { ar: "لا يمكن تغيير تعيين صلاحيات حسابك من هذه الصفحة.", en: "Your own staff assignment cannot be changed here." }
+    "self-protected": { ar: "لا يمكن تغيير بيانات حسابك أو تعيين صلاحياته من هذه الصفحة.", en: "Your own profile and staff assignment cannot be changed here." },
+    "profile-saved": { ar: "تم تحديث بيانات الحساب.", en: "Account profile updated." },
+    "profile-save-failed": { ar: "تعذر تحديث بيانات الحساب.", en: "Could not update account profile." }
   };
   return <main className="min-h-screen bg-[#f7f4ed] px-4 py-10 sm:py-14" dir={ar ? "rtl" : "ltr"}>
     <div className="mx-auto max-w-6xl">
@@ -51,13 +53,15 @@ export default async function StaffManagementPage({ params, searchParams }: { pa
           {people.map((person) => {
             const assignment = assignmentById.get(person.id);
             const self = person.id === user.id;
-            return <form key={person.id} action={saveStaffMember} className="grid gap-4 p-5 md:grid-cols-[minmax(0,1fr)_150px_150px_auto] md:items-center sm:px-6">
+            return <div key={person.id} className="border-b border-[#14263d]/10 last:border-b-0"><form action={saveStaffMember} className="grid gap-4 p-5 md:grid-cols-[minmax(0,1fr)_150px_150px_auto] md:items-center sm:px-6">
               <input type="hidden" name="locale" value={locale}/><input type="hidden" name="profileId" value={person.id}/>
               <div className="min-w-0"><p className="truncate font-bold text-[#14263d]">{person.full_name || (ar ? "بدون اسم" : "Unnamed account")}{self && <span className="ms-2 text-xs text-[#176b67]">({ar ? "أنت" : "You"})</span>}</p><p className="mt-1 break-all text-sm text-[#657184]">{person.email || person.id}</p><p className="mt-1 text-xs text-[#657184]">{ar ? "أُنشئ: " : "Created: "}{new Date(person.created_at).toLocaleDateString(locale === "ar" ? "ar-EG" : "en-GB")}</p></div>
               <label className="block text-xs font-bold text-[#657184]">{ar ? "الدور" : "Role"}<select name="role" defaultValue={assignment?.role ?? (actor.role === "owner" ? "lawyer" : "assistant")} disabled={self} className="mt-2 w-full rounded-xl border border-[#14263d]/15 bg-white px-3 py-2.5 text-sm text-[#14263d] disabled:bg-stone-100">{roles.map((role) => <option key={role.value} value={role.value}>{role[locale]}</option>)}</select></label>
               <label className="block text-xs font-bold text-[#657184]">{ar ? "الحالة" : "Status"}<select name="status" defaultValue={assignment?.status ?? "pending"} disabled={self} className="mt-2 w-full rounded-xl border border-[#14263d]/15 bg-white px-3 py-2.5 text-sm text-[#14263d] disabled:bg-stone-100">{statuses.map((status) => <option key={status.value} value={status.value}>{status[locale]}</option>)}</select></label>
-              <button type="submit" disabled={self} className="rounded-xl bg-[#14263d] px-4 py-3 text-sm font-bold text-white transition hover:bg-[#176b67] disabled:cursor-not-allowed disabled:opacity-40">{ar ? "حفظ" : "Save"}</button>
-            </form>;
+              <button type="submit" disabled={self} className="rounded-xl bg-[#14263d] px-4 py-3 text-sm font-bold text-white transition hover:bg-[#176b67] disabled:cursor-not-allowed disabled:opacity-40">{ar ? "حفظ الدور" : "Save role"}</button>
+            </form>
+            <form action={saveClientProfile} className="grid gap-3 px-5 pb-5 sm:grid-cols-[minmax(0,1fr)_150px_auto] sm:items-end sm:px-6"><input type="hidden" name="locale" value={locale}/><input type="hidden" name="profileId" value={person.id}/><label className="text-xs font-bold text-[#657184]">{ar?"اسم الحساب":"Account name"}<input name="fullName" required minLength={1} maxLength={120} defaultValue={person.full_name??""} disabled={self} className="mt-2 w-full rounded-xl border border-[#14263d]/15 px-3 py-2.5 text-sm font-normal disabled:bg-stone-100"/></label><label className="text-xs font-bold text-[#657184]">{ar?"لغة الحساب":"Account language"}<select name="profileLocale" defaultValue={person.locale} disabled={self} className="mt-2 w-full rounded-xl border border-[#14263d]/15 bg-white px-3 py-2.5 text-sm disabled:bg-stone-100"><option value="ar">العربية</option><option value="en">English</option></select></label><button type="submit" disabled={self} className="rounded-xl border border-[#14263d]/20 px-4 py-2.5 text-sm font-bold text-[#14263d] hover:border-[#176b67] disabled:opacity-40">{ar?"تحديث الملف":"Update profile"}</button></form>
+            </div>;
           })}
         </div>}
       </section>
