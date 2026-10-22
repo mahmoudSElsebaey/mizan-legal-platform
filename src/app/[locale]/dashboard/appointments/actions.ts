@@ -116,8 +116,11 @@ export async function requestAppointment(formData: FormData) {
   if (appointmentDate < today) finish(locale,"date-past");
   const startsAt = cairoLocalToIso(appointmentDate,appointmentTime);
   const endsAt = new Date(new Date(startsAt).getTime()+30*60*1000).toISOString();
-  const {data:lawyer,error:lawyerError} = await supabase.from("staff_members").select("profile_id").eq("profile_id",lawyerId).eq("role","lawyer").eq("status","active").maybeSingle();
-  if (lawyerError || !lawyer) finish(locale,"lawyer-unavailable");
+  // Validate against the same security-definer directory used by the booking form.
+  // Client RLS intentionally may not allow direct reads of staff_members.
+  const {data:lawyers,error:lawyerError} = await supabase.rpc("get_active_lawyer_directory");
+  const lawyerIsAvailable = (lawyers||[]).some((item: {profile_id:string})=>item.profile_id===lawyerId);
+  if (lawyerError || !lawyerIsAvailable) finish(locale,"lawyer-unavailable");
   const payload: Record<string,string> = {client_id:user.id,lawyer_id:lawyerId,starts_at:startsAt,ends_at:endsAt,status:"requested",client_message:clientMessage};
   if (serviceId) payload.service_id = serviceId;
   const {error} = await supabase.from("appointments").insert(payload);
