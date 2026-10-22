@@ -79,16 +79,16 @@ Each phase ends with a report of changed files, decisions, tests actually run, k
 - [ ] Verify the Phase 6 migration is applied to the connected Supabase project.
 - [ ] Complete the live runtime acceptance checklist in docs/PHASE-6-CASE-WORKSPACES.md.
 
-## Phase 7 — Conversations and notifications (implementation committed; CI and live Supabase acceptance pending)
+## Phase 7 — Conversations and notifications (accepted; CI and user-reported live checks passed)
 - [x] Add client-started conversations with active lawyer/assistant participants and optional case association at the database layer.
 - [x] Add participant-scoped conversation/message RLS, suspended-staff access denial, immutable messages, and database rate limiting.
 - [x] Add in-app notifications for new messages and conversation status changes; users can mark their own notifications as read.
 - [x] Add bilingual conversation list/thread UI and dashboard links.
 - [x] Add CI migration and smoke tests for participant isolation, notification delivery, sender identity, and suspended staff.
-- [ ] Pass GitHub CI after Phase 7 changes.
-- [ ] Apply the Phase 7 migration to the connected development/staging Supabase project.
-- [ ] Complete the live runtime acceptance checklist in docs/PHASE-7-CONVERSATIONS-NOTIFICATIONS.md.
-- [ ] Realtime delivery is intentionally deferred until database authorization and runtime checks are proven.
+- [x] Pass GitHub CI after Phase 7 changes (run 39829457800, commit 54fe723).
+- [x] Apply the Phase 7 and security-hardening migrations to the connected Supabase project through the controlled workflow.
+- [x] Complete the live runtime acceptance checklist; user confirmed all five grouped checks passed on 2026-10-22.
+- [ ] Realtime delivery remains deferred; new messages appear through normal refresh/navigation.
 
 ## Phase 8 — Verification and hardening
 - Unit/integration/end-to-end tests for critical flows.
