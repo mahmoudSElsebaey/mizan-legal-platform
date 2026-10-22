@@ -62,6 +62,8 @@ jobs:
         run: psql "postgresql://postgres:postgres@localhost:5432/mizan_test" -v ON_ERROR_STOP=1 -f supabase/migrations/20261022000100_phase3_identity_access.sql
       - name: Apply administration migration
         run: psql "postgresql://postgres:postgres@localhost:5432/mizan_test" -v ON_ERROR_STOP=1 -f supabase/migrations/20261022000200_phase4_administration.sql
+      - name: Apply appointments migration
+        run: psql "postgresql://postgres:postgres@localhost:5432/mizan_test" -v ON_ERROR_STOP=1 -f supabase/migrations/20261022000300_phase5_appointments.sql
       - name: Verify profile provisioning, role restrictions, and audit trail
         run: psql "postgresql://postgres:postgres@localhost:5432/mizan_test" -v ON_ERROR_STOP=1 -f scripts/ci-smoke-test.sql
       - name: Verify appointment overlap and availability guards
