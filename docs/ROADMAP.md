@@ -46,9 +46,20 @@ Each phase ends with a report of changed files, decisions, tests actually run, k
 - [ ] Run typecheck, lint, and production build locally; fix any issues.
 - [ ] Add automated role-based access tests and record actual results.
 
-## Phase 4 — Administration
-- Staff/client management, services/practice areas, content/settings.
-- Server-side validation and audit trail for privileged changes.
+## Phase 4 — Administration (implementation committed; validation pending)
+- [x] Add a guarded owner/admin workspace with role-aware navigation.
+- [x] Manage registered account names/languages and staff roles/statuses with server-side Zod validation.
+- [x] Enforce role assignment limits again through Supabase RLS; protect the acting administrator's own staff assignment.
+- [x] Create, edit, publish/unpublish, and delete bilingual practice-area records.
+- [x] Store office profile settings and display the public contact fields on the homepage.
+- [x] Add database-triggered audit entries for profile, staff assignment, practice-area, and office-setting changes.
+- [x] Add a CI workflow for typecheck, lint, and production build.
+- [ ] Apply the Phase 4 migration to the intended development Supabase project.
+- [ ] Run and pass CI; fix any type, lint, or build failures.
+- [ ] Exercise owner/admin/lawyer/assistant/client allow-deny paths using separate test accounts.
+- [ ] Verify service publishing, settings display, and audit log behavior against Supabase.
+
+**Exit gate:** do not mark Phase 4 complete until the migration is applied and runtime + CI checks pass.
 
 ## Phase 5 — Appointments
 - Availability rules and exceptions.
