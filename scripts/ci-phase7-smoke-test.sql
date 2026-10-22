@@ -31,13 +31,13 @@ begin
 end
 $$;
 reset role;
-do $
+do $notify$
 begin
  if (select count(*) from public.notifications where user_id='70000000-0000-4000-8000-000000000001' and conversation_id='70000000-0000-4000-8000-000000000010' and kind='new_message') <> 1 then
    raise exception 'Sending a message did not notify the intended staff participant';
  end if;
 end
-$;
+$notify$;
 
 -- The assigned active lawyer can reply; the client receives a notification.
 select set_config('request.jwt.claim.sub','70000000-0000-4000-8000-000000000001',false);
@@ -45,13 +45,13 @@ set role authenticated;
 insert into public.conversation_messages(id,conversation_id,sender_id,body)
 values ('70000000-0000-4000-8000-000000000021','70000000-0000-4000-8000-000000000010','70000000-0000-4000-8000-000000000001','Hello from the office');
 reset role;
-do $
+do $notify$
 begin
  if (select count(*) from public.notifications where user_id='70000000-0000-4000-8000-000000000002' and conversation_id='70000000-0000-4000-8000-000000000010' and kind='new_message') <> 1 then
    raise exception 'Sending a reply did not notify the client participant';
  end if;
 end
-$;
+$notify$;
 
 -- An unrelated client cannot see the thread, its messages, or its notifications.
 select set_config('request.jwt.claim.sub','70000000-0000-4000-8000-000000000003',false);
