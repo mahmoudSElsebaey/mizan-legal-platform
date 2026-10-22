@@ -7,19 +7,19 @@ import { isLocale } from "@/lib/i18n/config";
 import { createClient } from "@/lib/supabase/server";
 
 const staffInput = z.object({
-  locale: z.string().refine(isLocale),
+  locale: z.enum(["ar", "en"]),
   profileId: z.string().uuid(),
   role: z.enum(["owner", "admin", "lawyer", "assistant"]),
   status: z.enum(["pending", "active", "suspended"]),
 });
 const profileInput = z.object({
-  locale: z.string().refine(isLocale),
+  locale: z.enum(["ar", "en"]),
   profileId: z.string().uuid(),
   fullName: z.string().trim().min(1).max(120),
   profileLocale: z.enum(["ar", "en"]),
 });
 const serviceInput = z.object({
-  locale: z.string().refine(isLocale),
+  locale: z.enum(["ar", "en"]),
   id: z.string().uuid().optional(),
   slug: z.string().trim().min(2).max(80).regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
   titleAr: z.string().trim().min(2).max(160),
@@ -29,7 +29,7 @@ const serviceInput = z.object({
   sortOrder: z.coerce.number().int().min(0).max(10000),
 });
 const settingInput = z.object({
-  locale: z.string().refine(isLocale),
+  locale: z.enum(["ar", "en"]),
   nameAr: z.string().trim().min(2).max(160),
   nameEn: z.string().trim().min(2).max(160),
   email: z.union([z.literal(""), z.string().email().max(254)]),
