@@ -90,10 +90,15 @@ Each phase ends with a report of changed files, decisions, tests actually run, k
 - [x] Complete the live runtime acceptance checklist; user confirmed all five grouped checks passed on 2026-10-22.
 - [ ] Realtime delivery remains deferred; new messages appear through normal refresh/navigation.
 
-## Phase 8 — Verification and hardening
-- Unit/integration/end-to-end tests for critical flows.
-- RLS allow/deny matrix and booking concurrency checks.
-- Accessibility, performance, dependency, and production-configuration checks.
+## Phase 8 — Verification and hardening (automated regression matrix passing; live and audit checks pending)
+- [x] Extend CI with cross-feature RLS deny checks for unrelated clients/lawyers, anonymous access, appointment status transitions, and the appointment overlap exclusion constraint.
+- [x] Run the full migration chain and Phase 3–8 SQL regression scripts in CI.
+- [x] Pass typecheck, lint, and production build on commit b06c0ac.
+- [ ] Verify two genuinely concurrent booking requests against the connected Supabase project.
+- [ ] Complete keyboard, focus, accessible-name, contrast, and mobile checks on the critical flows.
+- [ ] Run and review a dependency vulnerability audit; resolve any high/critical findings.
+- [ ] Review production environment, auth redirects, private Storage policies, backups/retention, and performance with realistic data.
+- [ ] Publish the Phase 8 report with evidence and explicitly list anything not verified.
 
 ## Phase 9 — Deployment and handover
 - Configure hosting and environment secrets.
