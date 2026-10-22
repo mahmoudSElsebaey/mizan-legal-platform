@@ -161,4 +161,13 @@ create policy "profiles_select_admin_directory"
 on public.profiles for select to authenticated
 using ((select public.has_active_staff_role(array['owner','admin']::public.staff_role[])));
 
+create policy "profiles_update_admin_directory"
+on public.profiles for update to authenticated
+using ((select public.has_active_staff_role(array['owner','admin']::public.staff_role[])))
+with check ((select public.has_active_staff_role(array['owner','admin']::public.staff_role[])));
+
+create trigger audit_profiles
+after update on public.profiles
+for each row execute function public.write_admin_audit_log();
+
 commit;
