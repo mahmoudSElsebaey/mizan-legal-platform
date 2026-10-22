@@ -2,15 +2,26 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { isLocale, locales } from "@/lib/i18n/config";
 import { getPracticeArea, practiceAreas } from "@/lib/content/public-site";
+import { createClient } from "@/lib/supabase/server";
 export function generateStaticParams() {
   return locales.flatMap((locale) => Object.keys(practiceAreas).map((slug) => ({ locale, slug })));
 }
 export default async function PracticeAreaPage({ params }: { params: Promise<{ locale: string; slug: string }> }) {
   const { locale, slug } = await params;
   if (!isLocale(locale)) notFound();
-  const item = getPracticeArea(slug, locale);
-  if (!item) notFound();
   const ar = locale === "ar";
+  const staticItem = getPracticeArea(slug, locale);
+  type ManagedService = { slug: string; title_ar: string; title_en: string; description_ar: string; description_en: string; is_published: boolean };
+  let managedItem: ManagedService | null = null;
+  let databaseAvailable = false;
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase.from("office_services").select("slug,title_ar,title_en,description_ar,description_en,is_published").eq("slug", slug).maybeSingle();
+    if (!error) { managedItem = data as ManagedService | null; databaseAvailable = true; }
+  } catch { /* Keep the public static content available before Supabase is configured. */ }
+  if (databaseAvailable && (!managedItem || !managedItem.is_published)) notFound();
+  if (!databaseAvailable && !staticItem) notFound();
+  const item = managedItem ? { slug, title: ar ? managedItem.title_ar : managedItem.title_en, summary: ar ? managedItem.description_ar : managedItem.description_en, details: staticItem?.details ?? (ar ? ["التعرّف على الوقائع والمستندات ذات الصلة", "مناقشة الخيارات والخطوات التالية مع المكتب"] : ["Understand the relevant facts and documents", "Discuss options and next steps with the office"]) } : staticItem!;
   return <main className="min-h-screen">
     <header className="border-b border-[#14263d]/10"><div className="container flex min-h-[76px] items-center justify-between"><Link className="font-black tracking-wide text-[#14263d]" href={"/" + locale}>MIZAN <span className="text-[#176b67]">LEGAL</span></Link><nav className="flex items-center gap-4 text-sm font-semibold"><Link href={"/" + locale + "/services"}>{ar ? "كل الخدمات" : "All services"}</Link><Link href={locale === "ar" ? "/en/services/" + slug : "/ar/services/" + slug}>{ar ? "EN" : "عربي"}</Link></nav></div></header>
     <section className="bg-[#14263d] py-20 text-white sm:py-28"><div className="container"><p className="eyebrow !text-[#d8c39b]">{ar ? "مجال من مجالات الممارسة" : "PRACTICE AREA"}</p><h1 className="mt-5 max-w-3xl text-4xl font-black leading-tight sm:text-6xl">{item.title}</h1><p className="mt-6 max-w-2xl text-lg leading-8 text-white/70">{item.summary}</p></div></section>
