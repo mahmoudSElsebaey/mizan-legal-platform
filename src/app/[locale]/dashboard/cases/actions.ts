@@ -100,11 +100,18 @@ export async function uploadCaseDocument(formData:FormData) {
   const {supabase,user,staff}=await requireUser(locale);
   if(!activeStaff(staff,["owner","admin","lawyer","assistant"])) finish(locale,"forbidden");
   if(raw.size<1||raw.size>MAX_FILE_SIZE||!ALLOWED_TYPES.has(raw.type)) finish(locale,"file-invalid");
+  const bytes=Buffer.from(await raw.arrayBuffer());
+  const validSignature =
+    (raw.type==="application/pdf" && bytes.subarray(0,5).toString("ascii")==="%PDF-") ||
+    (raw.type==="image/jpeg" && bytes[0]===0xff && bytes[1]===0xd8 && bytes[2]===0xff) ||
+    (raw.type==="image/png" && bytes.subarray(0,8).equals(Buffer.from([0x89,0x50,0x4e,0x47,0x0d,0x0a,0x1a,0x0a]))) ||
+    (raw.type==="text/plain" && !bytes.includes(0));
+  if(!validSignature) finish(locale,"file-invalid");
   const {data:caseRow,error:caseError}=await supabase.from("cases").select("id").eq("id",caseId).maybeSingle();
   if(caseError||!caseRow) finish(locale,"upload-failed");
   const extension=EXTENSIONS[raw.type];
   const storagePath=caseId+"/"+randomUUID()+"."+extension;
-  const {error:storageError}=await supabase.storage.from("case-files").upload(storagePath,raw,{
+  const {error:storageError}=await supabase.storage.from("case-files").upload(storagePath,bytes,{
     contentType:raw.type,upsert:false,cacheControl:"0"
   });
   if(storageError) finish(locale,"upload-failed");
