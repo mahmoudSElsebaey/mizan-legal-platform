@@ -2,7 +2,7 @@
 
 Bilingual public website and legal-office platform foundation built with Next.js App Router, TypeScript, Tailwind CSS, and Supabase.
 
-> The bilingual public website, authentication foundation, office administration, appointment booking, and the Phase 6 case workspace implementation are in place. The case workspace still requires CI and live Supabase runtime acceptance before it can be considered complete. Conversations and notifications are planned for a later phase. Confirm all legal content with the office before production use.
+> The bilingual public website, authentication foundation, office administration, appointment booking, Phase 6 case workspaces, and Phase 7 conversations/notifications are implemented. Phases 6 and 7 still require CI and live Supabase runtime acceptance before they can be considered complete. Confirm all legal content with the office before production use.
 
 ## Requirements
 - Node.js 20.9 or newer
@@ -40,4 +40,4 @@ The app redirects / to Arabic (/ar). Use /en for English. Public pages include /
 - npm run typecheck — TypeScript checks
 - npm run seed:demo — create/update five demo users (requires server-only SUPABASE_SERVICE_ROLE_KEY and DEMO_SEED_PASSWORD; see docs/PHASE-3-SETUP.md)
 
-See docs/PHASE-0-ARCHITECTURE.md, docs/DATABASE-ERD.md, docs/SECURITY-PLAN.md, docs/ROADMAP.md, docs/PHASE-1-SETUP.md, docs/PHASE-3-SETUP.md, and docs/PHASE-4-SETUP.md.
+See docs/PHASE-0-ARCHITECTURE.md, docs/DATABASE-ERD.md, docs/SECURITY-PLAN.md, docs/ROADMAP.md, docs/PHASE-1-SETUP.md, docs/PHASE-3-SETUP.md, docs/PHASE-4-SETUP.md, docs/PHASE-5-APPOINTMENTS.md, docs/PHASE-6-CASE-WORKSPACES.md, and docs/PHASE-7-CONVERSATIONS-NOTIFICATIONS.md.
