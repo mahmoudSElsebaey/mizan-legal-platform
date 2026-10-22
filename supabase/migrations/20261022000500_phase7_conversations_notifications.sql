@@ -54,7 +54,7 @@ as $$
     where c.id = target_conversation_id
       and (
         c.client_id = (select auth.uid())
-        or c.staff_id = (select auth.uid())
+        or (c.staff_id = (select auth.uid()) and (select public.is_active_staff()))
         or (select public.has_active_staff_role(array['owner','admin']::public.staff_role[]))
       )
   );
@@ -191,7 +191,7 @@ alter table public.notifications enable row level security;
 
 create policy "conversations_read_participants"
 on public.conversations for select to authenticated
-using (client_id = (select auth.uid()) or staff_id = (select auth.uid()) or (select public.has_active_staff_role(array['owner','admin']::public.staff_role[])));
+using (client_id = (select auth.uid()) or (staff_id = (select auth.uid()) and (select public.is_active_staff())) or (select public.has_active_staff_role(array['owner','admin']::public.staff_role[])));
 
 create policy "clients_start_conversations"
 on public.conversations for insert to authenticated
@@ -205,12 +205,12 @@ create policy "participants_close_or_reopen_conversations"
 on public.conversations for update to authenticated
 using (
   client_id = (select auth.uid())
-  or staff_id = (select auth.uid())
+  or (staff_id = (select auth.uid()) and (select public.is_active_staff()))
   or (select public.has_active_staff_role(array['owner','admin']::public.staff_role[]))
 )
 with check (
   client_id = (select auth.uid())
-  or staff_id = (select auth.uid())
+  or (staff_id = (select auth.uid()) and (select public.is_active_staff()))
   or (select public.has_active_staff_role(array['owner','admin']::public.staff_role[]))
 );
 
