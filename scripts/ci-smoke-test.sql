@@ -44,7 +44,7 @@ reset role;
 
 select set_config('request.jwt.claim.sub', '10000000-0000-4000-8000-000000000001', false);
 set role authenticated;
-do $
+do $$
 declare affected integer;
 begin
   update public.staff_members set role = 'owner'
@@ -54,7 +54,7 @@ begin
     raise exception 'Client unexpectedly changed their own staff role';
   end if;
 end
-$;
+$$;
 reset role;
 
 do $$
