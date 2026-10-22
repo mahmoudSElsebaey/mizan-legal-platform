@@ -165,7 +165,7 @@ values ('case-files','case-files',false,10485760,array['application/pdf','image/
 on conflict (id) do update set public = false, file_size_limit = 10485760,
   allowed_mime_types = array['application/pdf','image/jpeg','image/png','text/plain'];
 
-alter table storage.objects enable row level security;
+-- Supabase Storage manages RLS on storage.objects; do not alter this managed table here.
 grant select, insert, update, delete on storage.objects to authenticated;
 
 create policy "case_file_read_authorized"
