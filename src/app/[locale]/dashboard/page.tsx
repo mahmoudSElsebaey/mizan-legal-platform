@@ -12,11 +12,11 @@ const copy = {
     dashboard:"لوحة التحكم", welcome:"مرحبًا بعودتك،", email:"البريد الإلكتروني", role:"نوع الحساب", status:"الحالة",
     roles:{owner:"مالك المكتب",admin:"مدير",lawyer:"محامٍ",assistant:"مساعد",client:"عميل"},
     statuses:{pending:"قيد المراجعة",suspended:"موقوف",active:"نشط"},
-    clientNote:"حسابك جاهز. ستظهر هنا الحجوزات والمحادثات والملفات عندما تكتمل مراحلها.",
-    staffNote:"لوحة العمل المتخصصة لهذا الدور ستُفعّل مع مراحل مساحة العمل والمواعيد.",
+    clientNote:"تابع ملفات القضايا والتحديثات والمستندات التي يشاركها المكتب معك.",
+    staffNote:"تابع القضايا المسندة إليك، وسجل التحديثات، والمستندات المصرح بها.",
     adminTitle:"إدارة المكتب", adminDescription:"إدارة حسابات المكتب والخدمات والإعدادات ومراجعة سجل التغييرات.",
-    links:[{href:"staff",title:"المستخدمون والصلاحيات",description:"إدارة أدوار الموظفين وحالات الوصول."},{href:"services",title:"الخدمات القانونية",description:"إدارة مجالات الممارسة والنشر على الموقع."},{href:"settings",title:"إعدادات المكتب",description:"تحديث بيانات التعريف الأساسية للمكتب."},{href:"audit",title:"سجل التدقيق",description:"مراجعة التغييرات الإدارية الأخيرة."},{href:"appointments",title:"المواعيد والحجوزات",description:"متابعة طلبات المواعيد والحجوزات."}],
-    home:"العودة إلى الموقع", appointments:"المواعيد والحجوزات", restricted:"حساب الموظف غير نشط. تواصل مع مالك المكتب لمراجعة صلاحياتك."
+    links:[{href:"staff",title:"المستخدمون والصلاحيات",description:"إدارة أدوار الموظفين وحالات الوصول."},{href:"services",title:"الخدمات القانونية",description:"إدارة مجالات الممارسة والنشر على الموقع."},{href:"settings",title:"إعدادات المكتب",description:"تحديث بيانات التعريف الأساسية للمكتب."},{href:"audit",title:"سجل التدقيق",description:"مراجعة التغييرات الإدارية الأخيرة."},{href:"appointments",title:"المواعيد والحجوزات",description:"متابعة طلبات المواعيد والحجوزات."},{href:"cases",title:"ملفات القضايا",description:"إدارة القضايا وسجل التحديثات والمستندات."}],
+    home:"العودة إلى الموقع", appointments:"المواعيد والحجوزات", cases:"ملفات القضايا", restricted:"حساب الموظف غير نشط. تواصل مع مالك المكتب لمراجعة صلاحياتك."
   },
   en: {
     dashboard:"Dashboard",welcome:"Welcome back,",email:"Email address",role:"Account type",status:"Status",
@@ -25,7 +25,7 @@ const copy = {
     clientNote:"Your account is ready. Appointments, conversations, and case files will appear as those features are delivered.",
     staffNote:"The dedicated workspace for this role will be enabled in the upcoming workspace and appointments phases.",
     adminTitle:"Office administration",adminDescription:"Manage office accounts, services, settings, and review the audit trail.",
-    links:[{href:"staff",title:"Users & access",description:"Manage staff roles and access status."},{href:"services",title:"Legal services",description:"Manage practice areas and public publishing."},{href:"settings",title:"Office settings",description:"Update the firm's core profile details."},{href:"audit",title:"Audit log",description:"Review recent administrative changes."},{href:"appointments",title:"Appointments",description:"Review appointment requests and bookings."}],
+    links:[{href:"staff",title:"Users & access",description:"Manage staff roles and access status."},{href:"services",title:"Legal services",description:"Manage practice areas and public publishing."},{href:"settings",title:"Office settings",description:"Update the firm's core profile details."},{href:"audit",title:"Audit log",description:"Review recent administrative changes."},{href:"appointments",title:"Appointments",description:"Review appointment requests and bookings."},{href:"cases",title:"Case workspaces",description:"Manage cases, timelines, and confidential documents."}],
     home:"Return to website",appointments:"Appointments & bookings",restricted:"Your staff account is inactive. Contact the office owner to review your access."
   }
 } as const;
@@ -57,7 +57,7 @@ export default async function DashboardPage({ params }: { params: Promise<{ loca
         <div className="rounded-2xl border border-[#14263d]/10 bg-white p-5"><p className="text-sm text-[#657184]">{t.role}</p><p className="mt-2 font-bold text-[#14263d]">{role}</p>{status && <p className="mt-1 text-xs text-[#657184]">{t.status}: {status}</p>}</div>
       </section>
       {isAdmin ? <section className="mt-10"><div className="mb-5"><h2 className="text-2xl font-black text-[#14263d]">{t.adminTitle}</h2><p className="mt-2 text-sm leading-7 text-[#657184]">{t.adminDescription}</p></div><div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">{t.links.map((item)=> <Link key={item.href} href={`/${locale}/dashboard/${item.href}`} className="group rounded-2xl border border-[#14263d]/10 bg-white p-5 transition hover:-translate-y-1 hover:border-[#176b67]/40"><span className="text-xs font-black tracking-widest text-[#b99a62]">MIZAN / 0{t.links.findIndex((link)=>link.href===item.href)+1}</span><h3 className="mt-5 font-extrabold text-[#14263d] group-hover:text-[#176b67]">{item.title}</h3><p className="mt-2 text-sm leading-6 text-[#657184]">{item.description}</p></Link>)}</div></section>
-      : <section className="mt-8 rounded-2xl border border-[#14263d]/10 bg-white p-6 leading-7 text-[#657184]"><p>{isInactiveStaff ? t.restricted : staff ? t.staffNote : t.clientNote}</p>{!isInactiveStaff && <Link className="mt-4 inline-flex rounded-xl bg-[#14263d] px-4 py-3 text-sm font-bold text-white hover:bg-[#176b67]" href={`/${locale}/dashboard/appointments`}>{t.appointments}</Link>}</section>}
+      : <section className="mt-8 rounded-2xl border border-[#14263d]/10 bg-white p-6 leading-7 text-[#657184]"><p>{isInactiveStaff ? t.restricted : staff ? t.staffNote : t.clientNote}</p>{!isInactiveStaff && <div className="mt-4 flex flex-wrap gap-3"><Link className="inline-flex rounded-xl bg-[#14263d] px-4 py-3 text-sm font-bold text-white hover:bg-[#176b67]" href={`/${locale}/dashboard/cases`}>{t.cases}</Link><Link className="inline-flex rounded-xl border border-[#14263d]/15 bg-white px-4 py-3 text-sm font-bold text-[#14263d] hover:border-[#176b67]" href={`/${locale}/dashboard/appointments`}>{t.appointments}</Link></div>}</section>}
       <div className="mt-8 border-t border-[#14263d]/10 pt-6"><Link href={`/${locale}`} className="font-bold text-[#176b67] hover:underline">{t.home}</Link></div>
     </div>
   </main>;

@@ -61,18 +61,23 @@ Each phase ends with a report of changed files, decisions, tests actually run, k
 
 **Exit gate:** do not mark Phase 4 complete until the migration is applied and runtime + CI checks pass.
 
-## Phase 5 — Appointments (implementation committed; CI passed; Supabase migration and runtime acceptance pending)
+## Phase 5 — Appointments (implemented; migration and user runtime checks completed)
 - [x] Weekly availability rules and date-specific exceptions.
 - [x] Request/approval/confirmation/cancellation workflow with database-enforced state transitions.
 - [x] Database-level overlap protection and CI smoke tests.
-- [ ] Apply the Phase 5 migration to the intended development Supabase project.
+- [x] Apply the Phase 5 migration to the intended development Supabase project (user confirmed).
 - [x] Pass CI typecheck, lint, production build, all migrations, and appointment smoke checks (commit 784e581).
-- [ ] Run the runtime acceptance checklist in docs/PHASE-5-APPOINTMENTS.md.
+- [x] Run the booking runtime acceptance checks (user confirmed the appointment flow works).
 
-## Phase 6 — Client and lawyer workspaces
-- Assigned cases, timelines, internal notes, client-visible updates.
-- Secure document metadata and Storage access.
-- Permission-aware dashboards and empty states.
+## Phase 6 — Client and lawyer workspaces (implementation committed; CI and live Supabase acceptance pending)
+- [x] Add case records and owner/admin assignment to active lawyers/assistants.
+- [x] Add timelines with database-enforced internal-note vs client-visible update policies.
+- [x] Add private document metadata and a private Storage bucket with authorized reads/uploads.
+- [x] Add bilingual case workspace UI, status updates, upload validation, and signed downloads.
+- [x] Add CI migration and RLS smoke tests for case/client isolation.
+- [ ] Pass GitHub CI after Phase 6 changes.
+- [ ] Verify the Phase 6 migration is applied to the connected Supabase project.
+- [ ] Complete the live runtime acceptance checklist in docs/PHASE-6-CASE-WORKSPACES.md.
 
 ## Phase 7 — Conversations and notifications
 - Participant-controlled conversations and message policies.

@@ -2,7 +2,7 @@
 
 Bilingual public website and legal-office platform foundation built with Next.js App Router, TypeScript, Tailwind CSS, and Supabase.
 
-> The public website, authentication foundation, and Phase 4 administration implementation are in place. Phase 4 still requires its Supabase migration and CI/runtime acceptance checks before it can be considered complete. Booking, case workspaces, and chat are future phases. Confirm all legal content with the office before production use.
+> The bilingual public website, authentication foundation, office administration, appointment booking, and the Phase 6 case workspace implementation are in place. The case workspace still requires CI and live Supabase runtime acceptance before it can be considered complete. Conversations and notifications are planned for a later phase. Confirm all legal content with the office before production use.
 
 ## Requirements
 - Node.js 20.9 or newer

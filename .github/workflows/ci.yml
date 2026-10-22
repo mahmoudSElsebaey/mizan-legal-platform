@@ -68,3 +68,7 @@ jobs:
         run: psql "postgresql://postgres:postgres@localhost:5432/mizan_test" -v ON_ERROR_STOP=1 -f scripts/ci-smoke-test.sql
       - name: Verify appointment overlap and availability guards
         run: psql "postgresql://postgres:postgres@localhost:5432/mizan_test" -v ON_ERROR_STOP=1 -f scripts/ci-appointments-smoke-test.sql
+      - name: Apply case workspace migration
+        run: psql "postgresql://postgres:postgres@localhost:5432/mizan_test" -v ON_ERROR_STOP=1 -f supabase/migrations/20261022000400_phase6_case_workspaces.sql
+      - name: Verify case privacy and document access rules
+        run: psql "postgresql://postgres:postgres@localhost:5432/mizan_test" -v ON_ERROR_STOP=1 -f scripts/ci-phase6-smoke-test.sql
