@@ -133,6 +133,10 @@ using ((select public.has_active_staff_role(array['owner','admin']::public.staff
 with check ((select public.has_active_staff_role(array['owner','admin']::public.staff_role[])));
 
 -- Settings are private to active office administrators.
+create policy "settings_read_public_office_profile"
+on public.office_settings for select to anon, authenticated
+using (key = 'office.profile');
+
 create policy "settings_manage_admin"
 on public.office_settings for all to authenticated
 using ((select public.has_active_staff_role(array['owner','admin']::public.staff_role[])))
@@ -146,6 +150,7 @@ using ((select public.has_active_staff_role(array['owner','admin']::public.staff
 revoke all on public.office_services, public.office_settings, public.audit_logs from anon, authenticated;
 grant select on public.office_services to anon, authenticated;
 grant insert, update, delete on public.office_services to authenticated;
+grant select on public.office_settings to anon;
 grant select, insert, update, delete on public.office_settings to authenticated;
 grant select on public.audit_logs to authenticated;
 grant usage, select on sequence public.audit_logs_id_seq to authenticated;
