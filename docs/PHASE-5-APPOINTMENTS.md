@@ -1,5 +1,7 @@
 # Phase 5 — Appointments
 
+**Status:** implementation committed on `main`; GitHub Actions passed on commit `784e581` (typecheck, lint, production build, all migrations, and appointment SQL smoke tests). Applying the migration to the user's Supabase project and runtime acceptance tests remain pending.
+
 ## Included on main
 
 - Weekly lawyer availability, one rule per weekday, in the Africa/Cairo office timezone.
@@ -34,7 +36,7 @@ npm run lint
 npm run build
 ~~~
 
-GitHub Actions applies all three migrations to an ephemeral PostgreSQL instance and runs SQL smoke checks for appointment availability and overlapping bookings. A green CI run validates compilation and migration behavior in the test database, not your actual Supabase project.
+GitHub Actions passed on commit `784e581`: typecheck, lint, production build, all three migrations, and SQL smoke checks for appointment availability and overlapping bookings. This validates the CI test database, not your actual Supabase project.
 
 ## Runtime acceptance checklist
 

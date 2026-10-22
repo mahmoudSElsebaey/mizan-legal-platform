@@ -61,12 +61,12 @@ Each phase ends with a report of changed files, decisions, tests actually run, k
 
 **Exit gate:** do not mark Phase 4 complete until the migration is applied and runtime + CI checks pass.
 
-## Phase 5 — Appointments (implementation committed; Supabase migration and runtime acceptance pending)
+## Phase 5 — Appointments (implementation committed; CI passed; Supabase migration and runtime acceptance pending)
 - [x] Weekly availability rules and date-specific exceptions.
 - [x] Request/approval/confirmation/cancellation workflow with database-enforced state transitions.
 - [x] Database-level overlap protection and CI smoke tests.
 - [ ] Apply the Phase 5 migration to the intended development Supabase project.
-- [ ] Pass CI typecheck, lint, production build, migration, and appointment smoke checks.
+- [x] Pass CI typecheck, lint, production build, all migrations, and appointment smoke checks (commit 784e581).
 - [ ] Run the runtime acceptance checklist in docs/PHASE-5-APPOINTMENTS.md.
 
 ## Phase 6 — Client and lawyer workspaces
