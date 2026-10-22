@@ -11,7 +11,7 @@
 - Arabic and English routes are supported. Realtime delivery is intentionally not enabled yet; the inbox refreshes through normal page navigation/revalidation.
 
 ## Migration
-Apply **supabase/migrations/20261022000500_phase7_conversations_notifications.sql** once in the intended development/staging Supabase project. Prefer the controlled migration workflow described in **SUPABASE-MIGRATION-AUTOMATION.md**. Committing the migration does not apply it to Supabase by itself.
+Apply these migrations in order in the intended development/staging Supabase project: **20261022000500_phase7_conversations_notifications.sql**, then **20261022000600_phase7_security_hardening.sql**. The second migration updates policies and grants for projects where the first migration was already recorded before its final hardening edits. Prefer the controlled migration workflow described in **SUPABASE-MIGRATION-AUTOMATION.md**. Committing a migration does not apply it to Supabase by itself.
 
 ## UI
 - **/ar/dashboard/conversations** and **/en/dashboard/conversations**: conversation list, client start form, recent notifications.
