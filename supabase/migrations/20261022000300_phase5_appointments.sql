@@ -245,7 +245,7 @@ grant update (status) on public.appointments to authenticated;
 -- Enforce the state machine at the database boundary as well as in server actions.
 create or replace function public.guard_appointment_status_transition()
 returns trigger language plpgsql security definer set search_path = ''
-as $
+as $status$
 declare
   is_office_admin boolean;
   is_assigned_lawyer boolean;
@@ -280,7 +280,7 @@ begin
   end if;
   return new;
 end;
-$;
+$status$;
 revoke all on function public.guard_appointment_status_transition() from public, anon, authenticated;
 create trigger appointments_guard_status_transition
 before update of status on public.appointments
