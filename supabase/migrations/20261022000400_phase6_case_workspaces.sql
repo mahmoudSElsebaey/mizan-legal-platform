@@ -155,7 +155,7 @@ with check (uploaded_by = (select auth.uid()) and (select public.can_manage_case
 
 revoke all on public.cases, public.case_events, public.case_documents from anon, authenticated;
 grant select on public.cases, public.case_events, public.case_documents to authenticated;
-grant insert (case_number,title,practice_area,description,status,client_id,assigned_staff_id,created_by) on public.cases to authenticated;
+grant insert (id,case_number,title,practice_area,description,status,client_id,assigned_staff_id,created_by) on public.cases to authenticated;
 grant update (title,practice_area,description,status) on public.cases to authenticated;
 grant insert (case_id,author_id,title,body,is_client_visible) on public.case_events to authenticated;
 grant insert (case_id,uploaded_by,original_name,storage_path,mime_type,size_bytes,is_client_visible) on public.case_documents to authenticated;
