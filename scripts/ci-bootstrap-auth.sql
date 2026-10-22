@@ -38,6 +38,8 @@ create table storage.objects (
   created_at timestamptz not null default now(),
   unique(bucket_id,name)
 );
+-- Match Supabase Storage's security model: object policies are enforced by RLS.
+alter table storage.objects enable row level security;
 create function storage.foldername(name text)
 returns text[]
 language sql immutable
