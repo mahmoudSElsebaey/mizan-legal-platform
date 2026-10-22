@@ -18,7 +18,7 @@ export default async function OfficeSettingsPage({ params, searchParams }: { par
   return <main className="min-h-screen bg-[#f7f4ed] px-4 py-10 sm:py-14" dir={ar?"rtl":"ltr"}><div className="mx-auto max-w-4xl">
     <Link href={`/${locale}/dashboard`} className="text-sm font-bold text-[#176b67] hover:underline">{ar?"← لوحة التحكم":"← Dashboard"}</Link>
     <p className="mt-5 text-xs font-black tracking-[.18em] text-[#176b67]">MIZAN LEGAL / SETTINGS</p><h1 className="mt-2 text-3xl font-black text-[#14263d] sm:text-4xl">{ar?"إعدادات المكتب":"Office settings"}</h1>
-    <p className="mt-3 leading-7 text-[#657184]">{ar?"عدّل بيانات التعريف الأساسية للمكتب. هذه البيانات محفوظة في قاعدة البيانات، ولن تظهر تلقائيًا في الموقع العام قبل ربط مكونات الموقع بها.":"Manage the firm's core profile. These values are stored in the database; public pages will not change until their components are wired to these settings."}</p>
+    <p className="mt-3 leading-7 text-[#657184]">{ar?"عدّل بيانات التعريف الأساسية للمكتب. بيانات التواصل المحفوظة هنا تظهر في قسم التواصل بالموقع العام.":"Manage the firm's core profile. Saved contact details are displayed in the public homepage contact section."}</p>
     {message && <p role="status" className="mt-5 rounded-xl border border-[#176b67]/20 bg-white p-4 text-sm font-semibold text-[#176b67]">{message}</p>}
     {error && <p role="alert" className="mt-5 rounded-xl bg-red-50 p-4 text-sm text-red-800">{ar?"تعذر قراءة الإعدادات. طبّق ترحيل المرحلة الرابعة.":"Could not load settings. Apply the Phase 4 migration."}</p>}
     <form action={saveOfficeSettings} className="mt-8 grid gap-5 rounded-2xl border border-[#14263d]/10 bg-white p-5 sm:grid-cols-2 sm:p-8"><input type="hidden" name="locale" value={locale}/>
