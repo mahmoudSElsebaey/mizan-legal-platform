@@ -50,20 +50,24 @@ end
 $$;
 
 -- A lawyer who is not assigned to a case cannot see its confidential workspace.
-if (select count(*) from public.cases
-    where id='60000000-0000-4000-8000-000000000010') <> 0 then
-  raise exception 'Unassigned lawyer could read a confidential case';
-end if;
+do $
+begin
+  if (select count(*) from public.cases
+      where id='60000000-0000-4000-8000-000000000010') <> 0 then
+    raise exception 'Unassigned lawyer could read a confidential case';
+  end if;
 
--- A lawyer who is not a conversation participant cannot read another thread or its messages.
-if (select count(*) from public.conversations
-    where id='70000000-0000-4000-8000-000000000010') <> 0 then
-  raise exception 'Unrelated lawyer could read another conversation';
-end if;
-if (select count(*) from public.conversation_messages
-    where conversation_id='70000000-0000-4000-8000-000000000010') <> 0 then
-  raise exception 'Unrelated lawyer could read another conversation messages';
-end if;
+  -- A lawyer who is not a conversation participant cannot read another thread or its messages.
+  if (select count(*) from public.conversations
+      where id='70000000-0000-4000-8000-000000000010') <> 0 then
+    raise exception 'Unrelated lawyer could read another conversation';
+  end if;
+  if (select count(*) from public.conversation_messages
+      where conversation_id='70000000-0000-4000-8000-000000000010') <> 0 then
+    raise exception 'Unrelated lawyer could read another conversation messages';
+  end if;
+end
+$;
 reset role;
 
 -- Anonymous callers must not be able to query private appointments or conversations.
