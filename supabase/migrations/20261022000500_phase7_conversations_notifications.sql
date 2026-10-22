@@ -236,9 +236,9 @@ with check (user_id = (select auth.uid()));
 
 revoke all on public.conversations,public.conversation_messages,public.notifications from anon,authenticated;
 grant select on public.conversations,public.conversation_messages,public.notifications to authenticated;
-grant insert (client_id,staff_id,case_id,subject,status) on public.conversations to authenticated;
+grant insert (id,client_id,staff_id,case_id,subject,status) on public.conversations to authenticated;
 grant update (status) on public.conversations to authenticated;
-grant insert (conversation_id,sender_id,body) on public.conversation_messages to authenticated;
+grant insert (id,conversation_id,sender_id,body) on public.conversation_messages to authenticated;
 grant update (read_at) on public.notifications to authenticated;
 
 -- Expose only the minimal contact directory needed to start a conversation.
