@@ -7,6 +7,26 @@ alter table public.profiles add column email text;
 update public.profiles p set email = u.email from auth.users u where u.id = p.id;
 create index profiles_email_idx on public.profiles(lower(email));
 
+create or replace function public.handle_new_auth_user()
+returns trigger
+language plpgsql
+security definer
+set search_path = ''
+as $
+begin
+  insert into public.profiles (id, email, full_name, locale)
+  values (
+    new.id,
+    new.email,
+    left(coalesce(new.raw_user_meta_data ->> 'full_name', ''), 120),
+    case when new.raw_user_meta_data ->> 'locale' = 'en' then 'en' else 'ar' end
+  )
+  on conflict (id) do nothing;
+  return new;
+end;
+$;
+revoke all on function public.handle_new_auth_user() from public, anon, authenticated;
+
 create or replace function public.sync_auth_user_profile()
 returns trigger
 language plpgsql
