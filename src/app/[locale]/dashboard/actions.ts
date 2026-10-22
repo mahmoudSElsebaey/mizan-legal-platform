@@ -70,10 +70,10 @@ export async function saveOfficeService(formData: FormData) {
   if (!parsed.success) throw new Error("Invalid service input.");
   const { locale, id, slug, titleAr, titleEn, descriptionAr, descriptionEn, sortOrder } = parsed.data;
   const { supabase, user } = await requireAdministrator(locale);
-  const values = { slug, title_ar: titleAr, title_en: titleEn, description_ar: descriptionAr, description_en: descriptionEn, sort_order: sortOrder, created_by: user.id };
+  const values = { slug, title_ar: titleAr, title_en: titleEn, description_ar: descriptionAr, description_en: descriptionEn, sort_order: sortOrder };
   const result = id
     ? await supabase.from("office_services").update(values).eq("id", id)
-    : await supabase.from("office_services").insert(values);
+    : await supabase.from("office_services").insert({ ...values, created_by: user.id });
   if (result.error) go(locale, "services", "save-failed");
   go(locale, "services", "saved");
 }
