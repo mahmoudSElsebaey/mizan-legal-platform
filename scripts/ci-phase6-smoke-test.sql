@@ -39,7 +39,7 @@ insert into storage.objects(bucket_id,name) values
 -- The case client can see their case, client-visible events and documents only.
 select set_config('request.jwt.claim.sub','60000000-0000-4000-8000-000000000002',false);
 set role authenticated;
-do $
+do $$
 begin
  if (select count(*) from public.cases where id='60000000-0000-4000-8000-000000000010') <> 1 then
    raise exception 'Case client could not read their own case';
