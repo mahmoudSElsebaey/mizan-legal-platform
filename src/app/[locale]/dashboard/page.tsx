@@ -22,11 +22,11 @@ const copy = {
     dashboard:"Dashboard",welcome:"Welcome back,",email:"Email address",role:"Account type",status:"Status",
     roles:{owner:"Office owner",admin:"Administrator",lawyer:"Lawyer",assistant:"Assistant",client:"Client"},
     statuses:{pending:"Pending",suspended:"Suspended",active:"Active"},
-    clientNote:"Your account is ready. Appointments, conversations, and case files will appear as those features are delivered.",
-    staffNote:"The dedicated workspace for this role will be enabled in the upcoming workspace and appointments phases.",
+    clientNote:"Track case files, updates, and documents shared with you by the office.",
+    staffNote:"Review assigned cases, case timelines, and documents you are authorized to access.",
     adminTitle:"Office administration",adminDescription:"Manage office accounts, services, settings, and review the audit trail.",
     links:[{href:"staff",title:"Users & access",description:"Manage staff roles and access status."},{href:"services",title:"Legal services",description:"Manage practice areas and public publishing."},{href:"settings",title:"Office settings",description:"Update the firm's core profile details."},{href:"audit",title:"Audit log",description:"Review recent administrative changes."},{href:"appointments",title:"Appointments",description:"Review appointment requests and bookings."},{href:"cases",title:"Case workspaces",description:"Manage cases, timelines, and confidential documents."}],
-    home:"Return to website",appointments:"Appointments & bookings",restricted:"Your staff account is inactive. Contact the office owner to review your access."
+    home:"Return to website",appointments:"Appointments & bookings",cases:"Case workspaces",restricted:"Your staff account is inactive. Contact the office owner to review your access."
   }
 } as const;
 
