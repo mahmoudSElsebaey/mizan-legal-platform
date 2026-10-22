@@ -1,7 +1,8 @@
 -- Phase 6 security smoke tests. Runs only in the ephemeral PostgreSQL CI database.
 insert into auth.users (id,email,raw_user_meta_data) values
  ('60000000-0000-4000-8000-000000000001','case-lawyer@example.test','{"full_name":"Case Lawyer","locale":"en"}'),
- ('60000000-0000-4000-8000-000000000002','other-client@example.test','{"full_name":"Other Client","locale":"en"}')
+ ('60000000-0000-4000-8000-000000000002','case-client@example.test','{"full_name":"Case Client","locale":"en"}'),
+ ('60000000-0000-4000-8000-000000000003','other-client@example.test','{"full_name":"Other Client","locale":"en"}')
 on conflict (id) do nothing;
 
 insert into public.staff_members(profile_id,role,status)
@@ -14,7 +15,7 @@ set role authenticated;
 insert into public.cases(id,case_number,title,practice_area,description,status,client_id,assigned_staff_id,created_by)
 values (
  '60000000-0000-4000-8000-000000000010','MZN-CI-0001','Confidential CI case','civil','Client-safe summary','open',
- '10000000-0000-4000-8000-000000000001','60000000-0000-4000-8000-000000000001','10000000-0000-4000-8000-000000000003'
+ '60000000-0000-4000-8000-000000000002','60000000-0000-4000-8000-000000000001','10000000-0000-4000-8000-000000000003'
 );
 reset role;
 
@@ -31,9 +32,9 @@ values
 reset role;
 
 -- The case client can see their case, client-visible events and documents only.
-select set_config('request.jwt.claim.sub','10000000-0000-4000-8000-000000000001',false);
+select set_config('request.jwt.claim.sub','60000000-0000-4000-8000-000000000002',false);
 set role authenticated;
-do $$
+do $
 begin
  if (select count(*) from public.cases where id='60000000-0000-4000-8000-000000000010') <> 1 then
    raise exception 'Case client could not read their own case';
@@ -49,7 +50,7 @@ $$;
 reset role;
 
 -- A different client must not be able to read or alter the case.
-select set_config('request.jwt.claim.sub','60000000-0000-4000-8000-000000000002',false);
+select set_config('request.jwt.claim.sub','60000000-0000-4000-8000-000000000003',false);
 set role authenticated;
 do $$
 begin
