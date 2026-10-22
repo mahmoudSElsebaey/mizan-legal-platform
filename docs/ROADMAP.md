@@ -46,7 +46,7 @@ Each phase ends with a report of changed files, decisions, tests actually run, k
 - [ ] Run typecheck, lint, and production build locally; fix any issues.
 - [ ] Add automated role-based access tests and record actual results.
 
-## Phase 4 — Administration (implementation committed; validation pending)
+## Phase 4 — Administration (implementation committed; user-confirmed runtime checks passed)
 - [x] Add a guarded owner/admin workspace with role-aware navigation.
 - [x] Manage registered account names/languages and staff roles/statuses with server-side Zod validation.
 - [x] Enforce role assignment limits again through Supabase RLS; protect the acting administrator's own staff assignment.
@@ -54,17 +54,20 @@ Each phase ends with a report of changed files, decisions, tests actually run, k
 - [x] Store office profile settings and display the public contact fields on the homepage.
 - [x] Add database-triggered audit entries for profile, staff assignment, practice-area, and office-setting changes.
 - [x] Add a CI workflow for typecheck, lint, and production build.
-- [ ] Apply the Phase 4 migration to the intended development Supabase project.
-- [ ] Run and pass CI; fix any type, lint, or build failures.
-- [ ] Exercise owner/admin/lawyer/assistant/client allow-deny paths using separate test accounts.
-- [ ] Verify service publishing, settings display, and audit log behavior against Supabase.
+- [x] Apply the Phase 4 migration to the intended development Supabase project (user confirmed success).
+- [x] Run and pass CI typecheck, lint, production build, migration, and SQL smoke checks.
+- [x] Exercise owner/admin/lawyer/assistant/client allow-deny paths using separate test accounts (user confirmed success).
+- [x] Verify service publishing, settings display, and audit log behavior against Supabase (user confirmed success).
 
 **Exit gate:** do not mark Phase 4 complete until the migration is applied and runtime + CI checks pass.
 
-## Phase 5 — Appointments
-- Availability rules and exceptions.
-- Request/approval/confirmation/cancellation workflow.
-- Database-level double-booking protection and tests.
+## Phase 5 — Appointments (implementation committed; Supabase migration and runtime acceptance pending)
+- [x] Weekly availability rules and date-specific exceptions.
+- [x] Request/approval/confirmation/cancellation workflow with database-enforced state transitions.
+- [x] Database-level overlap protection and CI smoke tests.
+- [ ] Apply the Phase 5 migration to the intended development Supabase project.
+- [ ] Pass CI typecheck, lint, production build, migration, and appointment smoke checks.
+- [ ] Run the runtime acceptance checklist in docs/PHASE-5-APPOINTMENTS.md.
 
 ## Phase 6 — Client and lawyer workspaces
 - Assigned cases, timelines, internal notes, client-visible updates.

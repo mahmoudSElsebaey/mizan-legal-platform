@@ -1,6 +1,6 @@
 # Phase 4 — Administration Setup and Verification
 
-**Implementation status:** committed to `main`. **Not yet certified complete:** apply the migration and pass the checks below before treating the phase as done.
+**Status:** complete for this delivery checkpoint. The user confirmed the Phase 4 migration succeeded and the runtime acceptance checks passed; GitHub Actions CI also passed on the current main commit at the time of verification.
 
 ## Included
 
