@@ -1187,3 +1187,37 @@ img, svg, video { max-width: 100%; }
 .mizan-dashboard-page .rounded-2xl.border.bg-white,.mizan-dashboard-page article.rounded-2xl{box-shadow:0 8px 30px rgba(15,45,43,.035)}
 @media(max-width:760px){.mizan-dashboard-page{padding:1rem .8rem 2rem!important}.mizan-dashboard-page-nav{gap:.25rem;margin-bottom:1.5rem}.mizan-dashboard-page-nav a{flex:1 1 calc(50% - .3rem);justify-content:flex-start;padding:.6rem;font-size:.73rem}.mizan-dashboard-page-nav a span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.mizan-dashboard-page h1{font-size:2rem;line-height:1.35}.mizan-dashboard-page .rounded-2xl{border-radius:17px}}
 @media(prefers-reduced-motion:reduce){.mizan-dashboard-page *{transition:none!important}}
+ 
+
+/* Mizan authentication: editorial, secure and responsive */
+.mizan-auth-page{position:relative;isolation:isolate;overflow:hidden;background:#f4f4ed;background-image:radial-gradient(ellipse at 8% 5%,rgba(212,175,124,.23),transparent 32%),radial-gradient(ellipse at 90% 85%,rgba(22,122,110,.12),transparent 34%),linear-gradient(135deg,#f8f7f1 0%,#edf1eb 100%);color:#1f2937}
+.mizan-auth-page:before,.mizan-auth-page:after{position:absolute;z-index:-1;content:"";pointer-events:none;border:1px solid rgba(15,45,43,.08);border-radius:50%}
+.mizan-auth-page:before{width:440px;height:440px;top:-250px;right:-150px;box-shadow:0 0 0 35px rgba(15,45,43,.018),0 0 0 70px rgba(15,45,43,.014)}
+.mizan-auth-page:after{width:360px;height:360px;bottom:-250px;left:-130px;box-shadow:0 0 0 28px rgba(212,175,124,.06),0 0 0 58px rgba(212,175,124,.035)}
+.mizan-auth-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(340px,460px);align-items:stretch;gap:clamp(2rem,6vw,6rem);width:min(100%,1040px);min-height:560px;justify-content:center}
+.mizan-auth-story{position:relative;display:flex;flex-direction:column;justify-content:center;overflow:hidden;padding:clamp(1rem,3vw,2.5rem) 0;color:#0f2d2b}
+.mizan-auth-monogram{display:grid;place-items:center;position:relative;width:58px;height:58px;margin-bottom:2.4rem;border:1px solid rgba(212,175,124,.65);border-radius:19px;background:#0f2d2b;color:#f7f6f2;font-family:Tahoma,Arial,sans-serif;font-size:2rem;font-weight:900;box-shadow:0 12px 30px rgba(15,45,43,.16)}
+.mizan-auth-monogram span{position:absolute;top:5px;right:6px;color:#d4af7c;font-size:.7rem}
+.mizan-auth-eyebrow{margin-bottom:1rem;font-size:.68rem;font-weight:900;letter-spacing:.24em;color:#167a6e}
+.mizan-auth-story h2{max-width:570px;white-space:pre-line;font-size:clamp(2.3rem,4.6vw,4rem);font-weight:900;line-height:1.18;letter-spacing:-.055em}
+.mizan-auth-story-copy{max-width:440px;margin-top:1.5rem;color:#5d6b64;font-size:1rem;line-height:2}
+.mizan-auth-trust{display:flex;align-items:center;gap:.8rem;margin-top:2.2rem;padding-top:1.2rem;border-top:1px solid rgba(15,45,43,.12);font-size:.85rem;font-weight:700;color:#35554e}
+.mizan-auth-trust span{display:grid;place-items:center;width:32px;height:32px;flex-shrink:0;border-radius:10px;background:#e5eee7;color:#167a6e}
+.mizan-auth-ornament{position:absolute;bottom:2.1rem;left:0;display:flex;gap:.45rem;align-items:center;opacity:.7}
+.mizan-auth-ornament span{display:block;width:32px;height:3px;border-radius:9px;background:#d4af7c}
+.mizan-auth-ornament span:nth-child(2){width:14px;background:#167a6e}.mizan-auth-ornament span:nth-child(3){width:7px;background:#0f2d2b}
+.mizan-auth-card{align-self:center;border-color:rgba(15,45,43,.1);box-shadow:0 28px 80px rgba(15,45,43,.10),0 3px 12px rgba(15,45,43,.035);backdrop-filter:blur(12px)}
+.mizan-auth-brand{display:flex;align-items:center;gap:.55rem;letter-spacing:.12em}
+.mizan-auth-brand-mark{display:grid;place-items:center;width:29px;height:29px;border-radius:9px;background:#0f2d2b;color:#d4af7c;font-size:1rem;letter-spacing:0}
+.mizan-auth-brand-ar{margin-inline-start:auto;color:#167a6e;font-size:.8rem;letter-spacing:0}
+.mizan-auth-label{line-height:1.7}
+.mizan-auth-input{min-height:49px;border-color:#dce4dc!important;background:#fbfcfa!important;border-radius:13px!important;color:#172f2b;font-size:.95rem}
+.mizan-auth-input::placeholder{color:#9aa59e}
+.mizan-auth-input:focus{border-color:#167a6e!important;box-shadow:0 0 0 4px rgba(22,122,110,.11)!important}
+.mizan-auth-submit{min-height:51px;border-radius:13px;background:linear-gradient(110deg,#0f2d2b,#176b60);box-shadow:0 8px 18px rgba(15,45,43,.15);letter-spacing:.01em}
+.mizan-auth-submit:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 12px 24px rgba(15,45,43,.2)}
+.mizan-auth-card a{transition:color .2s}
+.mizan-auth-card [role=alert],.mizan-auth-card [role=status]{border:1px solid rgba(15,45,43,.08);line-height:1.8}
+.mizan-auth-card button:focus-visible,.mizan-auth-card a:focus-visible{outline:3px solid rgba(22,122,110,.35);outline-offset:3px}
+@media(max-width:760px){.mizan-auth-layout{grid-template-columns:minmax(0,1fr);gap:1.5rem;max-width:480px;min-height:0}.mizan-auth-story{padding:.5rem 0 0}.mizan-auth-monogram{width:46px;height:46px;border-radius:15px;margin-bottom:1rem;font-size:1.6rem}.mizan-auth-eyebrow{margin-bottom:.5rem;font-size:.6rem}.mizan-auth-story h2{font-size:clamp(1.8rem,8vw,2.6rem);line-height:1.2}.mizan-auth-story-copy{margin-top:.65rem;font-size:.88rem;line-height:1.8}.mizan-auth-trust{margin-top:.8rem;padding-top:.7rem;font-size:.78rem}.mizan-auth-ornament{display:none}.mizan-auth-card{padding:1.35rem!important;border-radius:23px!important}.mizan-auth-page{padding-top:1.25rem!important;padding-bottom:2rem!important}}
+@media(prefers-reduced-motion:reduce){.mizan-auth-page *{transition:none!important;animation:none!important}}
