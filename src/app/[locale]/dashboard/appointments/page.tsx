@@ -60,7 +60,9 @@ export default async function AppointmentsPage({params,searchParams}:{params:Pro
   const todayParts = new Intl.DateTimeFormat("en-CA",{timeZone:"Africa/Cairo",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date());
   const todayMap = Object.fromEntries(todayParts.map((part)=>[part.type,part.value]));
   const today = todayMap.year+"-"+todayMap.month+"-"+todayMap.day;
-  return <main className="min-h-screen bg-[#f7f4ed] px-4 py-10 sm:py-14" dir={ar?"rtl":"ltr"}><div className="mx-auto max-w-6xl">
+  return <main className="mizan-dashboard-page min-h-screen bg-[#f7f4ed] px-4 py-10 sm:py-14" dir={ar?"rtl":"ltr"}>
+    <nav className="mizan-dashboard-page-nav" aria-label={ar?"التنقل داخل لوحة التحكم":"Dashboard navigation"}><Link href={"/"+locale+"/dashboard"}>⌂ <span>{ar?"لوحة التحكم":"Overview"}</span></Link><Link href={"/"+locale+"/dashboard/cases"}>▤ <span>{ar?"ملفات القضايا":"Cases"}</span></Link><Link href={"/"+locale+"/dashboard/appointments"}>▦ <span>{ar?"المواعيد":"Appointments"}</span></Link><Link href={"/"+locale+"/dashboard/conversations"}>◌ <span>{ar?"المحادثات":"Messages"}</span></Link>{["owner","admin"].includes(String(staff?.role||""))&&<><Link href={"/"+locale+"/dashboard/staff"}>♙ <span>{ar?"المستخدمون":"Staff"}</span></Link><Link href={"/"+locale+"/dashboard/services"}>⚖ <span>{ar?"الخدمات":"Services"}</span></Link><Link href={"/"+locale+"/dashboard/settings"}>⚙ <span>{ar?"الإعدادات":"Settings"}</span></Link><Link href={"/"+locale+"/dashboard/audit"}>◷ <span>{ar?"سجل التدقيق":"Audit log"}</span></Link></>}</nav>
+<div className="mx-auto max-w-6xl">
     <Link href={"/"+locale+"/dashboard"} className="text-sm font-bold text-[#176b67] hover:underline">{ar?"← لوحة التحكم":"← Dashboard"}</Link>
     <p className="mt-5 text-xs font-black tracking-[.18em] text-[#176b67]">MIZAN LEGAL / APPOINTMENTS</p>
     <h1 className="mt-2 text-3xl font-black text-[#14263d] sm:text-4xl">{ar?"المواعيد والحجوزات":"Appointments & bookings"}</h1>
