@@ -1267,8 +1267,17 @@ img, svg, video { max-width: 100%; }
 .mizan-chat-launcher:hover{transform:translateY(-1px);border-color:#9dc7b5;background:#f2f8f3}
 .mizan-chat-launcher svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
 .mizan-chat-launcher-count{position:absolute;top:-6px;inset-inline-end:-6px;display:grid;min-width:20px;height:20px;place-items:center;padding-inline:5px;border:2px solid #fff;border-radius:999px;background:#c34e52;color:#fff;font-size:.62rem;font-weight:900}
-.mizan-chat-backdrop{position:fixed;z-index:1000;inset:0;display:flex;justify-content:flex-end;background:rgba(9,27,25,.44);backdrop-filter:blur(4px);animation:mizan-chat-fade-in .18s ease-out}
+.mizan-chat-backdrop{position:fixed;z-index:1000;inset:0;display:flex;justify-content:flex-end;pointer-events:none;background:transparent;animation:mizan-chat-fade-in .18s ease-out}
 .mizan-chat-drawer{display:grid;grid-template-columns:minmax(265px,34%) minmax(0,1fr);width:min(980px,100%);height:100dvh;overflow:hidden;background:#fff;box-shadow:-24px 0 80px rgba(6,30,27,.2);animation:mizan-chat-slide-in .24s cubic-bezier(.2,.8,.2,1)}
+.mizan-chat-drawer{position:relative;pointer-events:auto;min-height:0;overscroll-behavior:contain;transition:width .22s ease,max-width .22s ease}
+.mizan-chat-drawer.is-expanded{width:100%;max-width:none}
+.mizan-chat-drawer-controls{position:absolute;z-index:5;top:.65rem;inset-inline-end:.7rem;display:flex;gap:.4rem}
+.mizan-chat-window-control{display:grid;width:32px;height:32px;place-items:center;border:1px solid #e1e9e0;border-radius:10px;background:rgba(255,255,255,.96);color:#37584d;box-shadow:0 2px 8px rgba(18,56,43,.06);cursor:pointer}
+.mizan-chat-window-control:hover{border-color:#9bbcac;background:#edf5ed}
+.mizan-chat-window-control svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.mizan-chat-sidebar,.mizan-chat-main{min-height:0;overflow:hidden}
+.mizan-chat-thread-list,.mizan-chat-messages{overscroll-behavior:contain;min-height:0;scrollbar-gutter:stable}
+.mizan-chat-messages{flex:1;overflow-y:auto;touch-action:pan-y;}
 .mizan-chat-sidebar{display:flex;min-width:0;flex-direction:column;border-inline-end:1px solid #e8eee8;background:#fbfcfa}
 .mizan-chat-sidebar-head{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;padding:1.5rem 1.2rem 1rem}
 .mizan-chat-eyebrow{color:#167a6e;font-size:.61rem;font-weight:900;letter-spacing:.16em}
