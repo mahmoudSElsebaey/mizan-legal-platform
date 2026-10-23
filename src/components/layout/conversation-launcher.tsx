@@ -121,6 +121,10 @@ export function ConversationLauncher({ locale }: { locale: Locale }) {
           else void loadThreads(userId);
         }
       })
+      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "conversation_messages" }, (payload) => {
+        const updated = payload.new as Message;
+        setMessages((current) => current.map((item) => item.id === updated.id ? { ...updated, attachments: updated.attachments || [] } : item));
+      })
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "notifications" }, (payload) => {
         const notice = payload.new as { user_id?: string; kind?: string };
         if (notice.user_id === userId) {
