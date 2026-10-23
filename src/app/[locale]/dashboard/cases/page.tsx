@@ -69,7 +69,9 @@ export default async function CasesPage({params,searchParams}:{params:Promise<{l
     result:result&&resultLabels[result]?resultLabels[result].en:""
   });
   const label=(key:string)=>statusLabels[key]?.[locale as Locale]||key;
-  return <main className="min-h-screen bg-[#f7f4ed] px-4 py-10 sm:py-14" dir={ar?"rtl":"ltr"}><div className="mx-auto max-w-6xl">
+  return <main className="mizan-dashboard-page min-h-screen bg-[#f7f4ed] px-4 py-10 sm:py-14" dir={ar?"rtl":"ltr"}>
+    <nav className="mizan-dashboard-page-nav" aria-label={ar?"التنقل داخل لوحة التحكم":"Dashboard navigation"}><Link href={"/"+locale+"/dashboard"}>⌂ <span>{ar?"لوحة التحكم":"Overview"}</span></Link><Link href={"/"+locale+"/dashboard/cases"}>▤ <span>{ar?"ملفات القضايا":"Cases"}</span></Link><Link href={"/"+locale+"/dashboard/appointments"}>▦ <span>{ar?"المواعيد":"Appointments"}</span></Link><Link href={"/"+locale+"/dashboard/conversations"}>◌ <span>{ar?"المحادثات":"Messages"}</span></Link>{["owner","admin"].includes(String(staff?.role||""))&&<><Link href={"/"+locale+"/dashboard/staff"}>♙ <span>{ar?"المستخدمون":"Staff"}</span></Link><Link href={"/"+locale+"/dashboard/services"}>⚖ <span>{ar?"الخدمات":"Services"}</span></Link><Link href={"/"+locale+"/dashboard/settings"}>⚙ <span>{ar?"الإعدادات":"Settings"}</span></Link><Link href={"/"+locale+"/dashboard/audit"}>◷ <span>{ar?"سجل التدقيق":"Audit log"}</span></Link></>}</nav>
+<div className="mx-auto max-w-6xl">
     <Link href={"/"+locale+"/dashboard"} className="text-sm font-bold text-[#176b67] hover:underline">← {t.back}</Link>
     <p className="mt-5 text-xs font-black tracking-[.18em] text-[#176b67]">MIZAN LEGAL / CASE WORKSPACE</p>
     <h1 className="mt-2 text-3xl font-black text-[#14263d] sm:text-4xl">{t.heading}</h1><p className="mt-3 max-w-3xl leading-7 text-[#657184]">{t.intro}</p>
