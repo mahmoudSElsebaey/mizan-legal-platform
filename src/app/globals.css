@@ -784,3 +784,70 @@ img, svg, video { max-width: 100%; }
   .mizan-site-brand { gap: 10px !important; }
   .mizan-site-brand-copy { width: auto !important; }
 }
+
+
+/* Mizan contact experience */
+.mizan-contact-page{overflow:hidden;background:#f7f6f2;color:#1f2937}
+.mizan-contact-hero{position:relative;isolation:isolate;overflow:hidden;background:#082321;color:#fff}
+.mizan-contact-hero:before{position:absolute;inset:0;z-index:-1;background:radial-gradient(ellipse at 72% 30%,rgba(22,122,110,.23),transparent 38%),linear-gradient(120deg,rgba(8,35,33,.1),rgba(8,35,33,.95));content:""}
+.mizan-contact-orbit{position:absolute;z-index:-1;border:1px solid rgba(212,175,124,.15);border-radius:50%;pointer-events:none}
+.mizan-contact-orbit-one{width:560px;height:560px;inset-inline-end:-170px;top:-270px;box-shadow:0 0 0 55px rgba(212,175,124,.025),0 0 0 110px rgba(212,175,124,.02)}
+.mizan-contact-orbit-two{width:340px;height:340px;inset-inline-start:-180px;bottom:-230px}
+.mizan-contact-hero-grid{display:grid;grid-template-columns:1.1fr .9fr;align-items:center;gap:3rem;min-height:520px;padding-block:5rem}
+.mizan-contact-hero-copy{position:relative;z-index:1;max-width:660px}
+.mizan-contact-eyebrow{display:inline-flex;align-items:center;gap:.65rem;color:#d4af7c;font-size:.82rem;font-weight:800;letter-spacing:.06em}
+.mizan-contact-eyebrow span{width:7px;height:7px;border-radius:50%;background:#d4af7c;box-shadow:0 0 0 5px rgba(212,175,124,.12)}
+.mizan-contact-hero h1{max-width:720px;margin:1.4rem 0 0;font-size:clamp(2.7rem,5.5vw,5.1rem);font-weight:850;letter-spacing:-.055em;line-height:1.16}
+[dir=rtl] .mizan-contact-hero h1{letter-spacing:-.035em;line-height:1.4}
+.mizan-contact-hero-copy>p{max-width:570px;margin:1.5rem 0 0;color:#c2d0ca;font-size:1.02rem;line-height:2}
+.mizan-contact-promise{display:flex;align-items:center;gap:.75rem;margin-top:2rem;color:#f1e3c9;font-size:.9rem;font-weight:650}
+.mizan-contact-promise-icon{display:grid;width:36px;height:36px;place-items:center;border:1px solid rgba(212,175,124,.4);border-radius:50%;color:#d4af7c}
+.mizan-contact-back{display:inline-flex;margin-top:2rem;color:#b7c9c1;font-size:.85rem;transition:color .2s}
+.mizan-contact-back:hover{color:#d4af7c}
+.mizan-contact-emblem{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1.4rem}
+.mizan-contact-emblem-ring{display:grid;width:min(100%,340px);aspect-ratio:1;place-items:center;border:1px solid rgba(212,175,124,.32);border-radius:50%;box-shadow:0 0 0 18px rgba(212,175,124,.025),0 0 0 38px rgba(212,175,124,.02);animation:mizan-contact-float 7s ease-in-out infinite}
+.mizan-contact-emblem-inner{display:grid;width:74%;height:74%;place-items:center;border:1px solid rgba(212,175,124,.42);border-radius:50%;background:radial-gradient(circle,rgba(22,122,110,.17),transparent 70%);color:#d4af7c}
+.mizan-contact-emblem-inner svg{width:68%;height:68%}
+.mizan-contact-seal-word{color:rgba(212,175,124,.72);font-family:Georgia,serif;font-size:.67rem;letter-spacing:.32em}
+.mizan-contact-hero-bottom{display:flex;justify-content:space-between;gap:1rem;border-top:1px solid rgba(212,175,124,.16);padding:1rem max(1.5rem,calc((100% - 1160px)/2));color:#a4b7ae;font-size:.62rem;letter-spacing:.2em}
+.mizan-contact-content{padding-block:clamp(3.5rem,7vw,6rem)}
+.mizan-contact-layout{display:grid;grid-template-columns:.78fr 1.22fr;align-items:start;gap:clamp(2rem,6vw,6rem)}
+.mizan-contact-aside{padding-top:1rem}
+.mizan-contact-kicker{color:#167a6e;font-size:.72rem;font-weight:850;letter-spacing:.16em}
+.mizan-contact-aside h2{max-width:440px;margin:1rem 0 0;color:#0f2d2b;font-size:clamp(2rem,3.4vw,3rem);font-weight:850;letter-spacing:-.045em;line-height:1.22}
+[dir=rtl] .mizan-contact-aside h2{line-height:1.5;letter-spacing:-.02em}
+.mizan-contact-aside>p{max-width:430px;margin:1rem 0 0;color:#6b7280;font-size:.95rem;line-height:2}
+.mizan-contact-steps{display:grid;gap:0;margin:2rem 0 0;padding:0;list-style:none}
+.mizan-contact-steps li{display:flex;align-items:center;gap:1rem;border-bottom:1px solid #e2e6df;padding:1rem 0;color:#34443f;font-size:.9rem;font-weight:650}
+.mizan-contact-steps li span{color:#b99a62;font-family:Georgia,serif;font-size:.8rem;letter-spacing:.08em}
+.mizan-contact-privacy{display:flex;gap:.9rem;margin-top:2rem;border:1px solid #e3e7df;border-radius:18px;background:rgba(255,255,255,.55);padding:1.1rem}
+.mizan-contact-privacy>span{display:grid;width:36px;height:36px;flex:0 0 36px;place-items:center;border-radius:12px;background:#e6efeb;color:#167a6e}
+.mizan-contact-privacy strong{display:block;color:#0f2d2b;font-size:.86rem}
+.mizan-contact-privacy p{margin:.4rem 0 0;color:#707a75;font-size:.77rem;line-height:1.85}
+.mizan-contact-form-card{border:1px solid rgba(15,45,43,.08);border-radius:26px;background:#fff;box-shadow:0 24px 80px rgba(15,45,43,.08);padding:clamp(1.25rem,3.5vw,2.6rem)}
+.mizan-contact-form-heading{display:flex;align-items:flex-start;gap:1rem;border-bottom:1px solid #edf0ea;padding-bottom:1.5rem}
+.mizan-contact-form-icon{display:grid;width:46px;height:46px;flex:0 0 46px;place-items:center;border-radius:15px;background:#0f2d2b;color:#d4af7c;font-size:1.3rem}
+.mizan-contact-form-heading h2{margin:.1rem 0 0;color:#0f2d2b;font-size:1.5rem;font-weight:850;letter-spacing:-.035em}
+.mizan-contact-form-heading p{margin:.45rem 0 0;color:#7a827d;font-size:.83rem;line-height:1.8}
+.mizan-contact-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.15rem;margin-top:1.5rem}
+.mizan-contact-field{display:flex;min-width:0;flex-direction:column;gap:.55rem}
+.mizan-contact-field-wide{grid-column:1/-1}
+.mizan-contact-field label{color:#263a34;font-size:.82rem;font-weight:750}
+.mizan-contact-field label span{color:#b85c62}
+.mizan-contact-field input,.mizan-contact-field select,.mizan-contact-field textarea{width:100%;min-height:48px;border:1px solid #dfe5de;border-radius:12px;background:#fbfcfa;padding:.8rem .9rem;color:#1f2937;font-size:.88rem;outline:none;transition:border-color .2s,box-shadow .2s,background .2s}
+.mizan-contact-field textarea{min-height:140px;resize:vertical;line-height:1.8}
+.mizan-contact-field input::placeholder,.mizan-contact-field textarea::placeholder{color:#a2aaa4}
+.mizan-contact-field input:focus,.mizan-contact-field select:focus,.mizan-contact-field textarea:focus{border-color:#167a6e;background:#fff;box-shadow:0 0 0 4px rgba(22,122,110,.1)}
+.mizan-contact-field small{align-self:flex-end;color:#929a94;font-size:.7rem}
+.mizan-contact-submit{display:flex;grid-column:1/-1;min-height:54px;align-items:center;justify-content:space-between;gap:1rem;border:0;border-radius:13px;background:#0f2d2b;padding:.9rem 1.2rem;color:#fff;font-size:.9rem;font-weight:800;cursor:pointer;transition:background .2s,transform .2s}
+.mizan-contact-submit:hover{transform:translateY(-2px);background:#167a6e}
+.mizan-contact-submit:disabled{cursor:wait;opacity:.7;transform:none}
+.mizan-contact-submit span:last-child{display:grid;width:32px;height:32px;place-items:center;border:1px solid rgba(212,175,124,.35);border-radius:50%;color:#d4af7c}
+.mizan-contact-feedback{grid-column:1/-1;margin:0;border-radius:12px;padding:.9rem 1rem;font-size:.84rem;line-height:1.8}
+.mizan-contact-feedback.is-success{border:1px solid #b6dfcd;background:#eef9f2;color:#17613d}
+.mizan-contact-feedback.is-error{border:1px solid #f1c9c9;background:#fff2f2;color:#9f3333}
+.mizan-contact-form-foot{grid-column:1/-1;margin:0;color:#89918b;font-size:.72rem;line-height:1.8}
+@keyframes mizan-contact-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@media(max-width:850px){.mizan-contact-hero-grid{grid-template-columns:1fr .65fr;gap:1rem;min-height:450px}.mizan-contact-emblem-ring{width:min(100%,240px)}.mizan-contact-layout{grid-template-columns:1fr;gap:2rem}.mizan-contact-aside{max-width:700px}.mizan-contact-steps{grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}.mizan-contact-steps li{align-items:flex-start;flex-direction:column;gap:.5rem}.mizan-contact-privacy{max-width:700px}}
+@media(max-width:600px){.mizan-contact-hero-grid{grid-template-columns:1fr;gap:2.5rem;padding-block:3.5rem}.mizan-contact-hero h1{font-size:clamp(2.45rem,10vw,3.8rem)}.mizan-contact-hero-copy>p{font-size:.92rem}.mizan-contact-emblem-ring{width:190px}.mizan-contact-hero-bottom{padding-inline:1rem;font-size:.48rem;letter-spacing:.1em}.mizan-contact-form{grid-template-columns:1fr}.mizan-contact-field-wide,.mizan-contact-submit,.mizan-contact-feedback,.mizan-contact-form-foot{grid-column:auto}.mizan-contact-steps{grid-template-columns:1fr;gap:0}.mizan-contact-steps li{align-items:center;flex-direction:row}.mizan-contact-form-heading h2{font-size:1.25rem}}
+@media(prefers-reduced-motion:reduce){.mizan-contact-emblem-ring{animation:none}}
