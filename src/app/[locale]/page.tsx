@@ -4,12 +4,10 @@ import { getDictionary } from "@/lib/i18n/dictionaries";
 import { isLocale } from "@/lib/i18n/config";
 import { createClient } from "@/lib/supabase/server";
 import { insightsContent } from "@/lib/content/public-site";
-function Mark() { return <span aria-hidden="true" className="grid h-10 w-10 place-items-center rounded-2xl bg-[#14263d] text-[#f7f4ed]"><svg viewBox="0 0 40 40" className="h-7 w-7" fill="none"><path d="M20 5v23M10 11h20M8 12l-5 10h10L8 12Zm24 0-5 10h10L32 12ZM12 32h16M15 28h10" stroke="#b99a62" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg></span>; }
 export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
  const { locale } = await params; if (!isLocale(locale)) notFound(); const t = getDictionary(locale); const ar = locale === "ar";
  type ManagedService = { slug: string; title_ar: string; title_en: string; description_ar: string; description_en: string; sort_order: number };
  let managedServices: ManagedService[] = []; let databaseAvailable = false;
- let officeProfile = { nameAr: "ميزان للمحاماة والاستشارات القانونية", nameEn: "Mizan Legal", email: "", phone: "", addressAr: "", addressEn: "" };
  try { const supabase = await createClient(); const { data, error } = await supabase.from("office_services").select("slug,title_ar,title_en,description_ar,description_en,sort_order").eq("is_published", true).order("sort_order"); if (!error) { managedServices = (data ?? []) as ManagedService[]; databaseAvailable = true; } const { data: settingsRow, error: settingsError } = await supabase.from("office_settings").select("value").eq("key", "office.profile").maybeSingle(); if (!settingsError && settingsRow?.value) { const saved = settingsRow.value as Partial<typeof officeProfile>; officeProfile = { nameAr: saved.nameAr || officeProfile.nameAr, nameEn: saved.nameEn || officeProfile.nameEn, email: saved.email || "", phone: saved.phone || "", addressAr: saved.addressAr || "", addressEn: saved.addressEn || "" }; } } catch { /* Static homepage remains available until Supabase is configured. */ }
  const serviceCards = databaseAvailable ? managedServices.map((item) => ({ slug: item.slug, number: "", title: ar ? item.title_ar : item.title_en, description: ar ? item.description_ar : item.description_en })) : t.services.items.map((item, index) => ({ slug: ["civil", "business", "family", "contracts"][index], number: item.number, title: item.title, description: item.description }));
  return <main className="mizan-homepage">
