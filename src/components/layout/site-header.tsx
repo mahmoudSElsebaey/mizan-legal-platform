@@ -63,7 +63,7 @@ export function SiteHeader({ locale }: { locale: Locale }) {
       </Link>
       <nav id="mizan-mobile-navigation" className={mobileMenuOpen ? "mizan-site-nav is-mobile-open" : "mizan-site-nav"} aria-label={ar ? "التنقل الرئيسي" : "Main navigation"} aria-hidden={!mobileMenuOpen && undefined}>
         {items.map(item => <Link key={item.href} href={item.href} aria-current={item.active ? "page" : undefined} className={item.active ? "is-active" : ""} onClick={() => setMobileMenuOpen(false)}>{item.label}</Link>)}
-        <Link href={`/${locale}/contact`} onClick={() => setMobileMenuOpen(false)}>{ar ? "تواصل معنا" : "Contact"}</Link>
+        <Link href={`/${locale}/contact`} aria-current={pathname.startsWith(`/${locale}/contact`) ? "page" : undefined} className={pathname.startsWith(`/${locale}/contact`) ? "is-active" : ""} onClick={() => setMobileMenuOpen(false)}>{ar ? "تواصل معنا" : "Contact"}</Link>
         <div className="mizan-mobile-menu-extras">
           <section className="mizan-mobile-menu-section">
             <h2>{ar ? "اللغة" : "Language"}</h2>
