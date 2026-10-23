@@ -9,9 +9,9 @@ export default async function ForgotPasswordPage({ params }: { params: Promise<{
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
   return (
-    <main className="min-h-[70vh] bg-stone-50 px-4 py-14 sm:py-20">
-      <div className="mx-auto mb-6 max-w-md text-center">
-        <a href={`/${locale}`} className="text-sm font-medium text-stone-600 underline-offset-4 hover:text-amber-800 hover:underline">
+    <main className="mizan-auth-page min-h-screen px-4 py-8 sm:py-12">
+      <div className="mizan-auth-back mx-auto mb-7 w-full max-w-5xl">
+        <a href={`/${locale}`} className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/70 px-4 py-2.5 text-sm font-semibold text-[#0f2d2b] shadow-sm backdrop-blur transition hover:-translate-y-0.5 hover:bg-white">
           {locale === "ar" ? "العودة إلى الموقع" : "Back to website"}
         </a>
       </div>
