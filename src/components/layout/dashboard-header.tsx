@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { ConversationLauncher } from "@/components/layout/conversation-launcher";
 
 type Locale = "ar" | "en";
 type Notice = { id: string; kind: string; title: string; body: string | null; href: string | null; created_at: string; read_at: string | null };
@@ -83,6 +84,7 @@ export function DashboardHeader({ locale }: { locale: Locale }) {
           <span><strong>MIZAN</strong><small>{ar ? "مساحة العمل القانونية" : "LEGAL WORKSPACE"}</small></span>
         </Link>
         <div className="mizan-dashboard-header-actions">
+          <ConversationLauncher locale={locale} />
           <div className="mizan-popover-anchor" ref={languageRef}>
             <button type="button" className="mizan-language mizan-dashboard-language" aria-label={ar ? "تغيير اللغة" : "Change language"} aria-expanded={languageOpen} onClick={() => { setLanguageOpen((value) => !value); setNotificationsOpen(false); }}>
               <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg><span>{ar ? "AR" : "EN"}</span><span aria-hidden="true">⌄</span>
