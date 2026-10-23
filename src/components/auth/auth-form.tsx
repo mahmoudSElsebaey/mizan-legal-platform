@@ -143,7 +143,7 @@ export function AuthForm({ locale, mode, demoAccounts = [] }: { locale: Locale; 
         <div className="mt-6 rounded-2xl border border-amber-200 bg-amber-50/70 p-4">
           <div className="mb-3">
             <h2 className="font-semibold text-stone-900">{locale === "ar" ? "حسابات التجربة" : "Demo accounts"}</h2>
-            <p className="mt-1 text-xs leading-5 text-stone-600">{locale === "ar" ? "للتطوير المحلي فقط. اضغط على الحساب لملء بيانات الدخول." : "Local development only. Select an account to fill in its credentials."}</p>
+            <p className="mt-1 text-xs leading-5 text-stone-600">{locale === "ar" ? "حسابات تجريبية لعرض وظائف المنصة فقط. اضغط على الحساب لملء بيانات الدخول." : "Demo accounts for portfolio testing only. Select an account to fill in its credentials."}</p>
           </div>
           <div className="grid gap-2 sm:grid-cols-2">
             {demoAccounts.map((account) => (
