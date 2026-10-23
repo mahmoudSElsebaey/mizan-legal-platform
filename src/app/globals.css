@@ -766,3 +766,21 @@ img, svg, video { max-width: 100%; }
   .mizan-site-nav a { font-size: .74rem; }
   .mizan-site-brand { gap: 10px; }
 }
+
+/* Tighten the wordmark: remove the fixed-width empty space beside the scale icon */
+.mizan-site-brand { gap: 10px !important; }
+.mizan-site-brand-copy {
+  width: auto !important;
+  min-width: 0;
+  flex: 0 1 auto;
+  align-items: flex-start !important;
+  text-align: start !important;
+}
+.mizan-site-brand-copy strong,
+.mizan-site-brand-copy small {
+  width: auto !important;
+}
+@media (max-width: 760px) {
+  .mizan-site-brand { gap: 10px !important; }
+  .mizan-site-brand-copy { width: auto !important; }
+}
