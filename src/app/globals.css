@@ -129,3 +129,28 @@ img, svg, video { max-width: 100%; }
     transition-duration: .01ms !important;
   }
 }
+
+/* Dashboard application shell */
+.mizan-dashboard { min-height: 100vh; display: flex; flex-direction: column; background: var(--ivory); }
+.mizan-dashboard-header { position: sticky; top: 0; z-index: 20; border-bottom: 1px solid rgba(228,231,226,.9); background: rgba(255,255,255,.94); backdrop-filter: blur(16px); }
+.mizan-dashboard-header-inner { width: min(1280px, calc(100% - 2rem)); min-height: 76px; margin-inline: auto; display: flex; align-items: center; gap: 1.5rem; }
+.mizan-dashboard-brand { display: inline-flex; align-items: center; gap: .7rem; flex-shrink: 0; color: var(--forest); }
+.mizan-brand-symbol { display: grid; width: 42px; height: 42px; place-items: center; border-radius: 14px 14px 14px 4px; background: var(--forest); color: var(--gold); font-family: Georgia, serif; font-size: 1.45rem; font-weight: 700; }
+.mizan-dashboard-brand strong { display: block; font-size: 1rem; letter-spacing: .14em; }
+.mizan-dashboard-brand small { display: block; margin-top: .12rem; color: var(--slate); font-size: .62rem; letter-spacing: .08em; }
+.mizan-dashboard-nav { display: flex; flex: 1; align-items: center; gap: .3rem; overflow-x: auto; }
+.mizan-dashboard-nav a, .mizan-dashboard-home { white-space: nowrap; border-radius: 999px; padding: .65rem .85rem; color: var(--text-secondary); font-size: .875rem; font-weight: 650; transition: background .18s ease, color .18s ease; }
+.mizan-dashboard-nav a:hover, .mizan-dashboard-home:hover { background: #edf4f1; color: var(--teal); }
+.mizan-dashboard-home { border: 1px solid var(--border); color: var(--forest); }
+.mizan-dashboard-content { width: min(1280px, calc(100% - 2rem)); margin: 0 auto; padding-block: clamp(1.5rem, 4vw, 3rem); flex: 1; }
+.mizan-dashboard-footer { display: flex; align-items: center; justify-content: space-between; gap: 1rem; border-top: 1px solid var(--border); padding: 1.25rem max(1rem, calc((100% - 1280px) / 2)); color: var(--slate); font-size: .8rem; }
+.mizan-dashboard-footer a { color: var(--teal); font-weight: 650; }
+@media (max-width: 760px) {
+  .mizan-dashboard-header { position: static; }
+  .mizan-dashboard-header-inner { flex-wrap: wrap; gap: .75rem; padding-block: .8rem; }
+  .mizan-dashboard-brand { margin-inline-end: auto; }
+  .mizan-dashboard-nav { order: 3; flex-basis: 100%; padding-bottom: .2rem; }
+  .mizan-dashboard-nav a { padding: .55rem .7rem; font-size: .8rem; }
+  .mizan-dashboard-home { font-size: .8rem; }
+  .mizan-dashboard-footer { align-items: flex-start; flex-direction: column; }
+}
