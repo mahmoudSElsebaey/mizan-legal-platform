@@ -61,7 +61,35 @@ export function SiteHeader({ locale }: { locale: Locale }) {
       <Link href={`/${locale}`} className="mizan-site-brand" aria-label={ar ? "ميزان - الرئيسية" : "MIZAN home"}>
         <span className="mizan-site-mark" aria-hidden="true"><svg viewBox="0 0 64 64" fill="none"><path d="M32 8v40M19 16h26M12 20l-7 16h14L12 20Zm40 0-7 16h14L52 20ZM5 36c1.2 5 13.8 5 14 0m26 0c1.2 5 13.8 5 14 0M20 48h24M24 53h16M28 58h8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/><path d="M32 5l3 3-3 3-3-3 3-3Z" fill="currentColor"/><circle cx="32" cy="48" r="2" fill="currentColor"/></svg></span><span className="mizan-site-brand-copy"><strong className={ar ? "mizan-arabic-wordmark" : ""}>{ar ? "مِــيــزَان" : "MIZAN"}</strong><small>{ar ? "مكتب محاماة واستشارات قانونية" : "LAW FIRM & LEGAL CONSULTANCY"}</small></span>
       </Link>
-      <nav id="mizan-mobile-navigation" className={mobileMenuOpen ? "mizan-site-nav is-mobile-open" : "mizan-site-nav"} aria-label={ar ? "التنقل الرئيسي" : "Main navigation"} aria-hidden={undefined}>{items.map(item => <Link key={item.href} href={item.href} aria-current={item.active ? "page" : undefined} className={item.active ? "is-active" : ""} onClick={() => setMobileMenuOpen(false)}>{item.label}</Link>)}<Link href={`/${locale}#contact`} onClick={() => setMobileMenuOpen(false)}>{ar ? "تواصل معنا" : "Contact"}</Link></nav>
+      <nav id="mizan-mobile-navigation" className={mobileMenuOpen ? "mizan-site-nav is-mobile-open" : "mizan-site-nav"} aria-label={ar ? "التنقل الرئيسي" : "Main navigation"} aria-hidden={!mobileMenuOpen && undefined}>
+        {items.map(item => <Link key={item.href} href={item.href} aria-current={item.active ? "page" : undefined} className={item.active ? "is-active" : ""} onClick={() => setMobileMenuOpen(false)}>{item.label}</Link>)}
+        <Link href={`/${locale}#contact`} onClick={() => setMobileMenuOpen(false)}>{ar ? "تواصل معنا" : "Contact"}</Link>
+        <div className="mizan-mobile-menu-extras">
+          <section className="mizan-mobile-menu-section">
+            <h2>{ar ? "اللغة" : "Language"}</h2>
+            <div className="mizan-mobile-language-options">
+              <Link href={switchPath("ar")} aria-current={ar ? "page" : undefined} onClick={() => setMobileMenuOpen(false)} className={ar ? "is-selected" : ""}><span className="mizan-mobile-option-icon">ع</span><span>{ar ? "العربية" : "Arabic"}</span>{ar && <b>✓</b>}</Link>
+              <Link href={switchPath("en")} aria-current={!ar ? "page" : undefined} onClick={() => setMobileMenuOpen(false)} className={!ar ? "is-selected" : ""}><span className="mizan-mobile-option-icon">A</span><span>English</span>{!ar && <b>✓</b>}</Link>
+            </div>
+          </section>
+          {user ? <>
+            <section className="mizan-mobile-menu-section">
+              <h2>{ar ? "حسابك" : "Your account"}</h2>
+              <div className="mizan-mobile-account-summary"><span className="mizan-avatar">{(firstName || user.email || "M").slice(0,1).toLocaleUpperCase()}</span><span><strong>{firstName || (ar ? "حسابي" : "My account")}</strong><small>{user.email}</small></span></div>
+              <div className="mizan-mobile-account-links">
+                <Link href={`/${locale}/dashboard`} onClick={() => setMobileMenuOpen(false)}><span>▦</span>{ar ? "لوحة التحكم" : "Dashboard"}<b>↗</b></Link>
+                <Link href={`/${locale}/dashboard/conversations`} onClick={() => setMobileMenuOpen(false)}><span>◌</span>{ar ? "المحادثات والرسائل" : "Messages"}<b>↗</b></Link>
+                <Link href={`/${locale}/dashboard/appointments`} onClick={() => setMobileMenuOpen(false)}><span>▣</span>{ar ? "المواعيد" : "Appointments"}<b>↗</b></Link>
+              </div>
+            </section>
+            <section className="mizan-mobile-menu-section mizan-mobile-notifications">
+              <h2>{ar ? "الإشعارات" : "Notifications"}</h2>
+              <div className="mizan-mobile-notification-empty"><span>✦</span><p>{ar ? "ستظهر هنا تحديثات المواعيد والرسائل الجديدة." : "Appointment updates and new messages will appear here."}</p></div>
+            </section>
+            <button type="button" className="mizan-mobile-signout" disabled={busy} onClick={() => { setMobileMenuOpen(false); void signOut(); }}><span>↪</span>{busy ? (ar ? "جارٍ الخروج..." : "Signing out...") : (ar ? "تسجيل الخروج" : "Sign out")}</button>
+          </> : <Link className="mizan-mobile-signin" href={`/${locale}/login`} onClick={() => setMobileMenuOpen(false)}>{ar ? "تسجيل الدخول" : "Sign in"}<span>↗</span></Link>}
+        </div>
+      </nav>
       <button type="button" className={mobileMenuOpen ? "mizan-mobile-menu-toggle is-open" : "mizan-mobile-menu-toggle"} aria-label={mobileMenuOpen ? (ar ? "إغلاق القائمة" : "Close menu") : (ar ? "فتح القائمة" : "Open menu")} aria-expanded={mobileMenuOpen} aria-controls="mizan-mobile-navigation" onClick={() => setMobileMenuOpen(value => !value)}><span/><span/><span/></button>
       <div className="mizan-site-actions">
         <div className="mizan-popover-anchor" ref={languageRef}>
