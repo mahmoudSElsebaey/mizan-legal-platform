@@ -139,7 +139,7 @@ export function ConversationLauncher({ locale }: { locale: Locale }) {
     const closeMessageMenus = (event: MouseEvent) => {
       const target = event.target as Node;
       document.querySelectorAll<HTMLDetailsElement>(".mizan-chat-message-menu[open]").forEach((menu) => {
-        if (!menu.contains(target)) menu.removeAttribute("open");
+        if (!menu.contains(target) || !(target instanceof Element && target.closest("summary"))) menu.removeAttribute("open");
       });
     };
     document.addEventListener("click", closeMessageMenus);
