@@ -1,3 +1,43 @@
 @import "tailwindcss";
-:root{--midnight:#14263d;--teal:#176b67;--ivory:#f7f4ed;--brass:#b99a62;--slate:#657184;--rose:#b85c62;--white:#fff;--font-sans:Arial,Tahoma,"Segoe UI",sans-serif}
-*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--ivory);color:var(--midnight);font-family:var(--font-sans);-webkit-font-smoothing:antialiased}a{color:inherit;text-decoration:none}button,input,textarea,select{font:inherit}::selection{background:rgba(23,107,103,.18)}:focus-visible{outline:3px solid var(--brass);outline-offset:3px}.container{width:min(1160px,calc(100% - 40px));margin-inline:auto}.eyebrow{color:var(--teal);font-size:.78rem;font-weight:800;letter-spacing:.12em}.section{padding-block:88px}.section-title{font-size:clamp(2rem,4vw,3.35rem);line-height:1.15;letter-spacing:-.04em}.muted{color:var(--slate)}
+
+:root {
+  color-scheme: light;
+  --forest: #0f2d2b;
+  --teal: #167a6e;
+  --ivory: #f7f6f2;
+  --gold: #d4af7c;
+  --charcoal: #1f2937;
+  --slate: #6b7280;
+  --rose: #b85c62;
+  --white: #ffffff;
+  --border: #e4e7e2;
+  --surface: #ffffff;
+  --surface-muted: #f0f2ed;
+  --midnight: var(--forest);
+  --brass: var(--gold);
+  --font-sans: "IBM Plex Sans Arabic", "Manrope", Tahoma, Arial, sans-serif;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--ivory);
+  color: var(--charcoal);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+a { color: inherit; text-decoration: none; }
+button, input, textarea, select { font: inherit; }
+::selection { background: rgba(22, 122, 110, .18); }
+:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+.container { width: min(1160px, calc(100% - 40px)); margin-inline: auto; }
+.eyebrow { color: var(--teal); font-size: .78rem; font-weight: 800; letter-spacing: .1em; }
+.section { padding-block: 88px; }
+.section-title { font-size: clamp(2rem, 4vw, 3.35rem); line-height: 1.15; letter-spacing: -.035em; }
+.muted { color: var(--slate); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
