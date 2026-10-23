@@ -100,50 +100,50 @@ export function AuthForm({ locale, mode, demoAccounts = [] }: { locale: Locale; 
   }
 
   return (
-    <section className="mx-auto w-full max-w-md rounded-3xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
+    <section className="mx-auto w-full max-w-md rounded-3xl border border-[var(--border)] bg-white p-6 shadow-[var(--shadow-card)] sm:p-8">
       <div className="mb-7">
-        <p className="mb-2 text-sm font-semibold tracking-wide text-amber-700">MIZAN LEGAL · ميزان</p>
-        <h1 className="text-2xl font-bold text-stone-950">{labels.title}</h1>
-        <p className="mt-2 text-sm leading-6 text-stone-600">{labels.description}</p>
+        <p className="mb-2 text-sm font-semibold tracking-wide text-[var(--teal)]">MIZAN LEGAL · ميزان</p>
+        <h1 className="text-2xl font-bold text-[var(--forest)]">{labels.title}</h1>
+        <p className="mt-2 text-sm leading-6 text-[var(--slate)]">{labels.description}</p>
       </div>
 
       <form className="space-y-4" onSubmit={handleSubmit}>
         {mode === "register" && (
-          <label className="block space-y-2 text-sm font-medium text-stone-700">
+          <label className="block space-y-2 text-sm font-medium text-[var(--charcoal)]">
             {t.fullName}
-            <input name="fullName" autoComplete="name" required maxLength={120} className="w-full rounded-xl border border-stone-300 px-4 py-3 outline-none transition focus:border-amber-700 focus:ring-2 focus:ring-amber-100" />
+            <input name="fullName" autoComplete="name" required maxLength={120} className="w-full rounded-xl border border-[var(--border)] px-4 py-3 outline-none transition focus:border-[var(--teal)] focus:ring-2 focus:ring-emerald-100" />
           </label>
         )}
         {mode !== "reset-password" && (
-          <label className="block space-y-2 text-sm font-medium text-stone-700">
+          <label className="block space-y-2 text-sm font-medium text-[var(--charcoal)]">
             {t.email}
-            <input name="email" type="email" autoComplete="email" value={emailValue} onChange={(event) => setEmailValue(event.target.value)} required maxLength={254} className="w-full rounded-xl border border-stone-300 px-4 py-3 outline-none transition focus:border-amber-700 focus:ring-2 focus:ring-amber-100" />
+            <input name="email" type="email" autoComplete="email" value={emailValue} onChange={(event) => setEmailValue(event.target.value)} required maxLength={254} className="w-full rounded-xl border border-[var(--border)] px-4 py-3 outline-none transition focus:border-[var(--teal)] focus:ring-2 focus:ring-emerald-100" />
           </label>
         )}
         {mode !== "forgot-password" && (
-          <label className="block space-y-2 text-sm font-medium text-stone-700">
+          <label className="block space-y-2 text-sm font-medium text-[var(--charcoal)]">
             {t.password}
-            <input name="password" type="password" value={passwordValue} onChange={(event) => setPasswordValue(event.target.value)} autoComplete={mode === "login" ? "current-password" : "new-password"} required minLength={8} maxLength={128} className="w-full rounded-xl border border-stone-300 px-4 py-3 outline-none transition focus:border-amber-700 focus:ring-2 focus:ring-amber-100" />
+            <input name="password" type="password" value={passwordValue} onChange={(event) => setPasswordValue(event.target.value)} autoComplete={mode === "login" ? "current-password" : "new-password"} required minLength={8} maxLength={128} className="w-full rounded-xl border border-[var(--border)] px-4 py-3 outline-none transition focus:border-[var(--teal)] focus:ring-2 focus:ring-emerald-100" />
           </label>
         )}
         {mode === "reset-password" && (
-          <label className="block space-y-2 text-sm font-medium text-stone-700">
+          <label className="block space-y-2 text-sm font-medium text-[var(--charcoal)]">
             {t.confirm}
-            <input name="confirmPassword" type="password" autoComplete="new-password" required minLength={8} maxLength={128} className="w-full rounded-xl border border-stone-300 px-4 py-3 outline-none transition focus:border-amber-700 focus:ring-2 focus:ring-amber-100" />
+            <input name="confirmPassword" type="password" autoComplete="new-password" required minLength={8} maxLength={128} className="w-full rounded-xl border border-[var(--border)] px-4 py-3 outline-none transition focus:border-[var(--teal)] focus:ring-2 focus:ring-emerald-100" />
           </label>
         )}
         {error && <p role="alert" className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-800">{error}</p>}
         {message && <p role="status" className="rounded-xl bg-emerald-50 px-4 py-3 text-sm text-emerald-800">{message}</p>}
-        <button disabled={loading} type="submit" className="w-full rounded-xl bg-stone-950 px-4 py-3 font-semibold text-white transition hover:bg-amber-800 disabled:cursor-not-allowed disabled:opacity-60">
+        <button disabled={loading} type="submit" className="w-full rounded-xl bg-[var(--forest)] px-4 py-3 font-semibold text-white transition hover:bg-[var(--teal)] disabled:cursor-not-allowed disabled:opacity-60">
           {loading ? t.working : labels.submit}
         </button>
       </form>
 
       {mode === "login" && demoAccounts.length > 0 && (
-        <div className="mt-6 rounded-2xl border border-amber-200 bg-amber-50/70 p-4">
+        <div className="mt-6 rounded-2xl border border-[var(--border)] bg-[var(--surface-muted)] p-4">
           <div className="mb-3">
-            <h2 className="font-semibold text-stone-900">{locale === "ar" ? "حسابات التجربة" : "Demo accounts"}</h2>
-            <p className="mt-1 text-xs leading-5 text-stone-600">{locale === "ar" ? "حسابات تجريبية لعرض وظائف المنصة فقط. اضغط على الحساب لملء بيانات الدخول." : "Demo accounts for portfolio testing only. Select an account to fill in its credentials."}</p>
+            <h2 className="font-semibold text-[var(--forest)]">{locale === "ar" ? "حسابات التجربة" : "Demo accounts"}</h2>
+            <p className="mt-1 text-xs leading-5 text-[var(--slate)]">{locale === "ar" ? "حسابات تجريبية لعرض وظائف المنصة فقط. اضغط على الحساب لملء بيانات الدخول." : "Demo accounts for portfolio testing only. Select an account to fill in its credentials."}</p>
           </div>
           <div className="grid gap-2 sm:grid-cols-2">
             {demoAccounts.map((account) => (
@@ -151,21 +151,21 @@ export function AuthForm({ locale, mode, demoAccounts = [] }: { locale: Locale; 
                 key={account.email}
                 type="button"
                 onClick={() => { setEmailValue(account.email); setPasswordValue(account.password); setError(""); setMessage(""); }}
-                className="rounded-xl border border-stone-200 bg-white px-3 py-3 text-start text-sm transition hover:border-amber-600 hover:bg-amber-50"
+                className="rounded-xl border border-[var(--border)] bg-white px-3 py-3 text-start text-sm transition hover:border-[var(--teal)] hover:bg-emerald-50"
               >
-                <span className="block font-semibold text-stone-900">{account.label}</span>
-                <span className="mt-1 block break-all text-xs text-stone-600">{account.email}</span>
+                <span className="block font-semibold text-[var(--forest)]">{account.label}</span>
+                <span className="mt-1 block break-all text-xs text-[var(--slate)]">{account.email}</span>
               </button>
             ))}
           </div>
         </div>
       )}
 
-      <div className="mt-6 flex flex-wrap items-center justify-between gap-3 text-sm text-stone-600">
-        <p>{labels.switchText} <Link className="font-semibold text-amber-800 underline-offset-4 hover:underline" href={`/${locale}/${mode === "login" ? "register" : "login"}`}>{labels.switchLabel}</Link></p>
-        {mode === "login" && <Link className="font-medium text-amber-800 underline-offset-4 hover:underline" href={`/${locale}/forgot-password`}>{t.login.forgot}</Link>}
+      <div className="mt-6 flex flex-wrap items-center justify-between gap-3 text-sm text-[var(--slate)]">
+        <p>{labels.switchText} <Link className="font-semibold text-[var(--teal)] underline-offset-4 hover:underline" href={`/${locale}/${mode === "login" ? "register" : "login"}`}>{labels.switchLabel}</Link></p>
+        {mode === "login" && <Link className="font-medium text-[var(--teal)] underline-offset-4 hover:underline" href={`/${locale}/forgot-password`}>{t.login.forgot}</Link>}
       </div>
-      {mode === "login" && <p className="mt-5 text-xs leading-5 text-stone-500">{locale === "ar" ? "إنشاء الحساب لا يمنح صلاحيات موظف أو مدير؛ تتم إدارة صلاحيات المكتب بشكل منفصل وآمن." : "Creating an account does not grant staff or administrator access. Office roles are assigned separately and securely."}</p>}
+      {mode === "login" && <p className="mt-5 text-xs leading-5 text-[var(--slate)]">{locale === "ar" ? "إنشاء الحساب لا يمنح صلاحيات موظف أو مدير؛ تتم إدارة صلاحيات المكتب بشكل منفصل وآمن." : "Creating an account does not grant staff or administrator access. Office roles are assigned separately and securely."}</p>}
     </section>
   );
 }
