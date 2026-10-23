@@ -73,6 +73,17 @@ export function ConversationThreadClient({
   }, [conversationId]);
 
   useEffect(() => {
+    const closeMessageMenus = (event: MouseEvent) => {
+      const target = event.target as Node;
+      document.querySelectorAll<HTMLDetailsElement>(".mizan-thread-menu[open]").forEach((menu) => {
+        if (!menu.contains(target)) menu.removeAttribute("open");
+      });
+    };
+    document.addEventListener("click", closeMessageMenus);
+    return () => document.removeEventListener("click", closeMessageMenus);
+  }, []);
+
+  useEffect(() => {
     let active = true;
     const paths = Array.from(new Set(messages.flatMap((message) => message.attachments).map((item) => item.path))).filter((path) => !urls[path]);
     if (!paths.length) return;
