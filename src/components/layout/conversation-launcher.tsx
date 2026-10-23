@@ -74,7 +74,7 @@ export function ConversationLauncher({ locale }: { locale: Locale }) {
       const { data: profiles } = await supabase.from("profiles").select("id,full_name").in("id", ids);
       setPeople(Object.fromEntries(((profiles || []) as Person[]).map((person) => [person.id, person.full_name || (ar ? "مستخدم" : "User")])));
     }
-    const { count } = await supabase.from("notifications").select("id", { count: "exact", head: true }).is("read_at", null);
+    const { count } = await supabase.from("notifications").select("id", { count: "exact", head: true }).eq("kind", "new_message").is("read_at", null);
     setUnread(count || 0);
     if (!selected && rows[0]) setSelected(rows[0].id);
     if (playSound && soundOn) playIncomingTone();
@@ -172,8 +172,8 @@ export function ConversationLauncher({ locale }: { locale: Locale }) {
         <aside className="mizan-chat-sidebar">
           <div className="mizan-chat-sidebar-head"><div><span className="mizan-chat-eyebrow">MIZAN · PRIVATE</span><h2>{labels.title}</h2><p>{labels.subtitle}</p></div><button type="button" className="mizan-chat-close" aria-label={ar ? "إغلاق" : "Close"} onClick={() => setOpen(false)}>×</button></div>
           <label className="mizan-chat-sound"><input type="checkbox" checked={soundOn} onChange={(event) => setSoundOn(event.target.checked)}/>{labels.sound}</label>
-          <p className="mizan-chat-list-label">{labels.search}</p>
-          <div className="mizan-chat-thread-list">{threads.length === 0 ? <p className="mizan-chat-empty">{labels.empty}</p> : threads.map((thread) => {
+          <label className="mizan-chat-search-label"><span className="sr-only">{labels.search}</span><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 4.5 4.5"/></svg><input value={searchQuery} onChange={(event) => setSearchQuery(event.target.value)} placeholder={labels.search} /></label>
+          <div className="mizan-chat-thread-list">{filteredThreads.length === 0 ? <p className="mizan-chat-empty">{threads.length === 0 ? labels.empty : (ar ? "لا توجد نتائج مطابقة" : "No matching conversations")}</p> : filteredThreads.map((thread) => {
             const participant = thread.client_id === userId ? thread.staff_id : thread.client_id;
             return <button type="button" key={thread.id} onClick={() => setSelected(thread.id)} className={"mizan-chat-thread" + (selected === thread.id ? " is-active" : "")}>
               <span className="mizan-chat-avatar">{initials(people[participant] || (ar ? "م" : "M"))}</span><span className="mizan-chat-thread-copy"><strong>{people[participant] || (ar ? "مستخدم" : "User")}</strong><small>{thread.subject}</small><time>{formatTime(thread.last_message_at)}</time></span><span className={"mizan-chat-status-dot" + (thread.status === "open" ? " is-open" : "")}/>
