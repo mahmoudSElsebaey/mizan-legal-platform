@@ -108,7 +108,7 @@ export function ConversationLauncher({ locale }: { locale: Locale }) {
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "conversation_messages" }, (payload) => {
         const message = payload.new as Message;
         if (message.sender_id !== userId && seen.current.has(message.id) === false) {
-          if (soundOn) playIncomingTone();
+          if (selected !== message.conversation_id && soundOn) playIncomingTone();
           if (selected === message.conversation_id) void loadMessages(message.conversation_id, userId);
           else void loadThreads(userId);
         }
@@ -117,7 +117,6 @@ export function ConversationLauncher({ locale }: { locale: Locale }) {
         const notice = payload.new as { user_id?: string; kind?: string };
         if (notice.user_id === userId) {
           setUnread((count) => count + 1);
-          if (notice.kind === "new_message" && soundOn) playIncomingTone();
           void loadThreads(userId);
         }
       }).subscribe();
