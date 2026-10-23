@@ -46,7 +46,7 @@ export function SiteHeader({ locale }: { locale: Locale }) {
   }, []);
   const items = [
     { href: `/${locale}`, label: ar ? "الرئيسية" : "Home", active: pathname === `/${locale}` },
-    { href: `/${locale}#services`, label: ar ? "الخدمات" : "Services", active: pathname.includes("/services") || pathname === `/${locale}` && false },
+    { href: `/${locale}/services`, label: ar ? "الخدمات" : "Services", active: pathname.includes("/services") },
     { href: `/${locale}/office`, label: ar ? "المكتب" : "The Office", active: pathname.includes("/office") },
     { href: `/${locale}/lawyer`, label: ar ? "المحامي" : "Lawyer", active: pathname.includes("/lawyer") },
     { href: `/${locale}/insights`, label: ar ? "المقالات" : "Insights", active: pathname.includes("/insights") },
