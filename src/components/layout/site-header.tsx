@@ -18,7 +18,7 @@ export function SiteHeader({ locale }: { locale: Locale }) {
   const languageRef = useRef<HTMLDivElement>(null);
   const profileRef = useRef<HTMLDivElement>(null);
   const notificationRef = useRef<HTMLDivElement>(null);
-  const switchPath = (next: Locale) => pathname.replace(/^\/(ar|en)(?=\/|$)/, `/${next}`);
+  const switchPath = (next: Locale) => pathname.replace(/^\/(ar|en)(?=\/|$)/, `/${next}`);\n  const firstName = (user?.name || "").trim().split(/\\s+/)[0];
   useEffect(() => {
     let alive = true;
     const supabase = createClient();
@@ -58,7 +58,7 @@ export function SiteHeader({ locale }: { locale: Locale }) {
     <div className="mizan-site-header-inner">
       <Link href={`/${locale}`} className="mizan-site-brand" aria-label={ar ? "ميزان - الرئيسية" : "MIZAN home"}>
         <span className="mizan-site-mark" aria-hidden="true"><svg viewBox="0 0 48 48" fill="none"><path d="M5 39V8l19 17L43 8v31M5 8l19 17L43 8M14 39V25m20 14V25" stroke="currentColor" strokeWidth="2.5" strokeLinejoin="round"/></svg></span>
-        <span className="mizan-site-brand-copy"><strong className={ar ? "mizan-arabic-wordmark" : ""}>{ar ? "ميزان" : "MIZAN"}</strong><small>{ar ? "منصتك القانونية" : "YOUR LEGAL PLATFORM"}</small></span>
+        <span className="mizan-site-mark" aria-hidden="true"><svg viewBox="0 0 64 64" fill="none"><path d="M32 8v40M19 16h26M12 20l-7 16h14L12 20Zm40 0-7 16h14L52 20ZM5 36c1.2 5 13.8 5 14 0m26 0c1.2 5 13.8 5 14 0M20 48h24M24 53h16M28 58h8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/><path d="M32 5l3 3-3 3-3-3 3-3Z" fill="currentColor"/><circle cx="32" cy="48" r="2" fill="currentColor"/></svg></span><span className="mizan-site-brand-copy"><strong className={ar ? "mizan-arabic-wordmark" : ""}>{ar ? "مِــيــزَان" : "MIZAN"}</strong><small>{ar ? "مكتب محاماة واستشارات قانونية" : "LAW FIRM & LEGAL CONSULTANCY"}</small></span>
       </Link>
       <nav className="mizan-site-nav" aria-label={ar ? "التنقل الرئيسي" : "Main navigation"}>{items.map(item => <Link key={item.href} href={item.href} aria-current={item.active ? "page" : undefined} className={item.active ? "is-active" : ""}>{item.label}</Link>)}<Link href={`/${locale}#contact`} className={pathname === `/${locale}` ? "" : ""}>{ar ? "تواصل معنا" : "Contact"}</Link></nav>
       <div className="mizan-site-actions">
