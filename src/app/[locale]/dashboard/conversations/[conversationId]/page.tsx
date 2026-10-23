@@ -63,6 +63,7 @@ export default async function ConversationDetailPage({
       <section className="mt-7 rounded-2xl border border-[#14263d]/10 bg-white p-4 sm:p-7">
         <h2 className="text-lg font-black text-[#14263d]">{t.messages}</h2>
         <ConversationThreadClient locale={locale} conversationId={conversation.id} userId={user.id} initialMessages={(messages || []) as Array<{ id: string; conversation_id: string; sender_id: string; body: string; created_at: string; attachments: Array<{ path: string; name: string; mime_type: string; size: number }>; edited_at: string | null; deleted_at: string | null }>} canSend={canSend} />
+        {!canSend && <p className="mt-5 rounded-xl bg-slate-50 p-4 text-sm text-slate-600">{t.closedNotice}</p>}
         {(isClient || isActiveStaff) && <form action={changeConversationStatus} className="mt-4 border-t border-[#14263d]/10 pt-4">
           <input type="hidden" name="locale" value={locale}/><input type="hidden" name="conversationId" value={conversation.id}/>
           <input type="hidden" name="status" value={conversation.status === "open" ? "closed" : "open"}/>
