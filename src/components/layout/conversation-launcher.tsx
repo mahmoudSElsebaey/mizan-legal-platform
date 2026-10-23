@@ -59,6 +59,7 @@ export function ConversationLauncher({ locale }: { locale: Locale }) {
     online: "مراسلة آمنة", sound: "صوت الإشعار", openFull: "فتح صفحة المحادثات",
     closed: "مغلقة", noMessages: "ابدأ المحادثة برسالتك الأولى", failed: "تعذر تحميل البيانات أو إرسال الرسالة.",
     you: "أنت", today: "اليوم", copy: "نسخ", edit: "تعديل", remove: "حذف", save: "حفظ", cancel: "إلغاء", edited: "تم التعديل", deleted: "تم حذف هذه الرسالة", attach: "إرفاق ملفات أو صور", filesLimit: "يمكن إرفاق 5 ملفات كحد أقصى، بحد 10 ميجابايت لكل ملف.", uploadFailed: "تعذر رفع الملف. حاول مرة أخرى.", editFailed: "تعذر تعديل الرسالة.", deleteFailed: "تعذر حذف الرسالة.", copied: "تم نسخ الرسالة", removeConfirm: "هل تريد حذف هذه الرسالة؟",
+  } : {
     title: "Messages", subtitle: "A private, direct line to your legal team", search: "Search conversations",
     empty: "No conversations yet", choose: "Choose a conversation to view messages",
     placeholder: "Write a message...", send: "Send", loading: "Loading conversations...",
