@@ -17,6 +17,9 @@ alter table public.conversation_messages
   );
 
 alter table public.conversation_messages
+  drop constraint if exists conversation_messages_attachments_check;
+
+alter table public.conversation_messages
   add constraint conversation_messages_attachments_check
   check (jsonb_typeof(attachments) = 'array' and jsonb_array_length(attachments) <= 5);
 
@@ -32,6 +35,9 @@ with check (
   sender_id = (select auth.uid())
   and (select public.can_access_conversation(conversation_id))
 );
+
+grant insert (id, conversation_id, sender_id, body, attachments)
+on public.conversation_messages to authenticated;
 
 grant update (body, attachments, edited_at, deleted_at)
 on public.conversation_messages to authenticated;
