@@ -1325,3 +1325,38 @@ img, svg, video { max-width: 100%; }
 @keyframes mizan-chat-slide-in{from{transform:translateX(3%);opacity:.8}to{transform:translateX(0);opacity:1}}
 @media(max-width:680px){.mizan-chat-drawer{grid-template-columns:minmax(0,1fr);width:100%}.mizan-chat-sidebar{display:flex}.mizan-chat-main{display:none}.mizan-chat-drawer:has(.mizan-chat-main .mizan-chat-conversation-head) .mizan-chat-sidebar{display:none}.mizan-chat-drawer:has(.mizan-chat-main .mizan-chat-conversation-head) .mizan-chat-main{display:flex}.mizan-chat-mobile-close{display:grid}.mizan-chat-message-row{max-width:96%}.mizan-chat-conversation-head{min-height:76px;padding:.8rem 1rem}.mizan-chat-messages{padding:1rem .7rem}.mizan-chat-composer{padding:.75rem}.mizan-chat-launcher{width:40px;height:40px;flex-basis:40px}}
 @media(prefers-reduced-motion:reduce){.mizan-chat-backdrop,.mizan-chat-drawer{animation:none}.mizan-chat-messages{scroll-behavior:auto}}
+
+
+/* Messenger refinement: searchable inbox, clearer identities and message metadata */
+.mizan-chat-search{display:flex;align-items:center;gap:.65rem;margin:.25rem 1rem 1rem;padding:.72rem .85rem;border:1px solid #e4ebe3;border-radius:14px;background:#f4f7f3;color:#819187;transition:border-color .18s,box-shadow .18s,background .18s}
+.mizan-chat-search:focus-within{border-color:#77aa98;background:#fff;box-shadow:0 0 0 3px rgba(22,122,110,.08)}
+.mizan-chat-search svg{width:17px;height:17px;flex:0 0 17px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round}
+.mizan-chat-search input{width:100%;min-width:0;border:0;outline:0;background:transparent;color:#173d35;font:inherit;font-size:.77rem}
+.mizan-chat-search input::placeholder{color:#8b9990}
+.mizan-chat-conversation-identity{min-width:0;display:flex;flex-direction:column;gap:.15rem}
+.mizan-chat-conversation-identity strong{overflow:hidden;color:#173d35;font-size:.9rem;font-weight:850;text-overflow:ellipsis;white-space:nowrap}
+.mizan-chat-conversation-identity p{display:flex;align-items:center;gap:.4rem;margin:.12rem 0 0;color:#728176;font-size:.68rem}
+.mizan-chat-conversation-identity small{overflow:hidden;max-width:min(54vw,420px);color:#9aa59d;font-size:.65rem;text-overflow:ellipsis;white-space:nowrap}
+.mizan-chat-conversation-identity .mizan-chat-status-dot{width:7px;height:7px;flex-basis:7px}
+.mizan-chat-message-row{gap:.6rem;animation:mizan-chat-message-in .2s ease-out both}
+.mizan-chat-bubble{position:relative;padding:.78rem 1rem;box-shadow:0 5px 16px rgba(18,56,43,.045)}
+.mizan-chat-bubble.is-own{background:linear-gradient(145deg,#19796b,#10594f);border-color:rgba(15,91,78,.9)}
+.mizan-chat-bubble time{display:flex;justify-content:flex-end;gap:.25rem;margin-top:.45rem;font-variant-numeric:tabular-nums}
+.mizan-chat-message-row.is-other .mizan-chat-bubble time{justify-content:flex-start}
+.mizan-chat-avatar.is-message-avatar{box-shadow:0 2px 6px rgba(18,56,43,.06)}
+.mizan-chat-thread-copy time{font-variant-numeric:tabular-nums}
+.mizan-chat-thread.is-active{background:linear-gradient(100deg,rgba(22,122,110,.12),rgba(22,122,110,.045));box-shadow:inset 3px 0 #167a6e}
+.mizan-chat-thread:focus-visible,.mizan-chat-close:focus-visible,.mizan-chat-launcher:focus-visible{outline:3px solid rgba(22,122,110,.4);outline-offset:2px}
+.mizan-chat-composer{padding-bottom:max(1rem,env(safe-area-inset-bottom))}
+.mizan-chat-composer textarea{max-height:132px}
+.mizan-chat-launcher{box-shadow:0 10px 28px rgba(8,35,33,.2)}
+.mizan-chat-launcher-count{font-variant-numeric:tabular-nums}
+@keyframes mizan-chat-message-in{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:680px){
+ .mizan-chat-search{margin:.25rem .8rem .8rem}
+ .mizan-chat-conversation-identity small{max-width:58vw}
+ .mizan-chat-message-row{max-width:100%;gap:.4rem}
+ .mizan-chat-bubble{padding:.7rem .8rem}
+ .mizan-chat-bubble p{font-size:.8rem}
+}
+@media(prefers-reduced-motion:reduce){.mizan-chat-message-row{animation:none}}
