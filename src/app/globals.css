@@ -1165,3 +1165,25 @@ img, svg, video { max-width: 100%; }
 @media(max-width:800px){.mizan-dashboard-redesign-shell{grid-template-columns:1fr}.mizan-dashboard-sidebar{position:relative;height:auto;border-inline-end:0;border-bottom:1px solid #e1e5dc;padding:1rem}.mizan-dashboard-logo{padding-bottom:.7rem}.mizan-dashboard-side-label,.mizan-dashboard-sidebar-bottom{display:none}.mizan-dashboard-sidebar{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.35rem}.mizan-dashboard-logo{grid-column:1/-1}.mizan-dashboard-side-link{font-size:.78rem}.mizan-dashboard-main{padding-inline:1rem}.mizan-dashboard-topbar{min-height:84px}.mizan-dashboard-welcome-art{width:100px}.mizan-dashboard-welcome-art span{font-size:3.5rem}.mizan-dashboard-summary-grid{grid-template-columns:1fr}.mizan-dashboard-feature-grid{grid-template-columns:1fr 1fr}}
 @media(max-width:520px){.mizan-dashboard-user-meta{display:none}.mizan-dashboard-top-actions{gap:.4rem}.mizan-dashboard-top-actions button{padding:.5rem .6rem}.mizan-dashboard-welcome-art{display:none}.mizan-dashboard-welcome{min-height:0}.mizan-dashboard-feature-grid{grid-template-columns:1fr}.mizan-dashboard-feature-card{min-height:190px}.mizan-dashboard-section-heading{align-items:flex-start;flex-direction:column}.mizan-dashboard-summary-card{padding:.9rem}}
 @media(prefers-reduced-motion:reduce){.mizan-dashboard-redesign *{animation:none!important;transition:none!important}}
+
+
+/* Mizan dashboard inner pages: consistent premium workspace */
+.mizan-dashboard-page{background:radial-gradient(ellipse at 92% 0%,rgba(22,122,110,.07),transparent 34%),#f5f5ef!important;padding-top:1.5rem!important}
+.mizan-dashboard-page>.mx-auto{max-width:1240px!important}
+.mizan-dashboard-page-nav{display:flex;flex-wrap:wrap;align-items:center;gap:.45rem;margin:0 0 2rem;padding:.55rem;border:1px solid #e2e7df;border-radius:17px;background:rgba(255,255,255,.88);box-shadow:0 8px 28px rgba(15,45,43,.035)}
+.mizan-dashboard-page-nav a{display:inline-flex;align-items:center;gap:.55rem;min-height:39px;border-radius:11px;padding:.55rem .8rem;color:#63736a;font-size:.78rem;font-weight:800;transition:background .2s,color .2s,transform .2s}
+.mizan-dashboard-page-nav a:hover{background:#eaf2ed;color:#0f665a;transform:translateY(-1px)}
+.mizan-dashboard-page-nav a:first-child{background:#0f3934;color:#e7c997}
+.mizan-dashboard-page h1{letter-spacing:-.035em;line-height:1.25}
+.mizan-dashboard-page h2{letter-spacing:-.025em}
+.mizan-dashboard-page section,.mizan-dashboard-page article{transition:border-color .2s,box-shadow .2s}
+.mizan-dashboard-page>div>section,.mizan-dashboard-page>div>article,.mizan-dashboard-page>div>div>section,.mizan-dashboard-page>div>div>article{border-color:#e1e7df}
+.mizan-dashboard-page form label{line-height:1.7}
+.mizan-dashboard-page input:not([type=hidden]):not([type=checkbox]):not([type=file]),.mizan-dashboard-page select,.mizan-dashboard-page textarea{border-color:#dfe5dc;border-radius:11px;background-color:#fff;transition:border-color .2s,box-shadow .2s}
+.mizan-dashboard-page input:focus,.mizan-dashboard-page select:focus,.mizan-dashboard-page textarea:focus{outline:2px solid transparent;border-color:#167a6e;box-shadow:0 0 0 3px rgba(22,122,110,.12)}
+.mizan-dashboard-page button{transition:background .2s,border-color .2s,transform .2s,box-shadow .2s}
+.mizan-dashboard-page button:hover:not(:disabled){box-shadow:0 5px 15px rgba(15,45,43,.08)}
+.mizan-dashboard-page [role=status]{box-shadow:0 8px 25px rgba(15,45,43,.035)}
+.mizan-dashboard-page .rounded-2xl.border.bg-white,.mizan-dashboard-page article.rounded-2xl{box-shadow:0 8px 30px rgba(15,45,43,.035)}
+@media(max-width:760px){.mizan-dashboard-page{padding:1rem .8rem 2rem!important}.mizan-dashboard-page-nav{gap:.25rem;margin-bottom:1.5rem}.mizan-dashboard-page-nav a{flex:1 1 calc(50% - .3rem);justify-content:flex-start;padding:.6rem;font-size:.73rem}.mizan-dashboard-page-nav a span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.mizan-dashboard-page h1{font-size:2rem;line-height:1.35}.mizan-dashboard-page .rounded-2xl{border-radius:17px}}
+@media(prefers-reduced-motion:reduce){.mizan-dashboard-page *{transition:none!important}}
