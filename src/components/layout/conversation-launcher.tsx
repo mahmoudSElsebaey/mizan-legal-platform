@@ -32,6 +32,7 @@ export function ConversationLauncher({ locale }: { locale: Locale }) {
   const ar = locale === "ar";
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const [expanded, setExpanded] = useState(false);
   const [userId, setUserId] = useState("");
   const [threads, setThreads] = useState<Thread[]>([]);
   const [people, setPeople] = useState<Record<string, string>>({});
@@ -167,10 +168,11 @@ export function ConversationLauncher({ locale }: { locale: Locale }) {
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11.5a7.5 7.5 0 0 1-7.5 7.5H5l-1-4a7.5 7.5 0 1 1 16-3.5Z"/><path d="M8 11h8M8 14h5"/></svg>
       {unread > 0 && <span className="mizan-chat-launcher-count">{unread > 99 ? "99+" : unread}</span>}
     </button>
-    {open && <div className="mizan-chat-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) setOpen(false); }}>
-      <section className="mizan-chat-drawer" dir={ar ? "rtl" : "ltr"} role="dialog" aria-modal="true" aria-label={labels.title}>
+    {open && <div className="mizan-chat-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) { setOpen(false); setExpanded(false); } }}>
+      <section className={"mizan-chat-drawer" + (expanded ? " is-expanded" : "")} dir={ar ? "rtl" : "ltr"} role="dialog" aria-modal="true" aria-label={labels.title} onMouseDown={(event) => event.stopPropagation()}>
+        <div className="mizan-chat-drawer-controls"><button type="button" className="mizan-chat-window-control" onClick={() => setExpanded((value) => !value)} aria-label={expanded ? (ar ? "استعادة حجم النافذة" : "Restore panel size") : (ar ? "ملء الشاشة" : "Expand to full screen")} title={expanded ? (ar ? "استعادة الحجم" : "Restore size") : (ar ? "ملء الشاشة" : "Full screen")}>{expanded ? <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3v5H3M16 3v5h5M3 16h5v5M21 16h-5v5"/></svg> : <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H3v5M16 3h5v5M3 16v5h5M21 16v5h-5"/></svg>}</button><button type="button" className="mizan-chat-window-control" onClick={() => { setOpen(false); setExpanded(false); }} aria-label={ar ? "إغلاق نافذة المحادثات" : "Close conversations"} title={ar ? "إغلاق" : "Close"}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>
         <aside className="mizan-chat-sidebar">
-          <div className="mizan-chat-sidebar-head"><div><span className="mizan-chat-eyebrow">MIZAN · PRIVATE</span><h2>{labels.title}</h2><p>{labels.subtitle}</p></div><button type="button" className="mizan-chat-close" aria-label={ar ? "إغلاق" : "Close"} onClick={() => setOpen(false)}>×</button></div>
+          <div className="mizan-chat-sidebar-head"><div><span className="mizan-chat-eyebrow">MIZAN · PRIVATE</span><h2>{labels.title}</h2><p>{labels.subtitle}</p></div><button type="button" className="mizan-chat-close" aria-label={ar ? "إغلاق" : "Close"} onClick={() => { setOpen(false); setExpanded(false); }}>×</button></div>
           <label className="mizan-chat-sound"><input type="checkbox" checked={soundOn} onChange={(event) => setSoundOn(event.target.checked)}/>{labels.sound}</label>
           <label className="mizan-chat-search-label"><span className="sr-only">{labels.search}</span><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 4.5 4.5"/></svg><input value={searchQuery} onChange={(event) => setSearchQuery(event.target.value)} placeholder={labels.search} /></label>
           <div className="mizan-chat-thread-list">{filteredThreads.length === 0 ? <p className="mizan-chat-empty">{threads.length === 0 ? labels.empty : (ar ? "لا توجد نتائج مطابقة" : "No matching conversations")}</p> : filteredThreads.map((thread) => {
@@ -183,7 +185,7 @@ export function ConversationLauncher({ locale }: { locale: Locale }) {
         </aside>
         <div className="mizan-chat-main">
           {active ? <>
-            <header className="mizan-chat-conversation-head"><span className="mizan-chat-avatar is-large">{initials(otherName)}</span><div className="mizan-chat-conversation-identity"><strong>{otherName}</strong><p><span className={"mizan-chat-status-dot" + (active.status === "open" ? " is-open" : "")}/>{active.status === "open" ? labels.online : labels.closed}</p><small>{active.subject}</small></div><button type="button" className="mizan-chat-close mizan-chat-mobile-close" onClick={() => setOpen(false)} aria-label={ar ? "إغلاق المحادثات" : "Close messages"}>×</button></header>
+            <header className="mizan-chat-conversation-head"><span className="mizan-chat-avatar is-large">{initials(otherName)}</span><div className="mizan-chat-conversation-identity"><strong>{otherName}</strong><p><span className={"mizan-chat-status-dot" + (active.status === "open" ? " is-open" : "")}/>{active.status === "open" ? labels.online : labels.closed}</p><small>{active.subject}</small></div><button type="button" className="mizan-chat-close mizan-chat-mobile-close" onClick={() => { setOpen(false); setExpanded(false); }} aria-label={ar ? "إغلاق المحادثات" : "Close messages"}>×</button></header>
             <div className="mizan-chat-messages">{messages.length === 0 ? <p className="mizan-chat-empty">{labels.noMessages}</p> : messages.map((message) => {
               const own = message.sender_id === userId;
               const senderName = own ? (people[userId] || labels.you) : otherName;
