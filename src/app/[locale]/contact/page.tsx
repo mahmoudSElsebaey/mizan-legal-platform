@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import Link from "next/link";
 
 type Locale = "ar" | "en";
@@ -14,10 +14,11 @@ export default function ContactPage({ params }: { params: Promise<{ locale: Loca
 function ContactPageContent({ params }: { params: Promise<{ locale: Locale }> }) {
   const [locale, setLocale] = useState<Locale>("ar");
   const [ready, setReady] = useState(false);
-  useState(() => {
-    void params.then(({ locale: nextLocale }) => { setLocale(nextLocale); setReady(true); });
-    return undefined;
-  });
+  useEffect(() => {
+    let active = true;
+    void params.then(({ locale: nextLocale }) => { if (active) { setLocale(nextLocale); setReady(true); } });
+    return () => { active = false; };
+  }, [params]);
   const ar = locale === "ar";
   const [status, setStatus] = useState<Status>("idle");
   const [errorMessage, setErrorMessage] = useState("");
