@@ -9,7 +9,8 @@ export default async function Page({ params }: { params: Promise<{ locale: strin
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
 
-  const demoPassword = process.env.NODE_ENV === "development" ? process.env.DEMO_SEED_PASSWORD : undefined;
+  // Only enable this on an isolated portfolio/demo Supabase project. Credentials are sent to the browser when enabled.
+  const demoPassword = process.env.ENABLE_DEMO_ACCOUNTS === "true" ? process.env.DEMO_SEED_PASSWORD : undefined;
   const demoAccounts = demoPassword ? [
     { label: locale === "ar" ? "عميل" : "Client", email: "mizan.demo.client@example.com", password: demoPassword },
     { label: locale === "ar" ? "محامٍ" : "Lawyer", email: "mizan.demo.lawyer@example.com", password: demoPassword },
