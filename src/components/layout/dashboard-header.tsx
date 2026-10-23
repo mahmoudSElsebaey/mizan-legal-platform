@@ -77,13 +77,12 @@ export function DashboardHeader({ locale }: { locale: Locale }) {
   }
 
   return (
-    <header className="mizan-dashboard-header" dir={ar ? "rtl" : "ltr"}>
-      <div className="mizan-dashboard-header-inner mizan-dashboard-header-compact">
-        <Link href={`/${locale}/dashboard`} className="mizan-dashboard-brand" aria-label={ar ? "ميزان - لوحة التحكم" : "MIZAN dashboard"}>
-          <span className="mizan-brand-symbol" aria-hidden="true">M</span>
-          <span><strong>MIZAN</strong><small>{ar ? "مساحة العمل القانونية" : "LEGAL WORKSPACE"}</small></span>
+    <header className="mizan-site-header mizan-dashboard-header" dir={ar ? "rtl" : "ltr"}>
+      <div className="mizan-site-header-inner mizan-dashboard-header-inner mizan-dashboard-header-compact">
+        <Link href={`/${locale}/dashboard`} className="mizan-site-brand" aria-label={ar ? "ميزان - لوحة التحكم" : "MIZAN dashboard"}>
+          <span className="mizan-site-mark" aria-hidden="true"><svg viewBox="0 0 64 64" fill="none"><path d="M32 8v40M19 16h26M12 20l-7 16h14L12 20Zm40 0-7 16h14L52 20ZM5 36c1.2 5 13.8 5 14 0m26 0c1.2 5 13.8 5 14 0M20 48h24M24 53h16M28 58h8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/><path d="M32 5l3 3-3 3-3-3 3-3Z" fill="currentColor"/><circle cx="32" cy="48" r="2" fill="currentColor"/></svg></span><span className="mizan-site-brand-copy"><strong className={ar ? "mizan-arabic-wordmark" : ""}>{ar ? "مِــيــزَان" : "MIZAN"}</strong><small>{ar ? "مكتب محاماة واستشارات قانونية" : "LAW FIRM & LEGAL CONSULTANCY"}</small></span>
         </Link>
-        <div className="mizan-dashboard-header-actions">
+        <div className="mizan-site-actions mizan-dashboard-header-actions">
           <ConversationLauncher locale={locale} />
           <div className="mizan-popover-anchor" ref={languageRef}>
             <button type="button" className="mizan-language mizan-dashboard-language" aria-label={ar ? "تغيير اللغة" : "Change language"} aria-expanded={languageOpen} onClick={() => { setLanguageOpen((value) => !value); setNotificationsOpen(false); }}>
