@@ -1221,3 +1221,42 @@ img, svg, video { max-width: 100%; }
 .mizan-auth-card button:focus-visible,.mizan-auth-card a:focus-visible{outline:3px solid rgba(22,122,110,.35);outline-offset:3px}
 @media(max-width:760px){.mizan-auth-layout{grid-template-columns:minmax(0,1fr);gap:1.5rem;max-width:480px;min-height:0}.mizan-auth-story{padding:.5rem 0 0}.mizan-auth-monogram{width:46px;height:46px;border-radius:15px;margin-bottom:1rem;font-size:1.6rem}.mizan-auth-eyebrow{margin-bottom:.5rem;font-size:.6rem}.mizan-auth-story h2{font-size:clamp(1.8rem,8vw,2.6rem);line-height:1.2}.mizan-auth-story-copy{margin-top:.65rem;font-size:.88rem;line-height:1.8}.mizan-auth-trust{margin-top:.8rem;padding-top:.7rem;font-size:.78rem}.mizan-auth-ornament{display:none}.mizan-auth-card{padding:1.35rem!important;border-radius:23px!important}.mizan-auth-page{padding-top:1.25rem!important;padding-bottom:2rem!important}}
 @media(prefers-reduced-motion:reduce){.mizan-auth-page *{transition:none!important;animation:none!important}}
+
+/* Compact dashboard utility header */
+.mizan-dashboard-header-compact{justify-content:space-between;gap:1rem;min-height:72px}
+.mizan-dashboard-header-actions{display:flex;align-items:center;gap:.65rem;margin-inline-start:auto}
+.mizan-dashboard-header-actions .mizan-popover-anchor{position:relative}
+.mizan-dashboard-language{display:inline-flex;align-items:center;justify-content:center;gap:.45rem;min-width:70px;min-height:42px;border:1px solid #e0e7df;border-radius:13px;background:#fff;color:#23453e;padding:.6rem .75rem;font-size:.78rem;font-weight:850}
+.mizan-dashboard-language svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round}
+.mizan-dashboard-notification-button{position:relative;display:grid;width:44px;height:44px;place-items:center;border:1px solid #e0e7df;border-radius:14px;background:#fff;color:#23453e}
+.mizan-dashboard-notification-button>svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.mizan-dashboard-notification-button:hover,.mizan-dashboard-language:hover{border-color:#b9d0c2;background:#f6faf6}
+.mizan-dashboard-notification-count{position:absolute;top:-6px;inset-inline-end:-6px;display:grid;min-width:20px;height:20px;place-items:center;padding-inline:5px;border:2px solid #fff;border-radius:999px;background:#b94e4e;color:#fff;font-size:.62rem;font-weight:900;line-height:1}
+.mizan-dashboard-notification-menu{inset-inline-end:0;width:min(370px,calc(100vw - 1.5rem));max-height:min(70vh,520px);overflow:hidden;display:none}
+.mizan-dashboard-notification-menu.is-open{display:block}
+.mizan-dashboard-notice-list{max-height:340px;overflow:auto}
+.mizan-dashboard-notice-empty{display:flex;min-height:150px;flex-direction:column;align-items:center;justify-content:center;gap:.55rem;padding:1.25rem;text-align:center;color:#65756b}
+.mizan-dashboard-notice-empty>span{display:grid;width:38px;height:38px;place-items:center;border-radius:13px;background:#edf3ed;color:#167a6e;font-size:1.2rem}
+.mizan-dashboard-notice-empty strong{color:#183c35;font-size:.86rem}
+.mizan-dashboard-notice-empty p{max-width:270px;font-size:.75rem;line-height:1.8}
+.mizan-dashboard-notice-item{display:flex;align-items:flex-start;gap:.7rem;border-bottom:1px solid #edf0eb;padding:.9rem 1rem;color:#45574e;transition:background .15s}
+.mizan-dashboard-notice-item:hover{background:#f5f8f3}
+.mizan-dashboard-notice-item.is-unread{background:#f1f7f1}
+.mizan-dashboard-notice-indicator{width:8px;height:8px;flex:0 0 8px;margin-top:.4rem;border-radius:50%;background:transparent}
+.mizan-dashboard-notice-item.is-unread .mizan-dashboard-notice-indicator{background:#167a6e;box-shadow:0 0 0 3px rgba(22,122,110,.1)}
+.mizan-dashboard-notice-copy{display:grid;min-width:0;gap:.28rem}
+.mizan-dashboard-notice-copy strong{font-size:.8rem;line-height:1.6;color:#173d35}
+.mizan-dashboard-notice-copy small{font-size:.73rem;line-height:1.7;color:#6c7b72;overflow-wrap:anywhere}
+.mizan-dashboard-notice-copy time{font-size:.65rem;color:#89958d}
+.mizan-dashboard-notification-footer{display:grid;gap:.15rem;border-top:1px solid #e6ebe4;background:#fbfcfa;padding:.55rem}
+.mizan-dashboard-notification-footer button,.mizan-dashboard-notification-footer a{display:block;border:0;border-radius:9px;background:transparent;padding:.65rem .7rem;text-align:center;color:#167a6e;font-size:.75rem;font-weight:850}
+.mizan-dashboard-notification-footer button:hover,.mizan-dashboard-notification-footer a:hover{background:#edf4ed}
+.mizan-dashboard-header .mizan-dashboard-header-actions .mizan-dropdown{z-index:60}
+@media(max-width:520px){.mizan-dashboard-header-inner{width:calc(100% - 1.25rem);min-height:64px}.mizan-dashboard-brand{gap:.5rem}.mizan-brand-symbol{width:36px;height:36px;border-radius:12px 12px 12px 4px;font-size:1.2rem}.mizan-dashboard-brand strong{font-size:.9rem}.mizan-dashboard-brand small{font-size:.53rem}.mizan-dashboard-header-actions{gap:.4rem}.mizan-dashboard-language{min-width:58px;min-height:40px;padding:.5rem .55rem}.mizan-dashboard-notification-button{width:40px;height:40px}.mizan-dashboard-notification-menu{inset-inline-end:-.1rem}}
+/* Keep the authentication language switcher available on every viewport */
+.mizan-auth-header{min-height:72px;padding-inline:max(.75rem,calc((100% - 1120px)/2))}
+.mizan-auth-header .mizan-popover-anchor{position:relative;flex-shrink:0}
+.mizan-auth-language{display:inline-flex!important;align-items:center;gap:.4rem;min-height:42px;white-space:nowrap;font-size:.78rem;font-weight:800}
+.mizan-auth-language svg{width:18px;height:18px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round}
+.mizan-auth-header .mizan-language-menu{inset-inline-end:0;min-width:180px;z-index:70}
+@media(max-width:520px){.mizan-auth-header{min-height:64px;gap:.6rem;padding-inline:.75rem}.mizan-auth-header .mizan-site-brand{gap:.45rem;min-width:0}.mizan-auth-header .mizan-site-mark{width:38px;height:38px;flex-shrink:0}.mizan-auth-header .mizan-site-brand-copy strong{font-size:1.05rem}.mizan-auth-header .mizan-site-brand-copy small{font-size:.52rem;letter-spacing:.05em}.mizan-auth-language{min-height:40px;padding:.55rem .65rem!important;font-size:.72rem}.mizan-auth-language .mizan-chevron{margin-inline-start:.1rem}}
