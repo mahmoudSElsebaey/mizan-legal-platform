@@ -39,20 +39,21 @@ export function ConversationLauncher({ locale }: { locale: Locale }) {
   const [selected, setSelected] = useState("");
   const [draft, setDraft] = useState("");
   const [unread, setUnread] = useState(0);
+  const [searchQuery, setSearchQuery] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [soundOn, setSoundOn] = useState(true);
   const seen = useRef(new Set<string>());
   const bottomRef = useRef<HTMLDivElement>(null);
   const labels = useMemo(() => ar ? {
-    title: "المحادثات", subtitle: "رسائلك الخاصة مع فريق المكتب", search: "محادثاتك",
+    title: "المحادثات", subtitle: "تواصل مباشر وآمن مع فريق المكتب", search: "ابحث في المحادثات",
     empty: "لا توجد محادثات حتى الآن", choose: "اختر محادثة لعرض الرسائل",
     placeholder: "اكتب رسالتك...", send: "إرسال", loading: "جارٍ تحميل المحادثات...",
     online: "مراسلة آمنة", sound: "صوت الإشعار", openFull: "فتح صفحة المحادثات",
     closed: "مغلقة", noMessages: "ابدأ المحادثة برسالتك الأولى", failed: "تعذر تحميل البيانات أو إرسال الرسالة.",
     you: "أنت", today: "اليوم"
   } : {
-    title: "Messages", subtitle: "Private messages with your legal team", search: "Your conversations",
+    title: "Messages", subtitle: "A private, direct line to your legal team", search: "Search conversations",
     empty: "No conversations yet", choose: "Choose a conversation to view messages",
     placeholder: "Write a message...", send: "Send", loading: "Loading conversations...",
     online: "Secure messaging", sound: "Notification sound", openFull: "Open conversations page",
@@ -151,6 +152,11 @@ export function ConversationLauncher({ locale }: { locale: Locale }) {
   }
 
   const active = threads.find((thread) => thread.id === selected);
+  const filteredThreads = threads.filter((thread) => {
+    const participant = thread.client_id === userId ? thread.staff_id : thread.client_id;
+    const query = searchQuery.trim().toLocaleLowerCase(ar ? "ar-EG" : "en-US");
+    return !query || `${people[participant] || ""} ${thread.subject}`.toLocaleLowerCase(ar ? "ar-EG" : "en-US").includes(query);
+  });
   const otherId = active ? (active.client_id === userId ? active.staff_id : active.client_id) : "";
   const otherName = people[otherId] || (ar ? "المحامي / العميل" : "Lawyer / Client");
   const formatTime = (value: string) => new Intl.DateTimeFormat(ar ? "ar-EG" : "en-GB", { dateStyle: "medium", timeStyle: "short", timeZone: "Africa/Cairo" }).format(new Date(value));
@@ -177,10 +183,10 @@ export function ConversationLauncher({ locale }: { locale: Locale }) {
         </aside>
         <div className="mizan-chat-main">
           {active ? <>
-            <header className="mizan-chat-conversation-head"><span className="mizan-chat-avatar is-large">{initials(otherName)}</span><div><strong>{otherName}</strong><p>{active.subject} · {active.status === "open" ? labels.online : labels.closed}</p></div><button type="button" className="mizan-chat-close mizan-chat-mobile-close" onClick={() => setOpen(false)} aria-label={ar ? "إغلاق المحادثات" : "Close messages"}>×</button></header>
+            <header className="mizan-chat-conversation-head"><span className="mizan-chat-avatar is-large">{initials(otherName)}</span><div className="mizan-chat-conversation-identity"><strong>{otherName}</strong><p><span className={"mizan-chat-status-dot" + (active.status === "open" ? " is-open" : "")}/>{active.status === "open" ? labels.online : labels.closed}</p><small>{active.subject}</small></div><button type="button" className="mizan-chat-close mizan-chat-mobile-close" onClick={() => setOpen(false)} aria-label={ar ? "إغلاق المحادثات" : "Close messages"}>×</button></header>
             <div className="mizan-chat-messages">{messages.length === 0 ? <p className="mizan-chat-empty">{labels.noMessages}</p> : messages.map((message) => {
               const own = message.sender_id === userId;
-              const senderName = own ? labels.you : otherName;
+              const senderName = own ? (people[userId] || labels.you) : otherName;
               return <article key={message.id} className={"mizan-chat-message-row" + (own ? " is-own" : " is-other")}><span className="mizan-chat-avatar is-message-avatar">{initials(senderName)}</span><div className={"mizan-chat-bubble" + (own ? " is-own" : " is-other")}><p>{message.body}</p><time dateTime={message.created_at}>{formatTime(message.created_at)}</time></div></article>;
             })}<div ref={bottomRef}/></div>
             <form className="mizan-chat-composer" onSubmit={sendMessage}><textarea value={draft} onChange={(event) => setDraft(event.target.value)} maxLength={4000} rows={2} disabled={active.status !== "open"} placeholder={active.status === "open" ? labels.placeholder : labels.closed}/><button type="submit" disabled={busy || !draft.trim() || active.status !== "open"} aria-label={labels.send}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 4 17 8-17 8 3-8-3-8Z"/><path d="M7 12h14"/></svg></button></form>
