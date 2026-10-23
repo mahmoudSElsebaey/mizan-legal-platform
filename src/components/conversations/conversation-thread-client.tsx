@@ -76,7 +76,7 @@ export function ConversationThreadClient({
     const closeMessageMenus = (event: MouseEvent) => {
       const target = event.target as Node;
       document.querySelectorAll<HTMLDetailsElement>(".mizan-thread-menu[open]").forEach((menu) => {
-        if (!menu.contains(target)) menu.removeAttribute("open");
+        if (!menu.contains(target) || !(target instanceof Element && target.closest("summary"))) menu.removeAttribute("open");
       });
     };
     document.addEventListener("click", closeMessageMenus);
