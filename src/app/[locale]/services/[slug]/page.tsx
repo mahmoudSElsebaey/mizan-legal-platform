@@ -21,8 +21,8 @@ export default async function PracticeAreaPage({ params }: { params: Promise<{ l
     const { data, error } = await supabase.from("office_services").select("slug,title_ar,title_en,description_ar,description_en,is_published").eq("slug", slug).maybeSingle();
     if (!error) { managedItem = data as ManagedService | null; databaseAvailable = true; }
   } catch { /* Keep static public content available when Supabase is not configured. */ }
-  if (databaseAvailable && (!managedItem || !managedItem.is_published)) notFound();
-  if (!databaseAvailable && !staticItem) notFound();
+  if (databaseAvailable && managedItem && !managedItem.is_published) notFound();
+  if (!managedItem && !staticItem) notFound();
 
   const item = managedItem
     ? { slug, title: ar ? managedItem.title_ar : managedItem.title_en, summary: ar ? managedItem.description_ar : managedItem.description_en, details: staticItem?.details ?? [], constitutional: staticItem?.constitutional ?? [], topics: staticItem?.topics ?? [] }
