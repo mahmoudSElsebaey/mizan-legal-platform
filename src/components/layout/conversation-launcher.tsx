@@ -57,14 +57,14 @@ export function ConversationLauncher({ locale }: { locale: Locale }) {
     empty: "لا توجد محادثات حتى الآن", choose: "اختر محادثة لعرض الرسائل",
     placeholder: "اكتب رسالتك...", send: "إرسال", loading: "جارٍ تحميل المحادثات...",
     online: "مراسلة آمنة", sound: "صوت الإشعار", openFull: "فتح صفحة المحادثات",
-    closed: "مغلقة", noMessages: "ابدأ المحادثة برسالتك الأولى", failed: "تعذر تحميل البيانات أو إرسال الرسالة.",
+    closed: "مغلقة", newConversation: "بدء محادثة جديدة", noMessages: "ابدأ المحادثة برسالتك الأولى", failed: "تعذر تحميل البيانات أو إرسال الرسالة.",
     you: "أنت", today: "اليوم", copy: "نسخ", edit: "تعديل", remove: "حذف", save: "حفظ", cancel: "إلغاء", edited: "تم التعديل", deleted: "تم حذف هذه الرسالة", attach: "إرفاق ملفات أو صور", filesLimit: "يمكن إرفاق 5 ملفات كحد أقصى، بحد 10 ميجابايت لكل ملف.", uploadFailed: "تعذر رفع الملف. حاول مرة أخرى.", editFailed: "تعذر تعديل الرسالة.", deleteFailed: "تعذر حذف الرسالة.", copied: "تم نسخ الرسالة", removeConfirm: "هل تريد حذف هذه الرسالة؟",
   } : {
     title: "Messages", subtitle: "A private, direct line to your legal team", search: "Search conversations",
     empty: "No conversations yet", choose: "Choose a conversation to view messages",
     placeholder: "Write a message...", send: "Send", loading: "Loading conversations...",
     online: "Secure messaging", sound: "Notification sound", openFull: "Open conversations page",
-    closed: "Closed", noMessages: "Start the conversation with your first message", failed: "Could not load data or send the message.",
+    closed: "Closed", newConversation: "Start a new conversation", noMessages: "Start the conversation with your first message", failed: "Could not load data or send the message.",
     you: "You", today: "Today", copy: "Copy", edit: "Edit", remove: "Delete", save: "Save", cancel: "Cancel", edited: "Edited", deleted: "This message was deleted", attach: "Attach files or images", filesLimit: "Up to 5 files, 10 MB per file.", uploadFailed: "Could not upload the file. Please try again.", editFailed: "Could not edit this message.", deleteFailed: "Could not delete this message.", copied: "Message copied", removeConfirm: "Delete this message?",
   }, [ar]);
 
@@ -83,7 +83,7 @@ export function ConversationLauncher({ locale }: { locale: Locale }) {
     }
     const { count } = await supabase.from("notifications").select("id", { count: "exact", head: true }).eq("kind", "new_message").is("read_at", null);
     setUnread(count || 0);
-    if (!selected && rows[0]) setSelected(rows[0].id);
+    if (!selected && rows[0] && !window.matchMedia("(max-width: 680px)").matches) setSelected(rows[0].id);
     if (playSound && soundOn) playIncomingTone();
   }, [ar, labels.failed, selected, soundOn]);
 
@@ -134,6 +134,17 @@ export function ConversationLauncher({ locale }: { locale: Locale }) {
       }).subscribe();
     return () => { alive = false; void supabase.removeChannel(channel); };
   }, [pathname, loadThreads, loadMessages, selected, soundOn, userId]);
+
+  useEffect(() => {
+    const closeMessageMenus = (event: MouseEvent) => {
+      const target = event.target as Node;
+      document.querySelectorAll<HTMLDetailsElement>(".mizan-chat-message-menu[open]").forEach((menu) => {
+        if (!menu.contains(target)) menu.removeAttribute("open");
+      });
+    };
+    document.addEventListener("click", closeMessageMenus);
+    return () => document.removeEventListener("click", closeMessageMenus);
+  }, []);
 
   useEffect(() => {
     if (!open || !selected || !userId) return;
@@ -234,13 +245,13 @@ export function ConversationLauncher({ locale }: { locale: Locale }) {
       {unread > 0 && <span className="mizan-chat-launcher-count">{unread > 99 ? "99+" : unread}</span>}
     </button>
     {open && <div className="mizan-chat-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) { setOpen(false); setExpanded(false); } }}>
-      <section className={"mizan-chat-drawer" + (expanded ? " is-expanded" : "")} dir={ar ? "rtl" : "ltr"} role="dialog" aria-modal="true" aria-label={labels.title} onMouseDown={(event) => event.stopPropagation()}>
+      <section className={"mizan-chat-drawer" + (expanded ? " is-expanded" : "") + (selected ? " has-selected-thread" : "")} dir={ar ? "rtl" : "ltr"} role="dialog" aria-modal="true" aria-label={labels.title} onMouseDown={(event) => event.stopPropagation()}>
         <div className="mizan-chat-drawer-controls"><button type="button" className="mizan-chat-window-control" onClick={() => setExpanded((value) => !value)} aria-label={expanded ? (ar ? "استعادة حجم النافذة" : "Restore panel size") : (ar ? "ملء الشاشة" : "Expand to full screen")} title={expanded ? (ar ? "استعادة الحجم" : "Restore size") : (ar ? "ملء الشاشة" : "Full screen")}>{expanded ? <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3v5H3M16 3v5h5M3 16h5v5M21 16h-5v5"/></svg> : <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H3v5M16 3h5v5M3 16v5h5M21 16v5h-5"/></svg>}</button><button type="button" className="mizan-chat-window-control" onClick={() => { setOpen(false); setExpanded(false); }} aria-label={ar ? "إغلاق نافذة المحادثات" : "Close conversations"} title={ar ? "إغلاق" : "Close"}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>
         <aside className="mizan-chat-sidebar">
           <div className="mizan-chat-sidebar-head"><div><span className="mizan-chat-eyebrow">MIZAN · PRIVATE</span><h2>{labels.title}</h2><p>{labels.subtitle}</p></div><button type="button" className="mizan-chat-close" aria-label={ar ? "إغلاق" : "Close"} onClick={() => { setOpen(false); setExpanded(false); }}>×</button></div>
           <label className="mizan-chat-sound"><input type="checkbox" checked={soundOn} onChange={(event) => setSoundOn(event.target.checked)}/>{labels.sound}</label>
           <label className="mizan-chat-search-label"><span className="sr-only">{labels.search}</span><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 4.5 4.5"/></svg><input value={searchQuery} onChange={(event) => setSearchQuery(event.target.value)} placeholder={labels.search} /></label>
-          <div className="mizan-chat-thread-list">{filteredThreads.length === 0 ? <p className="mizan-chat-empty">{threads.length === 0 ? labels.empty : (ar ? "لا توجد نتائج مطابقة" : "No matching conversations")}</p> : filteredThreads.map((thread) => {
+          <a className="mizan-chat-new-conversation" href={"/" + locale + "/dashboard/conversations"}>{labels.newConversation} <span>＋</span></a><div className="mizan-chat-thread-list">{filteredThreads.length === 0 ? <p className="mizan-chat-empty">{threads.length === 0 ? labels.empty : (ar ? "لا توجد نتائج مطابقة" : "No matching conversations")}</p> : filteredThreads.map((thread) => {
             const participant = thread.client_id === userId ? thread.staff_id : thread.client_id;
             return <button type="button" key={thread.id} onClick={() => setSelected(thread.id)} className={"mizan-chat-thread" + (selected === thread.id ? " is-active" : "")}>
               <span className="mizan-chat-avatar">{initials(people[participant] || (ar ? "م" : "M"))}</span><span className="mizan-chat-thread-copy"><strong>{people[participant] || (ar ? "مستخدم" : "User")}</strong><small>{thread.subject}</small><time>{formatTime(thread.last_message_at)}</time></span><span className={"mizan-chat-status-dot" + (thread.status === "open" ? " is-open" : "")}/>
@@ -250,7 +261,7 @@ export function ConversationLauncher({ locale }: { locale: Locale }) {
         </aside>
         <div className="mizan-chat-main">
           {active ? <>
-            <header className="mizan-chat-conversation-head"><span className="mizan-chat-avatar is-large">{initials(otherName)}</span><div className="mizan-chat-conversation-identity"><strong>{otherName}</strong><p><span className={"mizan-chat-status-dot" + (active.status === "open" ? " is-open" : "")}/>{active.status === "open" ? labels.online : labels.closed}</p><small>{active.subject}</small></div><button type="button" className="mizan-chat-close mizan-chat-mobile-close" onClick={() => { setOpen(false); setExpanded(false); }} aria-label={ar ? "إغلاق المحادثات" : "Close messages"}>×</button></header>
+            <header className="mizan-chat-conversation-head"><span className="mizan-chat-avatar is-large">{initials(otherName)}</span><div className="mizan-chat-conversation-identity"><strong>{otherName}</strong><p><span className={"mizan-chat-status-dot" + (active.status === "open" ? " is-open" : "")}/>{active.status === "open" ? labels.online : labels.closed}</p><small>{active.subject}</small></div><button type="button" className="mizan-chat-close mizan-chat-mobile-close" onClick={() => { setSelected(""); setEditingId(""); setEditDraft(""); }} aria-label={ar ? "إغلاق المحادثات" : "Close messages"}>×</button></header>
             <div className="mizan-chat-messages">{messages.length === 0 ? <p className="mizan-chat-empty">{labels.noMessages}</p> : messages.map((message) => {
               const own = message.sender_id === userId;
               const senderName = own ? (people[userId] || labels.you) : otherName;
