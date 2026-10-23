@@ -80,3 +80,5 @@ jobs:
         run: psql "postgresql://postgres:postgres@localhost:5432/mizan_test" -v ON_ERROR_STOP=1 -f scripts/ci-phase7-smoke-test.sql
       - name: Verify cross-feature security and workflow regression matrix
         run: psql "postgresql://postgres:postgres@localhost:5432/mizan_test" -v ON_ERROR_STOP=1 -f scripts/ci-phase8-hardening-smoke-test.sql
+      - name: Apply message management and attachments migration
+        run: psql "postgresql://postgres:postgres@localhost:5432/mizan_test" -v ON_ERROR_STOP=1 -f supabase/migrations/20261024000100_phase9_message_management_attachments.sql
