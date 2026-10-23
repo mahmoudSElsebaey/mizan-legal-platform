@@ -351,3 +351,32 @@ img, svg, video { max-width: 100%; }
  .mizan-site-brand-copy small{font-size:.34rem}
  .mizan-site-actions .mizan-login{font-size:.6rem;padding-inline:.38rem!important}
 }
+
+
+/* Compact luxury mobile navigation: collapsible panel */
+.mizan-mobile-menu-toggle{display:none;position:relative;width:42px;height:42px;flex:0 0 42px;align-items:center;justify-content:center;flex-direction:column;gap:5px;border:1px solid rgba(212,175,124,.48);border-radius:13px;background:rgba(255,255,255,.035);color:var(--gold);cursor:pointer;transition:background .2s ease,border-color .2s ease,transform .2s ease}
+.mizan-mobile-menu-toggle span{display:block;width:18px;height:1.7px;border-radius:2px;background:currentColor;transition:transform .22s ease,opacity .18s ease,width .22s ease}
+.mizan-mobile-menu-toggle:hover{border-color:var(--gold);background:rgba(212,175,124,.11)}
+.mizan-mobile-menu-toggle.is-open span:first-child{transform:translateY(6.7px) rotate(45deg)}
+.mizan-mobile-menu-toggle.is-open span:nth-child(2){opacity:0;transform:scaleX(.3)}
+.mizan-mobile-menu-toggle.is-open span:last-child{transform:translateY(-6.7px) rotate(-45deg)}
+@media(max-width:760px){
+ .mizan-site-header-inner{position:relative;grid-template-columns:minmax(0,1fr) auto auto;gap:.5rem}
+ .mizan-mobile-menu-toggle{display:flex;grid-column:2;grid-row:1}
+ .mizan-site-actions{grid-column:3;grid-row:1}
+ .mizan-site-nav{display:flex;position:absolute;top:calc(100% + .5rem);inset-inline:0;z-index:70;width:100%;max-height:min(72vh,460px);overflow:auto;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:.25rem;padding:.55rem;border:1px solid rgba(212,175,124,.22);border-radius:18px;background:#0b2927;box-shadow:0 22px 55px rgba(0,0,0,.28);opacity:0;visibility:hidden;pointer-events:none;transform:translateY(-7px) scale(.985);transform-origin:top center;transition:opacity .2s ease,transform .2s ease,visibility .2s ease}
+ .mizan-site-nav.is-mobile-open{opacity:1;visibility:visible;pointer-events:auto;transform:translateY(0) scale(1)}
+ .mizan-site-nav a{display:flex;width:100%;min-height:44px;align-items:center;justify-content:flex-start;padding:.75rem .9rem;border-radius:11px;color:#e4ebe7;font-size:.88rem;white-space:normal}
+ [dir="rtl"] .mizan-site-nav a{justify-content:flex-start}
+ .mizan-site-nav a:hover,.mizan-site-nav a.is-active{background:rgba(212,175,124,.09);color:var(--gold)}
+ .mizan-site-nav a.is-active:after{inset-inline-start:.45rem;inset-inline-end:auto;bottom:10px;width:3px;height:22px;border-radius:3px;transform:none}
+ [dir="ltr"] .mizan-site-nav a.is-active:after{inset-inline-start:auto;inset-inline-end:.45rem}
+ .mizan-site-nav a:last-child{margin-top:.25rem;border-top:1px solid rgba(212,175,124,.16);border-radius:0 0 10px 10px;padding-top:.9rem}
+}
+@media(max-width:390px){
+ .mizan-site-header-inner{grid-template-columns:minmax(0,1fr) auto auto;gap:.35rem}
+ .mizan-mobile-menu-toggle{width:38px;height:38px;flex-basis:38px;border-radius:11px}
+ .mizan-mobile-menu-toggle span{width:17px}
+ .mizan-site-actions{gap:.15rem}
+}
+@media(prefers-reduced-motion:reduce){.mizan-mobile-menu-toggle,.mizan-mobile-menu-toggle span,.mizan-site-nav{transition:none}}
