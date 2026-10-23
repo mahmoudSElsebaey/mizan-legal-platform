@@ -209,7 +209,7 @@ export function ConversationLauncher({ locale }: { locale: Locale }) {
     const deletedAt = new Date().toISOString();
     const { data, error: updateError } = await createClient().from("conversation_messages").update({ body: "", attachments: [], deleted_at: deletedAt }).eq("id", message.id).eq("sender_id", userId).is("deleted_at", null).select("id").maybeSingle();
     if (updateError || !data) setError(labels.deleteFailed);
-    else { setMessages((current) => current.map((item) => item.id === message.id ? { ...item, body: "", attachments: [], deleted_at: deletedAt } : item)); setEditingId(""); }
+    else { setMessages((current) => current.map((item) => item.id === message.id ? { ...item, body: "", attachments: [], deleted_at: deletedAt } : item)); if (message.attachments?.length) void createClient().storage.from("conversation-attachments").remove(message.attachments.map((attachment) => attachment.path)); setEditingId(""); }
     setBusy(false);
   }
 
