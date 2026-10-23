@@ -100,18 +100,20 @@ export function AuthForm({ locale, mode, demoAccounts = [] }: { locale: Locale; 
   }
 
   return (
-    <section className="mx-auto w-full max-w-md rounded-3xl border border-[var(--border)] bg-white p-6 shadow-[var(--shadow-card)] sm:p-8">
+    <div className="mizan-auth-layout mx-auto">
+    <aside className="mizan-auth-story" aria-label={locale === "ar" ? "عن منصة ميزان" : "About Mizan"}><div className="mizan-auth-monogram">م<span>✦</span></div><p className="mizan-auth-eyebrow">MIZAN LEGAL PLATFORM</p><h2>{locale === "ar" ? "الوضوح في كل خطوة.\nوالثقة في كل قضية." : "Clarity in every step.\nConfidence in every case."}</h2><p className="mizan-auth-story-copy">{locale === "ar" ? "مساحة قانونية تجمعك بمكتبك، تحفظ تفاصيلك، وتساعدك تتابع طلباتك ومواعيدك بكل سهولة." : "A considered legal workspace to connect with your office, keep details organized, and follow requests and appointments with confidence."}</p><div className="mizan-auth-trust"><span>✦</span><p>{locale === "ar" ? "خصوصيتك وأمان بياناتك أولوية" : "Your privacy and data security come first"}</p></div><div className="mizan-auth-ornament" aria-hidden="true"><span></span><span></span><span></span></div></aside>
+    <section className="mizan-auth-card w-full max-w-md rounded-[28px] border border-[var(--border)] bg-white p-6 sm:p-9">
       <div className="mb-7">
-        <p className="mb-2 text-sm font-semibold tracking-wide text-[var(--teal)]">MIZAN LEGAL · ميزان</p>
-        <h1 className="text-2xl font-bold text-[var(--forest)]">{labels.title}</h1>
-        <p className="mt-2 text-sm leading-6 text-[var(--slate)]">{labels.description}</p>
+        <p className="mizan-auth-brand mb-3 text-xs font-extrabold tracking-[.18em] text-[var(--teal)]"><span className="mizan-auth-brand-mark">م</span> MIZAN LEGAL <span className="mizan-auth-brand-ar">ميزان</span></p>
+        <h1 className="text-3xl font-black tracking-tight text-[var(--forest)] sm:text-[2rem]">{labels.title}</h1>
+        <p className="mt-3 text-sm leading-7 text-[var(--slate)]">{labels.description}</p>
       </div>
 
       <form className="space-y-4" onSubmit={handleSubmit}>
         {mode === "register" && (
-          <label className="block space-y-2 text-sm font-medium text-[var(--charcoal)]">
+          <label className="mizan-auth-label block space-y-2 text-sm font-bold text-[var(--charcoal)]">
             {t.fullName}
-            <input name="fullName" autoComplete="name" required maxLength={120} className="w-full rounded-xl border border-[var(--border)] px-4 py-3 outline-none transition focus:border-[var(--teal)] focus:ring-2 focus:ring-emerald-100" />
+            <input name="fullName" autoComplete="name" required maxLength={120} className="mizan-auth-input w-full rounded-xl border border-[var(--border)] px-4 py-3.5 outline-none transition focus:border-[var(--teal)] focus:ring-2 focus:ring-emerald-100" />
           </label>
         )}
         {mode !== "reset-password" && (
@@ -134,7 +136,7 @@ export function AuthForm({ locale, mode, demoAccounts = [] }: { locale: Locale; 
         )}
         {error && <p role="alert" className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-800">{error}</p>}
         {message && <p role="status" className="rounded-xl bg-emerald-50 px-4 py-3 text-sm text-emerald-800">{message}</p>}
-        <button disabled={loading} type="submit" className="w-full rounded-xl bg-[var(--forest)] px-4 py-3 font-semibold text-white transition hover:bg-[var(--teal)] disabled:cursor-not-allowed disabled:opacity-60">
+        <button disabled={loading} type="submit" className="mizan-auth-submit w-full rounded-xl bg-[var(--forest)] px-4 py-3.5 font-bold text-white transition hover:bg-[var(--teal)] disabled:cursor-not-allowed disabled:opacity-60">
           {loading ? t.working : labels.submit}
         </button>
       </form>
@@ -167,5 +169,6 @@ export function AuthForm({ locale, mode, demoAccounts = [] }: { locale: Locale; 
       </div>
       {mode === "login" && <p className="mt-5 text-xs leading-5 text-[var(--slate)]">{locale === "ar" ? "إنشاء الحساب لا يمنح صلاحيات موظف أو مدير؛ تتم إدارة صلاحيات المكتب بشكل منفصل وآمن." : "Creating an account does not grant staff or administrator access. Office roles are assigned separately and securely."}</p>}
     </section>
+    </div>
   );
 }
