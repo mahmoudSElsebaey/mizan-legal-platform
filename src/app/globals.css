@@ -685,3 +685,84 @@ img, svg, video { max-width: 100%; }
 @media (prefers-reduced-motion: reduce) {
   .mizan-mobile-menu-extras { transition: none !important; }
 }
+
+/* Desktop header restoration: keep the full navigation and account actions in the header */
+@media (min-width: 761px) {
+  .mizan-site-header-inner {
+    display: flex;
+    grid-template-columns: none;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: nowrap;
+    gap: 1.5rem;
+    min-height: 86px;
+    padding-block: 0;
+  }
+  .mizan-site-brand { gap: 10px; }
+  .mizan-mobile-menu-toggle { display: none !important; }
+  .mizan-site-nav {
+    position: static;
+    display: flex;
+    width: auto;
+    height: auto;
+    max-height: none;
+    overflow: visible;
+    flex: 1 1 auto;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    order: initial;
+    gap: clamp(.55rem, 1.3vw, 1.35rem);
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: none;
+  }
+  .mizan-site-nav::before,
+  .mizan-mobile-menu-extras { display: none !important; }
+  .mizan-site-nav a {
+    width: auto;
+    min-height: 0;
+    align-self: auto;
+    justify-content: center;
+    padding: .6rem 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: #e2e8e5;
+    font-size: .84rem;
+    text-align: start;
+    white-space: nowrap;
+    opacity: 1;
+    transform: none;
+  }
+  .mizan-site-nav a:last-child { margin-top: 0; border-top: 0; padding-top: .6rem; }
+  .mizan-site-nav a.is-active::after { display: block; }
+  .mizan-site-actions {
+    display: flex !important;
+    position: static;
+    inset: auto;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: flex-end;
+    gap: .55rem;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    backdrop-filter: none;
+  }
+}
+@media (min-width: 761px) and (max-width: 1100px) {
+  .mizan-site-header-inner { gap: .8rem; }
+  .mizan-site-nav { gap: .55rem; }
+  .mizan-site-nav a { font-size: .74rem; }
+  .mizan-site-brand { gap: 10px; }
+}
