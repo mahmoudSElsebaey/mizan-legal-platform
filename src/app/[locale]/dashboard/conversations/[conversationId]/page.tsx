@@ -2,7 +2,8 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { isLocale } from "@/lib/i18n/config";
 import { createClient } from "@/lib/supabase/server";
-import { changeConversationStatus, sendConversationMessage } from "../actions";
+import { changeConversationStatus } from "../actions";
+import { ConversationThreadClient } from "@/components/conversations/conversation-thread-client";
 
 export default async function ConversationDetailPage({
   params,
@@ -21,7 +22,7 @@ export default async function ConversationDetailPage({
 
   const [{ data: conversation, error: conversationError }, { data: messages, error: messagesError }] = await Promise.all([
     supabase.from("conversations").select("id,client_id,staff_id,subject,status,created_at,last_message_at").eq("id", conversationId).maybeSingle(),
-    supabase.from("conversation_messages").select("id,conversation_id,sender_id,body,created_at").eq("conversation_id", conversationId).order("created_at", { ascending: true }).limit(300),
+    supabase.from("conversation_messages").select("id,conversation_id,sender_id,body,created_at,attachments,edited_at,deleted_at").eq("conversation_id", conversationId).order("created_at", { ascending: true }).limit(300),
   ]);
   if (conversationError || !conversation) notFound();
   const { data: staff } = await supabase.from("staff_members").select("role,status").eq("profile_id", user.id).maybeSingle();
@@ -61,25 +62,7 @@ export default async function ConversationDetailPage({
       {messagesError && <p role="alert" className="mt-5 rounded-xl bg-red-50 p-4 text-sm text-red-800">{t.noMessages}</p>}
       <section className="mt-7 rounded-2xl border border-[#14263d]/10 bg-white p-4 sm:p-7">
         <h2 className="text-lg font-black text-[#14263d]">{t.messages}</h2>
-        {!messages?.length ? <p className="mt-5 rounded-xl bg-[#f7f4ed] p-5 text-sm text-[#657184]">{t.empty}</p> :
-          <ol className="mt-5 space-y-4">
-            {messages.map((message) => {
-              const own = message.sender_id === user.id;
-              return <li key={message.id} className={"flex " + (own ? "justify-end" : "justify-start")}>
-                <article className={"max-w-[90%] rounded-2xl px-4 py-3 sm:max-w-[78%] " + (own ? "bg-[#14263d] text-white" : "border border-[#14263d]/10 bg-[#f7f4ed] text-[#14263d]")}>
-                  <p className="whitespace-pre-wrap break-words text-sm leading-7">{message.body}</p>
-                  <p className={"mt-2 text-[11px] " + (own ? "text-white/65" : "text-[#657184]")}>{new Intl.DateTimeFormat(ar ? "ar-EG" : "en-GB", { dateStyle: "medium", timeStyle: "short", timeZone: "Africa/Cairo" }).format(new Date(message.created_at))}</p>
-                </article>
-              </li>;
-            })}
-          </ol>}
-        {canSend ? <form action={sendConversationMessage} className="mt-6 border-t border-[#14263d]/10 pt-5">
-          <input type="hidden" name="locale" value={locale}/><input type="hidden" name="conversationId" value={conversation.id}/>
-          <label className="block text-sm font-bold text-[#14263d]">{t.placeholder}
-            <textarea required minLength={1} maxLength={4000} name="body" rows={4} placeholder={t.placeholder} className="mt-2 w-full resize-y rounded-xl border border-[#14263d]/15 bg-white px-3 py-3 font-normal" />
-          </label>
-          <div className="mt-3 flex flex-wrap items-center justify-between gap-3"><p className="text-xs text-[#657184]">{ar ? "حد الرسالة 4000 حرف، مع حد إرسال لمنع الإزعاج." : "4000-character limit; sending is rate-limited to prevent abuse."}</p><button className="rounded-xl bg-[#176b67] px-5 py-3 text-sm font-bold text-white hover:bg-[#14263d]">{t.send}</button></div>
-        </form> : <p className="mt-6 rounded-xl bg-slate-50 p-4 text-sm text-slate-600">{t.closedNotice}</p>}
+        <ConversationThreadClient locale={locale} conversationId={conversation.id} userId={user.id} initialMessages={(messages || []) as Array<{ id: string; conversation_id: string; sender_id: string; body: string; created_at: string; attachments: Array<{ path: string; name: string; mime_type: string; size: number }>; edited_at: string | null; deleted_at: string | null }>} canSend={canSend} />
         {(isClient || isActiveStaff) && <form action={changeConversationStatus} className="mt-4 border-t border-[#14263d]/10 pt-4">
           <input type="hidden" name="locale" value={locale}/><input type="hidden" name="conversationId" value={conversation.id}/>
           <input type="hidden" name="status" value={conversation.status === "open" ? "closed" : "open"}/>
