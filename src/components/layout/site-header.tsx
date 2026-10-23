@@ -18,7 +18,8 @@ export function SiteHeader({ locale }: { locale: Locale }) {
   const languageRef = useRef<HTMLDivElement>(null);
   const profileRef = useRef<HTMLDivElement>(null);
   const notificationRef = useRef<HTMLDivElement>(null);
-  const switchPath = (next: Locale) => pathname.replace(/^\/(ar|en)(?=\/|$)/, `/${next}`);\n  const firstName = (user?.name || "").trim().split(/\\s+/)[0];
+  const switchPath = (next: Locale) => pathname.replace(/^\/(ar|en)(?=\/|$)/, `/${next}`);
+  const firstName = (user?.name || "").trim().split(/\s+/)[0];
   useEffect(() => {
     let alive = true;
     const supabase = createClient();
