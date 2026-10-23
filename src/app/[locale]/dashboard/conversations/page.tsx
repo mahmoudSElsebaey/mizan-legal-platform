@@ -4,8 +4,6 @@ import { isLocale } from "@/lib/i18n/config";
 import { createClient } from "@/lib/supabase/server";
 import { markNotificationsRead, startConversation } from "./actions";
 
-type Locale = "ar" | "en";
-
 export default async function ConversationsPage({
   params,
   searchParams,
