@@ -59,6 +59,20 @@ export function ConversationThreadClient({
   };
 
   useEffect(() => {
+    const supabase = createClient();
+    const channel = supabase.channel("mizan-full-thread-" + conversationId)
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "conversation_messages", filter: "conversation_id=eq." + conversationId }, (payload) => {
+        const incoming = payload.new as Message;
+        setMessages((current) => current.some((message) => message.id === incoming.id) ? current : [...current, { ...incoming, attachments: incoming.attachments || [] }]);
+      })
+      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "conversation_messages", filter: "conversation_id=eq." + conversationId }, (payload) => {
+        const updated = payload.new as Message;
+        setMessages((current) => current.map((message) => message.id === updated.id ? { ...updated, attachments: updated.attachments || [] } : message));
+      }).subscribe();
+    return () => { void supabase.removeChannel(channel); };
+  }, [conversationId]);
+
+  useEffect(() => {
     let active = true;
     const paths = Array.from(new Set(messages.flatMap((message) => message.attachments).map((item) => item.path))).filter((path) => !urls[path]);
     if (!paths.length) return;
