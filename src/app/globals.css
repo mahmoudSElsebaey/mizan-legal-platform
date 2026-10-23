@@ -220,3 +220,71 @@ img, svg, video { max-width: 100%; }
 @media(max-width:1100px){.mizan-site-brand-copy{width:clamp(175px,19vw,215px)}.mizan-site-brand-copy small{font-size:.52rem}.mizan-site-brand-copy .mizan-arabic-wordmark{font-size:1.9rem!important}}
 @media(max-width:760px){.mizan-site-brand-copy{width:clamp(160px,45vw,200px)}.mizan-site-brand-copy .mizan-arabic-wordmark{font-size:1.75rem!important}.mizan-site-brand-copy small{font-size:.48rem}.mizan-site-mark{width:36px;height:42px}.mizan-profile-copy{display:flex}.mizan-profile-copy strong{max-width:72px!important}.mizan-profile-trigger{gap:.35rem}.mizan-site-actions .mizan-language{display:inline-flex!important}.mizan-site-actions .mizan-language-code{display:inline!important}}
 @media(max-width:420px){.mizan-site-brand-copy{width:148px}.mizan-site-brand-copy .mizan-arabic-wordmark{font-size:1.55rem!important}.mizan-site-brand-copy small{font-size:.43rem}.mizan-site-mark{width:30px;height:36px}.mizan-profile-copy{display:none}.mizan-profile-trigger{padding:.25rem}.mizan-site-actions .mizan-language{gap:.25rem;padding-inline:.45rem!important}}
+
+
+/* Final responsive polish for the shared public header and footer */
+.mizan-footer-column a{color:#b7c4bf}
+.mizan-footer-column a .mizan-footer-arrow{color:var(--gold)}
+.mizan-footer-column a span:not(.mizan-footer-arrow){color:inherit;transition:color .22s ease}
+.mizan-footer-column a:hover,.mizan-footer-column a:hover span:not(.mizan-footer-arrow),.mizan-footer-column a:hover .mizan-footer-arrow{color:var(--gold)}
+.mizan-footer-column a:hover{transform:translateX(-2px)}
+[dir="ltr"] .mizan-footer-column a:hover{transform:translateX(2px)}
+.mizan-footer-column a{transition:color .22s ease,transform .22s ease}
+@media(max-width:900px){
+ .mizan-site-header-inner{width:calc(100% - 2rem);min-height:76px;gap:.7rem}
+ .mizan-site-nav{gap:.55rem}
+ .mizan-site-nav a{font-size:.74rem}
+ .mizan-site-brand-copy{width:175px}
+ .mizan-site-brand-copy .mizan-arabic-wordmark{font-size:1.75rem!important}
+ .mizan-site-brand-copy small{font-size:.48rem}
+ .mizan-site-actions{gap:.35rem}
+ .mizan-site-actions .mizan-login{padding-inline:.7rem}
+}
+@media(max-width:760px){
+ .mizan-site-header-inner{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:.65rem;padding-block:.75rem}
+ .mizan-site-brand{min-width:0;gap:.35rem}
+ .mizan-site-mark{width:34px;height:38px}
+ .mizan-site-brand-copy{width:clamp(142px,43vw,190px)}
+ .mizan-site-brand-copy .mizan-arabic-wordmark{font-size:1.65rem!important}
+ .mizan-site-brand-copy small{font-size:clamp(.4rem,1.8vw,.48rem);white-space:normal;line-height:1.35}
+ .mizan-site-actions{min-width:0;gap:.25rem}
+ .mizan-site-actions .mizan-language{display:inline-flex!important;gap:.25rem;padding:.45rem!important}
+ .mizan-site-actions .mizan-language-code{display:inline!important;font-size:.68rem}
+ .mizan-site-actions .mizan-language>svg:first-child{width:15px;height:15px}
+ .mizan-chevron-icon{width:13px;height:13px}
+ .mizan-profile-trigger{gap:.25rem;padding:.22rem}
+ .mizan-profile-trigger .mizan-avatar{width:31px;height:31px}
+ .mizan-profile-copy{display:none}
+ .mizan-site-nav{grid-column:1/-1;order:initial;width:100%;justify-content:flex-start;gap:1.2rem;overflow-x:auto;padding:.3rem 0 .15rem;scrollbar-width:none}
+ .mizan-site-nav::-webkit-scrollbar{display:none}
+ .mizan-site-nav a{font-size:.78rem;flex-shrink:0}
+ .mizan-icon-button{width:36px;height:36px}
+ .mizan-login{min-height:36px!important;padding:.45rem .65rem!important}
+ .mizan-dropdown{max-width:calc(100vw - 1.25rem)}
+ .mizan-notification-menu{inset-inline-end:-2.5rem}
+ .mizan-footer-main{width:calc(100% - 2rem);grid-template-columns:repeat(2,minmax(0,1fr));gap:2rem 1.2rem;padding-block:3rem}
+ .mizan-footer-about{grid-column:1/-1}
+ .mizan-footer-contact{grid-column:1/-1}
+ .mizan-footer-column{min-width:0}
+ .mizan-footer-column a{font-size:.82rem;overflow-wrap:anywhere}
+ .mizan-footer-bottom{width:calc(100% - 2rem);padding-block:1.25rem}
+}
+@media(max-width:420px){
+ .mizan-site-header-inner{width:calc(100% - 1.25rem);gap:.45rem}
+ .mizan-site-brand{gap:.2rem}
+ .mizan-site-mark{width:28px;height:33px}
+ .mizan-site-brand-copy{width:clamp(125px,39vw,150px)}
+ .mizan-site-brand-copy .mizan-arabic-wordmark{font-size:1.45rem!important}
+ .mizan-site-brand-copy small{font-size:.39rem;letter-spacing:0}
+ .mizan-site-actions{gap:.15rem}
+ .mizan-site-actions .mizan-language{padding:.35rem!important}
+ .mizan-site-actions .mizan-language>svg:first-child{display:none}
+ .mizan-profile-trigger .mizan-avatar{width:29px;height:29px}
+ .mizan-site-nav{gap:1rem}
+ .mizan-site-nav a{font-size:.74rem}
+ .mizan-footer-main{grid-template-columns:minmax(0,1fr);gap:1.8rem}
+ .mizan-footer-about,.mizan-footer-contact{grid-column:auto}
+ .mizan-footer-column{gap:.85rem}
+ .mizan-footer-column h2,.mizan-footer-contact h2{margin-bottom:.75rem}
+ .mizan-footer-bottom div{gap:.8rem;font-size:.72rem}
+}
