@@ -93,7 +93,7 @@ export function ConversationLauncher({ locale }: { locale: Locale }) {
     setMessages(next);
     if (playSound && incoming.length && soundOn) playIncomingTone();
     void createClient().from("notifications").update({ read_at: new Date().toISOString() })
-      .eq("user_id", uid).is("read_at", null).eq("kind", "new_message");
+      .eq("user_id", uid).eq("conversation_id", threadId).is("read_at", null).eq("kind", "new_message");
     void loadThreads(uid);
   }, [labels.failed, loadThreads, soundOn]);
 
