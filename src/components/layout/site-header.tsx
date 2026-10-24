@@ -17,8 +17,11 @@ export function SiteHeader({ locale }: { locale: Locale }) {
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [notices, setNotices] = useState<Notice[]>([]);
   const [notificationsLoading, setNotificationsLoading] = useState(false);
+  const [markingAllNotificationsRead, setMarkingAllNotificationsRead] = useState(false);
+  const [noticeFilter, setNoticeFilter] = useState<"all" | "unread">("all");
   const [userId, setUserId] = useState<string | null>(null);
   const unreadNotifications = notices.filter((notice) => !notice.read_at).length;
+  const visibleNotices = noticeFilter === "unread" ? notices.filter((notice) => !notice.read_at) : notices;
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [user, setUser] = useState<{ email?: string; name?: string } | null>(null);
   const [busy, setBusy] = useState(false);
@@ -80,12 +83,14 @@ export function SiteHeader({ locale }: { locale: Locale }) {
   }
 
   async function markAllNotificationsRead() {
-    if (!userId || unreadNotifications === 0) return;
+    if (!userId || unreadNotifications === 0 || markingAllNotificationsRead) return;
+    setMarkingAllNotificationsRead(true);
     const ids = notices.filter((notice) => !notice.read_at).map((notice) => notice.id);
     const readAt = new Date().toISOString();
     setNotices((current) => current.map((notice) => ids.includes(notice.id) ? { ...notice, read_at: readAt } : notice));
     const { error } = await createClient().from("notifications").update({ read_at: readAt }).eq("user_id", userId).in("id", ids);
     if (error) setNotices((current) => current.map((notice) => ids.includes(notice.id) ? { ...notice, read_at: null } : notice));
+    setMarkingAllNotificationsRead(false);
   }
 
   function notificationHref(notice: Notice) {
@@ -153,11 +158,33 @@ export function SiteHeader({ locale }: { locale: Locale }) {
               {unreadNotifications > 0 && <span className="mizan-header-unread-count">{unreadNotifications > 99 ? "99+" : unreadNotifications}</span>}
             </button>
             <div className={notificationsOpen ? "mizan-dropdown mizan-notification-menu is-open" : "mizan-dropdown mizan-notification-menu"} aria-hidden={!notificationsOpen}>
-              <div className="mizan-dropdown-heading"><strong>{ar ? "الإشعارات" : "Notifications"}</strong><span>{unreadNotifications ? (ar ? `${unreadNotifications} غير مقروء` : `${unreadNotifications} unread`) : (ar ? "آخر التحديثات" : "Latest updates")}</span></div>
-              <div className="mizan-header-notice-list">
-                {notificationsLoading ? <p className="mizan-header-notice-empty">{ar ? "جارٍ تحميل الإشعارات..." : "Loading notifications..."}</p> : notices.length === 0 ? <div className="mizan-header-notice-empty"><span>✦</span><strong>{ar ? "لا توجد إشعارات جديدة" : "You're all caught up"}</strong><p>{ar ? "ستظهر هنا الرسائل وتحديثات المكتب والمواعيد." : "Messages, office updates and appointment alerts will appear here."}</p></div> : notices.map((notice) => <Link key={notice.id} href={notificationHref(notice)} onClick={() => { setNotificationsOpen(false); void markNotificationRead(notice); }} className={notice.read_at ? "mizan-header-notice-item" : "mizan-header-notice-item is-unread"}><span className="mizan-header-notice-indicator"/><span className="mizan-header-notice-copy"><strong>{notice.title}</strong>{notice.body && <small>{notice.body}</small>}<time dateTime={notice.created_at}>{new Date(notice.created_at).toLocaleString(ar ? "ar-EG" : "en-US", { dateStyle: "medium", timeStyle: "short", timeZone: "Africa/Cairo" })}</time></span></Link>)}
+              <div className="mizan-notice-panel-head">
+                <div className="mizan-notice-heading-copy">
+                  <span className="mizan-notice-eyebrow">{ar ? "مركز التنبيهات" : "YOUR UPDATES"}</span>
+                  <strong>{ar ? "الإشعارات" : "Notifications"}</strong>
+                  <span>{unreadNotifications ? (ar ? `لديك ${unreadNotifications} إشعارات غير مقروءة` : `You have ${unreadNotifications} unread ${unreadNotifications === 1 ? "notification" : "notifications"}`) : (ar ? "أنت على اطلاع بكل جديد" : "You’re all caught up")}</span>
+                </div>
+                <span className="mizan-notice-header-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg>{unreadNotifications > 0 && <i />}</span>
               </div>
-              <div className="mizan-header-notification-footer">{unreadNotifications > 0 && <button type="button" onClick={() => void markAllNotificationsRead()}>{ar ? "تحديد الكل كمقروء" : "Mark all as read"}</button>}<Link href={`/${locale}/dashboard/conversations`} onClick={() => setNotificationsOpen(false)}>{ar ? "عرض الرسائل" : "View messages"} ↗</Link></div>
+              <div className="mizan-notice-toolbar">
+                <div className="mizan-notice-filters" role="group" aria-label={ar ? "تصفية الإشعارات" : "Filter notifications"}>
+                  <button type="button" className={noticeFilter === "all" ? "is-active" : ""} aria-pressed={noticeFilter === "all"} onClick={() => setNoticeFilter("all")}>{ar ? "الكل" : "All"} <span>{notices.length}</span></button>
+                  <button type="button" className={noticeFilter === "unread" ? "is-active" : ""} aria-pressed={noticeFilter === "unread"} onClick={() => setNoticeFilter("unread")}>{ar ? "غير مقروء" : "Unread"} {unreadNotifications > 0 && <span>{unreadNotifications}</span>}</button>
+                </div>
+                {unreadNotifications > 0 && <button className="mizan-notice-mark-all" type="button" disabled={markingAllNotificationsRead} aria-busy={markingAllNotificationsRead} onClick={() => void markAllNotificationsRead()}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg>{markingAllNotificationsRead ? (ar ? "جارٍ التحديث" : "Updating") : (ar ? "قراءة الكل" : "Mark all read")}</button>}
+              </div>
+              <div className="mizan-dashboard-notice-list mizan-notice-feed">
+                {notificationsLoading ? <div className="mizan-notice-state"><span className="mizan-notice-spinner" /><strong>{ar ? "جارٍ تحميل الإشعارات" : "Loading notifications"}</strong><p>{ar ? "لحظات ونجهز آخر التحديثات." : "Getting your latest updates ready."}</p></div> : visibleNotices.length === 0 ? <div className="mizan-notice-state"><span className="mizan-notice-empty-icon" aria-hidden="true">✦</span><strong>{noticeFilter === "unread" ? (ar ? "لا توجد إشعارات غير مقروءة" : "No unread notifications") : (ar ? "لا توجد إشعارات حتى الآن" : "No notifications yet")}</strong><p>{ar ? "ستظهر هنا تحديثات المواعيد والرسائل وأي تنبيهات جديدة." : "Appointment updates, messages and important alerts will appear here."}</p>{noticeFilter === "unread" && <button type="button" onClick={() => setNoticeFilter("all")}>{ar ? "عرض كل الإشعارات" : "View all notifications"}</button>}</div> : visibleNotices.map((notice) => {
+                  const kind = notice.kind.toLowerCase();
+                  const symbol = kind.includes("message") || kind.includes("conversation") ? "✉" : kind.includes("appointment") || kind.includes("booking") ? "◷" : kind.includes("document") || kind.includes("case") ? "§" : "✦";
+                  return <Link key={notice.id} href={notificationHref(notice)} onClick={() => { setNotificationsOpen(false); void markNotificationRead(notice); }} className={notice.read_at ? "mizan-dashboard-notice-item" : "mizan-dashboard-notice-item is-unread"}>
+                    <span className={`mizan-notice-kind-icon ${notice.read_at ? "" : "is-unread"}`} aria-hidden="true">{symbol}</span>
+                    <span className="mizan-dashboard-notice-copy"><span className="mizan-notice-title-line"><strong>{notice.title}</strong>{!notice.read_at && <i aria-label={ar ? "جديد" : "New"} />}</span>{notice.body && <small>{notice.body}</small>}<time dateTime={notice.created_at}><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>{new Date(notice.created_at).toLocaleString(ar ? "ar-EG" : "en-US", { dateStyle: "medium", timeStyle: "short", timeZone: "Africa/Cairo" })}</time></span>
+                    <span className="mizan-notice-row-arrow" aria-hidden="true">↗</span>
+                  </Link>;
+                })}
+              </div>
+              <div className="mizan-dashboard-notification-footer mizan-notice-panel-footer"><span>{ar ? "ميزان · مكتبك القانوني في صورة أوضح" : "MIZAN · Clarity for every legal step"}</span><Link href={`/${locale}/dashboard/conversations`} onClick={() => setNotificationsOpen(false)}>{ar ? "الانتقال إلى الرسائل" : "Go to messages"} <b aria-hidden="true">↗</b></Link></div>
             </div>
           </div>
           <div className="mizan-popover-anchor" ref={profileRef}><button type="button" className="mizan-profile-trigger" aria-expanded={profileOpen} onClick={() => { setProfileOpen(v => !v); setNotificationsOpen(false); setLanguageOpen(false); }}><span className="mizan-avatar" aria-hidden="true">{(firstName || user.email || "M").slice(0,1).toLocaleUpperCase()}</span><span className="mizan-profile-copy"><strong>{firstName || (ar ? "حسابي" : "Account")}</strong></span><svg className={profileOpen ? "mizan-chevron-icon is-open" : "mizan-chevron-icon"} viewBox="0 0 20 20" aria-hidden="true"><path d="m5 7 5 5 5-5"/></svg></button><div className={profileOpen ? "mizan-dropdown mizan-profile-menu is-open" : "mizan-dropdown mizan-profile-menu"} aria-hidden={!profileOpen}><div className="mizan-profile-menu-user"><span className="mizan-avatar">{(user.name || user.email || "M").slice(0,1).toLocaleUpperCase()}</span><span><strong>{user.name || (ar ? "حسابي" : "My account")}</strong><small>{user.email}</small></span></div><Link href={`/${locale}/dashboard`} onClick={() => setProfileOpen(false)}><span>▦</span>{ar ? "لوحة التحكم" : "Dashboard"}<b>↗</b></Link><Link href={`/${locale}/dashboard/conversations`} onClick={() => setProfileOpen(false)}><span>◌</span>{ar ? "المحادثات" : "Messages"}<b>↗</b></Link><Link href={`/${locale}/dashboard/appointments`} onClick={() => setProfileOpen(false)}><span>▣</span>{ar ? "المواعيد" : "Appointments"}<b>↗</b></Link><div className="mizan-profile-divider"/><button type="button" disabled={busy} onClick={signOut}><span>↪</span>{busy ? (ar ? "جارٍ الخروج..." : "Signing out...") : (ar ? "تسجيل الخروج" : "Sign out")}</button></div></div>
