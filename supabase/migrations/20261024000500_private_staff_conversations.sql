@@ -102,7 +102,7 @@ $$;
 
 drop trigger if exists conversations_validate_participants on public.conversations;
 create trigger conversations_validate_participants
-before insert or update of client_id,staff_id,case_id,conversation_type on public.conversations
+before insert or update on public.conversations
 for each row execute function public.validate_conversation_participants();
 
 drop policy if exists "clients_start_conversations" on public.conversations;
