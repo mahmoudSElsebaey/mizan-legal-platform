@@ -1729,3 +1729,29 @@ img, svg, video { max-width: 100%; }
 .mizan-site-header .mizan-notification-menu{width:min(370px,calc(100vw - 1.5rem));max-height:min(70vh,520px);overflow:hidden}
 @media(max-width:760px){.mizan-site-header .mizan-chat-launcher{width:38px;height:38px;min-width:38px;flex-basis:38px}}
 @media(max-width:480px){.mizan-site-header .mizan-chat-launcher{width:36px;height:36px;min-width:36px;flex-basis:36px}.mizan-site-header .mizan-notification-menu{inset-inline-end:-.1rem}}
+
+
+/* Consistent conversation identity, message actions and read-state feedback */
+.mizan-thread-sound{display:flex;align-items:center;gap:.55rem;margin:0 0 .75rem;color:#6b7b70;font-size:.72rem}
+.mizan-thread-sound input{accent-color:#176b67}
+.mizan-thread-row{align-items:flex-end;gap:.55rem}
+.mizan-thread-row.is-own{flex-direction:row-reverse}
+.mizan-thread-avatar{display:grid;width:32px;height:32px;flex:0 0 32px;place-items:center;border:1px solid rgba(22,107,96,.12);border-radius:50%;background:linear-gradient(145deg,#e5eee4,#c9ded0);color:#176b60;font-size:.72rem;font-weight:900;box-shadow:0 3px 9px rgba(18,56,43,.08)}
+.mizan-thread-row.is-own .mizan-thread-avatar{border-color:rgba(212,175,124,.35);background:linear-gradient(145deg,#f3dfbd,#d7b985);color:#173d35}
+.mizan-thread-sender{display:block;margin:0 1.6rem .35rem 0;color:#6f8176;font-size:.65rem;font-weight:850;line-height:1.35}
+.mizan-thread-bubble.is-own .mizan-thread-sender{margin-inline:0 1.6rem;color:rgba(255,255,255,.78)}
+.mizan-thread-bubble>time{font-variant-numeric:tabular-nums;font-size:.62rem}
+.mizan-thread-menu summary{font-size:0!important;opacity:.7}
+.mizan-thread-menu summary:before{content:"⋮";font-size:1.2rem}
+.mizan-thread-menu summary:hover,.mizan-thread-menu summary:focus-visible{opacity:1;background:rgba(255,255,255,.96)}
+.mizan-thread-menu>div{z-index:20}
+.mizan-chat-message-menu>div{z-index:10000}
+.mizan-chat-message-menu summary{font-size:0!important}
+.mizan-chat-message-menu summary:before{content:"⋮";font-size:1.2rem}
+.mizan-chat-message-menu>div button,.mizan-thread-menu>div button{white-space:nowrap}
+@media(max-width:560px){
+ .mizan-thread-row{gap:.35rem}
+ .mizan-thread-avatar{width:27px;height:27px;flex-basis:27px;font-size:.65rem}
+ .mizan-thread-bubble{max-width:calc(100% - 34px);min-width:0}
+ .mizan-thread-sender{font-size:.61rem}
+}
