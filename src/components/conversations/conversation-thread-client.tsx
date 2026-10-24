@@ -77,19 +77,17 @@ export function ConversationThreadClient({
   const fileRef = useRef<HTMLInputElement>(null);
 
   const t = ar ? {
-    copy: "نسخ", edit: "تعديل", remove: "حذف", save: "حفظ", cancel: "إلغاء", you: "أنت", sound: "صوت إشعار الرسائل",
+    copy: "نسخ", edit: "تعديل", save: "حفظ", cancel: "إلغاء", you: "أنت", sound: "صوت إشعار الرسائل",
     edited: "تم التعديل", deleted: "تم حذف هذه الرسالة", attach: "إرفاق ملفات أو صور",
     placeholder: "اكتب رسالتك هنا...", send: "إرسال الرسالة", filesLimit: "الحد الأقصى 5 ملفات، 10 ميجابايت لكل ملف.",
     uploadFailed: "تعذر رفع المرفق أو إرسال الرسالة.", editFailed: "تعذر تعديل الرسالة.",
-    deleteFailed: "تعذر حذف الرسالة.", confirm: "هل تريد حذف هذه الرسالة؟",
     noMessages: "لا توجد رسائل بعد. اكتب رسالتك الأولى أدناه.", error: "حدث خطأ. حاول مرة أخرى.",
     filesReady: "ملفات جاهزة", openFile: "فتح الملف"
   } : {
-    copy: "Copy", edit: "Edit", remove: "Delete", save: "Save", cancel: "Cancel", you: "You", sound: "Message notification sound",
+    copy: "Copy", edit: "Edit", save: "Save", cancel: "Cancel", you: "You", sound: "Message notification sound",
     edited: "Edited", deleted: "This message was deleted", attach: "Attach files or images",
     placeholder: "Write your message here...", send: "Send message", filesLimit: "Up to 5 files, 10 MB each.",
     uploadFailed: "Could not upload the attachment or send the message.", editFailed: "Could not edit the message.",
-    deleteFailed: "Could not delete the message.", confirm: "Delete this message?",
     noMessages: "No messages yet. Write your first message below.", error: "Something went wrong. Please try again.",
     filesReady: "file(s) ready", openFile: "Open file"
   };
@@ -210,23 +208,6 @@ export function ConversationThreadClient({
     setBusy(false);
   }
 
-  async function deleteMessage(message: Message) {
-    if (busy || !window.confirm(t.confirm)) return;
-    setBusy(true);
-    setError("");
-    const deletedAt = new Date().toISOString();
-    const { data, error: updateError } = await createClient().from("conversation_messages")
-      .update({ body: "", attachments: [], deleted_at: deletedAt }).eq("id", message.id)
-      .eq("sender_id", userId).is("deleted_at", null).select("id").maybeSingle();
-    if (updateError || !data) setError(t.deleteFailed);
-    else {
-      setMessages((current) => current.map((item) => item.id === message.id ? { ...item, body: "", attachments: [], deleted_at: deletedAt } : item));
-      if (message.attachments.length) void createClient().storage.from("conversation-attachments").remove(message.attachments.map((item) => item.path));
-      setEditingId("");
-    }
-    setBusy(false);
-  }
-
   const initials = (name: string) => (name.trim().charAt(0) || "?").toLocaleUpperCase(ar ? "ar-EG" : "en-US");
 
   return <div className="mizan-thread-client">
@@ -255,7 +236,6 @@ export function ConversationThreadClient({
               <details className="mizan-thread-menu"><summary aria-label={ar ? "خيارات الرسالة" : "Message options"}>{ar ? "خيارات" : "Options"}</summary><div>
                 <button type="button" onClick={() => void copyMessage(message)}>{t.copy}</button>
                 {own && <button type="button" onClick={() => { setEditingId(message.id); setEditDraft(message.body); }}>{t.edit}</button>}
-                {own && <button type="button" className="is-danger" onClick={() => void deleteMessage(message)}>{t.remove}</button>}
               </div></details>
             </>}
             {!message.deleted_at && <time>{formatTime(message.created_at)}{message.edited_at ? " · " + t.edited : ""}</time>}
