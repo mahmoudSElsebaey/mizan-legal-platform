@@ -56,8 +56,8 @@ as $$
 declare
   client_role public.staff_role;
   staff_role_value public.staff_role;
-  client_status text;
-  staff_status text;
+  client_status public.staff_status;
+  staff_status_value public.staff_status;
 begin
   if new.conversation_type = 'staff' then
     if new.case_id is not null then
