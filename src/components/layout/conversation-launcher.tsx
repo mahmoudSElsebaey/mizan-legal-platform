@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 type Locale = "ar" | "en";
-type Thread = { id: string; client_id: string; staff_id: string; subject: string; status: string; last_message_at: string };
+type Thread = { id: string; client_id: string; staff_id: string; subject: string; status: string; conversation_type: "client" | "staff"; last_message_at: string };
 type Attachment = { path: string; name: string; mime_type: string; size: number };
 type Message = { id: string; conversation_id: string; sender_id: string; body: string; created_at: string; attachments: Attachment[]; edited_at: string | null; deleted_at: string | null };
 type Person = { id: string; full_name: string | null };
@@ -49,6 +49,7 @@ export function ConversationLauncher({ locale }: { locale: Locale }) {
   const [open, setOpen] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [userId, setUserId] = useState("");
+  const [currentStaffRole, setCurrentStaffRole] = useState("");
   const [threads, setThreads] = useState<Thread[]>([]);
   const [people, setPeople] = useState<Record<string, string>>({});
   const [personRoles, setPersonRoles] = useState<Record<string, string>>({});
@@ -70,6 +71,7 @@ export function ConversationLauncher({ locale }: { locale: Locale }) {
   const [newModalOpen, setNewModalOpen] = useState(false);
   const [newSubject, setNewSubject] = useState("");
   const [newRecipient, setNewRecipient] = useState("");
+  const [newConversationType, setNewConversationType] = useState<"client" | "staff">("client");
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [contactsLoading, setContactsLoading] = useState(false);
   const seen = useRef(new Set<string>());
@@ -80,23 +82,26 @@ export function ConversationLauncher({ locale }: { locale: Locale }) {
     placeholder: "اكتب رسالتك...", send: "إرسال", loading: "جارٍ تحميل المحادثات...",
     online: "مراسلة آمنة", sound: "صوت الإشعار", openFull: "فتح صفحة المحادثات",
     closed: "مغلقة", newConversation: "بدء محادثة جديدة", noMessages: "ابدأ المحادثة برسالتك الأولى", failed: "تعذر تحميل البيانات أو إرسال الرسالة.",
-    you: "أنت", today: "اليوم", newModalTitle: "ابدأ محادثة جديدة", topic: "موضوع المحادثة", interlocutor: "اختر المحاور", start: "إنشاء المحادثة", noContacts: "لا يوجد محامون أو مساعدين نشطون متاحون حاليًا.", subjectPlaceholder: "مثال: استفسار عن قضية أو موعد", copy: "نسخ", edit: "تعديل", remove: "حذف", save: "حفظ", cancel: "إلغاء", edited: "تم التعديل", deleted: "تم حذف هذه الرسالة", attach: "إرفاق ملفات أو صور", filesLimit: "يمكن إرفاق 5 ملفات كحد أقصى، بحد 10 ميجابايت لكل ملف.", uploadFailed: "تعذر رفع الملف. حاول مرة أخرى.", editFailed: "تعذر تعديل الرسالة.", deleteFailed: "تعذر حذف الرسالة.", copied: "تم نسخ الرسالة", removeConfirm: "هل تريد حذف هذه الرسالة؟", hideConversation: "حذف المحادثة من حسابي", hideConversationConfirm: "هل تريد إخفاء المحادثة من حسابك؟ ستظل ظاهرة للطرف الآخر.", hideConversationFailed: "تعذر إخفاء المحادثة.",
+    you: "أنت", today: "اليوم", newModalTitle: "ابدأ محادثة جديدة", topic: "موضوع المحادثة", interlocutor: "اختر المحاور", start: "إنشاء المحادثة", noContacts: "لا يوجد أعضاء فريق نشطون متاحون حاليًا.", privateConversation: "محادثة داخلية خاصة", privateHint: "هذه المحادثة خاصة بينك وبين الموظف الذي تختاره فقط.", viewOnly: "يمكنك الاطلاع على هذه المحادثة فقط، ولا يمكن إرسال رسائل إلا من طرفيها.", subjectPlaceholder: "مثال: استفسار عن قضية أو موعد", copy: "نسخ", edit: "تعديل", remove: "حذف", save: "حفظ", cancel: "إلغاء", edited: "تم التعديل", deleted: "تم حذف هذه الرسالة", attach: "إرفاق ملفات أو صور", filesLimit: "يمكن إرفاق 5 ملفات كحد أقصى، بحد 10 ميجابايت لكل ملف.", uploadFailed: "تعذر رفع الملف. حاول مرة أخرى.", editFailed: "تعذر تعديل الرسالة.", deleteFailed: "تعذر حذف الرسالة.", copied: "تم نسخ الرسالة", removeConfirm: "هل تريد حذف هذه الرسالة؟", hideConversation: "حذف المحادثة من حسابي", hideConversationConfirm: "هل تريد إخفاء المحادثة من حسابك؟ ستظل ظاهرة للطرف الآخر.", hideConversationFailed: "تعذر إخفاء المحادثة.",
   } : {
     title: "Messages", subtitle: "", search: "Search conversations",
     empty: "No conversations yet", choose: "Choose a conversation to view messages",
     placeholder: "Write a message...", send: "Send", loading: "Loading conversations...",
     online: "Secure messaging", sound: "Notification sound", openFull: "Open conversations page",
     closed: "Closed", newConversation: "Start a new conversation", noMessages: "Start the conversation with your first message", failed: "Could not load data or send the message.",
-    you: "You", today: "Today", newModalTitle: "Start a new conversation", topic: "Conversation subject", interlocutor: "Choose a participant", start: "Create conversation", noContacts: "No active lawyers or assistants are available right now.", subjectPlaceholder: "e.g. Question about a case or appointment", copy: "Copy", edit: "Edit", remove: "Delete", save: "Save", cancel: "Cancel", edited: "Edited", deleted: "This message was deleted", attach: "Attach files or images", filesLimit: "Up to 5 files, 10 MB per file.", uploadFailed: "Could not upload the file. Please try again.", editFailed: "Could not edit this message.", deleteFailed: "Could not delete this message.", copied: "Message copied", removeConfirm: "Delete this message?", hideConversation: "Remove conversation", hideConversationConfirm: "Hide this conversation from your account? It will remain visible to the other participant.", hideConversationFailed: "Could not hide the conversation.",
+    you: "You", today: "Today", newModalTitle: "Start a new conversation", topic: "Conversation subject", interlocutor: "Choose a participant", start: "Create conversation", noContacts: "No active office team members are available right now.", privateConversation: "Private staff conversation", privateHint: "This conversation is private between you and the selected staff member only.", viewOnly: "You can view this conversation, but only its two participants can send messages.", subjectPlaceholder: "e.g. Question about a case or appointment", copy: "Copy", edit: "Edit", remove: "Delete", save: "Save", cancel: "Cancel", edited: "Edited", deleted: "This message was deleted", attach: "Attach files or images", filesLimit: "Up to 5 files, 10 MB per file.", uploadFailed: "Could not upload the file. Please try again.", editFailed: "Could not edit this message.", deleteFailed: "Could not delete this message.", copied: "Message copied", removeConfirm: "Delete this message?", hideConversation: "Remove conversation", hideConversationConfirm: "Hide this conversation from your account? It will remain visible to the other participant.", hideConversationFailed: "Could not hide the conversation.",
   }, [ar]);
 
   const loadThreads = useCallback(async (uid: string, playSound = false) => {
     const supabase = createClient();
     const [{ data, error: queryError }, { data: hiddenRows }] = await Promise.all([
-      supabase.from("conversations").select("id,client_id,staff_id,subject,status,last_message_at").order("last_message_at", { ascending: false }).limit(60),
+      supabase.from("conversations").select("id,client_id,staff_id,subject,status,conversation_type,last_message_at").order("last_message_at", { ascending: false }).limit(60),
       supabase.from("conversation_hidden_for_user").select("conversation_id").eq("user_id", uid),
     ]);
     if (queryError) { setError(labels.failed); return; }
+    const { data: ownStaff } = await supabase.from("staff_members").select("role,status").eq("profile_id", uid).maybeSingle();
+    const activeRole = ownStaff?.status === "active" ? ownStaff.role : "";
+    setCurrentStaffRole(activeRole);
     const hiddenIds = new Set((hiddenRows || []).map((item) => item.conversation_id));
     const rows = ((data || []) as Thread[]).filter((thread) => !hiddenIds.has(thread.id));
     setThreads(rows);
@@ -105,7 +110,7 @@ export function ConversationLauncher({ locale }: { locale: Locale }) {
     if (ids.length) {
       const [profilesResult, staffResult] = await Promise.all([
         supabase.from("profiles").select("id,full_name").in("id", ids),
-        supabase.rpc("list_contactable_staff"),
+        activeRole ? supabase.rpc("list_contactable_staff_recipients") : supabase.rpc("list_contactable_staff"),
       ]);
       const nextPeople: Record<string, string> = Object.fromEntries(
         ((profilesResult.data || []) as Person[]).map((person) => [person.id, person.full_name?.trim() || ""]),
@@ -232,10 +237,11 @@ export function ConversationLauncher({ locale }: { locale: Locale }) {
     setError("");
     if (contacts.length || contactsLoading) return;
     setContactsLoading(true);
-    const { data, error: contactsError } = await createClient().rpc("list_contactable_staff");
+    const { data, error: contactsError } = await createClient().rpc(currentStaffRole ? "list_contactable_staff_recipients" : "list_contactable_staff");
     if (contactsError) setError(labels.failed);
     else {
       const available = (data || []) as Contact[];
+      setNewConversationType(currentStaffRole ? "staff" : "client");
       setContacts(available);
       if (available[0]) setNewRecipient(available[0].profile_id);
     }
@@ -249,8 +255,8 @@ export function ConversationLauncher({ locale }: { locale: Locale }) {
     setBusy(true);
     setError("");
     const { data, error: createError } = await createClient().from("conversations")
-      .insert({ client_id: userId, staff_id: newRecipient, subject, status: "open" })
-      .select("id,client_id,staff_id,subject,status,last_message_at").single();
+      .insert({ client_id: userId, staff_id: newRecipient, subject, status: "open", conversation_type: currentStaffRole ? "staff" : "client" })
+      .select("id,client_id,staff_id,subject,status,conversation_type,last_message_at").single();
     if (createError || !data) {
       setError(labels.failed);
       setBusy(false);
@@ -351,6 +357,7 @@ export function ConversationLauncher({ locale }: { locale: Locale }) {
   };
   const displayPerson = (id: string) => people[id]?.trim() || roleLabel(personRoles[id] || "user");
   const otherName = displayPerson(otherId);
+  const canSendActive = !!active && active.status === "open" && (active.conversation_type === "staff" ? (currentStaffRole !== "" && (active.client_id === userId || active.staff_id === userId)) : (active.client_id === userId || (active.staff_id === userId && currentStaffRole !== "")));
   const formatTime = (value: string) => new Intl.DateTimeFormat(ar ? "ar-EG" : "en-GB", { dateStyle: "medium", timeStyle: "short", timeZone: "Africa/Cairo" }).format(new Date(value));
   const initials = (name: string) => (name.trim().charAt(0) || "?").toLocaleUpperCase(ar ? "ar-EG" : "en-US");
 
@@ -372,7 +379,7 @@ export function ConversationLauncher({ locale }: { locale: Locale }) {
           {searchVisible && <label className="mizan-chat-search-label"><span className="sr-only">{labels.search}</span><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 4.5 4.5"/></svg><input id="mizan-chat-search" value={searchQuery} onChange={(event) => setSearchQuery(event.target.value)} placeholder={labels.search} /></label>}<div className="mizan-chat-thread-list">{filteredThreads.length === 0 ? <p className="mizan-chat-empty">{threads.length === 0 ? labels.empty : (ar ? "لا توجد نتائج مطابقة" : "No matching conversations")}</p> : filteredThreads.map((thread) => {
             const participant = thread.client_id === userId ? thread.staff_id : thread.client_id;
             return <div key={thread.id} className={"mizan-chat-thread-wrap" + (selected === thread.id ? " is-active" : "")}><button type="button" onClick={() => setSelected(thread.id)} className={"mizan-chat-thread" + (selected === thread.id ? " is-active" : "")}>
-              <span className="mizan-chat-avatar">{initials(displayPerson(participant))}</span><span className="mizan-chat-thread-copy"><strong>{displayPerson(participant)}</strong><small>{thread.subject}</small><time>{formatTime(thread.last_message_at)}</time></span><span className={"mizan-chat-status-dot" + (thread.status === "open" ? " is-open" : "")}/>
+              <span className="mizan-chat-avatar">{initials(displayPerson(participant))}</span><span className="mizan-chat-thread-copy"><strong>{displayPerson(participant)}</strong><small>{thread.conversation_type === "staff" ? labels.privateConversation + " · " : ""}{thread.subject}</small><time>{formatTime(thread.last_message_at)}</time></span><span className={"mizan-chat-status-dot" + (thread.status === "open" ? " is-open" : "")}/>
             </button><button type="button" className="mizan-chat-hide-thread" title={labels.hideConversation} aria-label={labels.hideConversation} disabled={hidingConversationId === thread.id} onClick={() => void hideConversation(thread)}>×</button></div>;
           })}</div>
           <a className="mizan-chat-full-link" href={"/" + locale + "/dashboard/conversations"}>{labels.openFull} ↗</a>
@@ -385,16 +392,16 @@ export function ConversationLauncher({ locale }: { locale: Locale }) {
               const senderName = own ? (people[userId]?.trim() || labels.you) : otherName;
               return <article key={message.id} className={"mizan-chat-message-row" + (own ? " is-own" : " is-other")}><span className="mizan-chat-avatar is-message-avatar">{initials(senderName)}</span><div className={"mizan-chat-bubble" + (own ? " is-own" : " is-other") + (message.deleted_at ? " is-deleted" : "")}><small className="mizan-chat-sender-name">{senderName}</small>{message.deleted_at ? <p className="mizan-chat-deleted">{labels.deleted}</p> : editingId === message.id ? <div className="mizan-chat-edit-form"><textarea value={editDraft} onChange={(event) => setEditDraft(event.target.value)} maxLength={4000} rows={3} aria-label={labels.edit}/><div><button type="button" disabled={busy || !editDraft.trim()} onClick={() => void saveMessageEdit(message)}>{labels.save}</button><button type="button" disabled={busy} onClick={() => { setEditingId(""); setEditDraft(""); }}>{labels.cancel}</button></div></div> : <>{message.body && <p>{message.body}</p>}{(message.attachments || []).map((attachment) => { const url = attachmentUrls[attachment.path]; const isImage = attachment.mime_type.startsWith("image/"); return <a className={"mizan-chat-attachment" + (isImage ? " is-image" : "")} href={url || "#"} key={attachment.path} target="_blank" rel="noreferrer" onClick={(event) => { if (!url) event.preventDefault(); }}>{isImage && url ? <img src={url} alt={attachment.name} loading="lazy"/> : <span className="mizan-chat-attachment-icon">↗</span>}<span><strong>{attachment.name}</strong><small>{(attachment.size / 1024 / 1024).toFixed(2)} MB</small></span></a>; })}<details className="mizan-chat-message-menu"><summary aria-label={ar ? "خيارات الرسالة" : "Message options"}>⋯</summary><div><button type="button" onClick={() => void copyMessage(message)}>{labels.copy}</button>{own && <button type="button" onClick={() => { setEditingId(message.id); setEditDraft(message.body); }}>{labels.edit}</button>}{own && <button type="button" className="is-danger" onClick={() => void deleteMessage(message)}>{labels.remove}</button>}</div></details></>}{!message.deleted_at && <time dateTime={message.created_at}>{formatTime(message.created_at)}{message.edited_at ? ` · ${labels.edited}` : ""}</time>}</div></article>;
             })}<div ref={bottomRef}/></div>
-            <form className="mizan-chat-composer" onSubmit={sendMessage}><input ref={fileInputRef} className="mizan-chat-file-input" type="file" multiple accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt,.rtf,.odt,.ods,.ppt,.pptx" onChange={(event) => { const selectedFiles = Array.from(event.target.files || []); if (selectedFiles.length > 5 || selectedFiles.some((file) => file.size > 10 * 1024 * 1024)) { setError(labels.filesLimit); event.target.value = ""; return; } setPendingFiles(selectedFiles); setError(""); }}/><button type="button" className="mizan-chat-attach-button" disabled={busy || active.status !== "open"} aria-label={labels.attach} title={labels.attach} onClick={() => fileInputRef.current?.click()}>＋</button><textarea value={draft} onChange={(event) => setDraft(event.target.value)} maxLength={4000} rows={2} disabled={active.status !== "open"} placeholder={active.status === "open" ? labels.placeholder : labels.closed}/><button type="submit" disabled={busy || (!draft.trim() && pendingFiles.length === 0) || active.status !== "open"} aria-label={labels.send}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 4 17 8-17 8 3-8-3-8Z"/><path d="M7 12h14"/></svg></button>{pendingFiles.length > 0 && <span className="mizan-chat-pending-files">{pendingFiles.length} {ar ? "ملف/ملفات جاهزة" : "file(s) ready"} <button type="button" onClick={() => { setPendingFiles([]); if (fileInputRef.current) fileInputRef.current.value = ""; }}>×</button></span>}</form>
+            <form className="mizan-chat-composer" onSubmit={sendMessage}><input ref={fileInputRef} className="mizan-chat-file-input" type="file" multiple accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt,.rtf,.odt,.ods,.ppt,.pptx" onChange={(event) => { const selectedFiles = Array.from(event.target.files || []); if (selectedFiles.length > 5 || selectedFiles.some((file) => file.size > 10 * 1024 * 1024)) { setError(labels.filesLimit); event.target.value = ""; return; } setPendingFiles(selectedFiles); setError(""); }}/><button type="button" className="mizan-chat-attach-button" disabled={busy || !canSendActive} aria-label={labels.attach} title={labels.attach} onClick={() => fileInputRef.current?.click()}>＋</button><textarea value={draft} onChange={(event) => setDraft(event.target.value)} maxLength={4000} rows={2} disabled={!canSendActive} placeholder={!canSendActive ? (active.status !== "open" ? labels.closed : labels.viewOnly) : labels.placeholder}/><button type="submit" disabled={busy || (!draft.trim() && pendingFiles.length === 0) || !canSendActive} aria-label={labels.send}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 4 17 8-17 8 3-8-3-8Z"/><path d="M7 12h14"/></svg></button>{pendingFiles.length > 0 && <span className="mizan-chat-pending-files">{pendingFiles.length} {ar ? "ملف/ملفات جاهزة" : "file(s) ready"} <button type="button" onClick={() => { setPendingFiles([]); if (fileInputRef.current) fileInputRef.current.value = ""; }}>×</button></span>}</form>
           </> : <div className="mizan-chat-no-selection"><span>✦</span><h3>{labels.choose}</h3><p>{labels.online}</p></div>}
           {error && <p role="alert" className="mizan-chat-error">{error}</p>}
         </div>
         {newModalOpen && <div className="mizan-chat-modal-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) setNewModalOpen(false); }}>
           <section className="mizan-chat-new-modal" role="dialog" aria-modal="true" aria-labelledby="mizan-new-conversation-title" dir={ar ? "rtl" : "ltr"} onMouseDown={(event) => event.stopPropagation()}>
-            <div className="mizan-chat-new-modal-head"><span className="mizan-chat-modal-symbol"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11.5a7.5 7.5 0 0 1-7.5 7.5H5l-1-4a7.5 7.5 0 1 1 16-3.5Z"/><path d="M12 8v7M8.5 11.5h7"/></svg></span><button type="button" className="mizan-chat-close" onClick={() => setNewModalOpen(false)} aria-label={ar ? "إغلاق" : "Close"}>×</button><h2 id="mizan-new-conversation-title">{labels.newModalTitle}</h2><p>{ar ? "اختر موضوعًا وعضوًا من فريق المكتب لبدء تواصل آمن." : "Choose a topic and an office team member to start a secure conversation."}</p></div>
+            <div className="mizan-chat-new-modal-head"><span className="mizan-chat-modal-symbol"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11.5a7.5 7.5 0 0 1-7.5 7.5H5l-1-4a7.5 7.5 0 1 1 16-3.5Z"/><path d="M12 8v7M8.5 11.5h7"/></svg></span><button type="button" className="mizan-chat-close" onClick={() => setNewModalOpen(false)} aria-label={ar ? "إغلاق" : "Close"}>×</button><h2 id="mizan-new-conversation-title">{labels.newModalTitle}</h2><p>{currentStaffRole ? labels.privateHint : (ar ? "اختر موضوعًا وعضوًا من فريق المكتب لبدء تواصل آمن." : "Choose a topic and an office team member to start a secure conversation.")}</p></div>
             <form onSubmit={createConversation} className="mizan-chat-new-modal-form">
               <label>{labels.topic}<input autoFocus required minLength={3} maxLength={160} value={newSubject} onChange={(event) => setNewSubject(event.target.value)} placeholder={labels.subjectPlaceholder}/></label>
-              <label>{labels.interlocutor}<select required value={newRecipient} onChange={(event) => setNewRecipient(event.target.value)} disabled={contactsLoading || contacts.length === 0}><option value="">{contactsLoading ? (ar ? "جارٍ تحميل فريق المكتب..." : "Loading office team...") : labels.interlocutor}</option>{contacts.map((contact) => <option key={contact.profile_id} value={contact.profile_id}>{contact.full_name || (ar ? "عضو فريق المكتب" : "Office team member")} · {contact.role === "lawyer" ? (ar ? "محامٍ" : "Lawyer") : (ar ? "مساعد" : "Assistant")}</option>)}</select></label>
+              <label>{labels.interlocutor}<select required value={newRecipient} onChange={(event) => setNewRecipient(event.target.value)} disabled={contactsLoading || contacts.length === 0}><option value="">{contactsLoading ? (ar ? "جارٍ تحميل فريق المكتب..." : "Loading office team...") : labels.interlocutor}</option>{contacts.map((contact) => <option key={contact.profile_id} value={contact.profile_id}>{contact.full_name || (ar ? "عضو فريق المكتب" : "Office team member")} · {contact.role === "owner" ? (ar ? "رئيس المكتب" : "Office owner") : contact.role === "admin" ? (ar ? "مدير" : "Manager") : contact.role === "lawyer" ? (ar ? "محامٍ" : "Lawyer") : (ar ? "مساعد" : "Assistant")}</option>)}</select></label>
               {contacts.length === 0 && !contactsLoading && <p className="mizan-chat-modal-hint">{labels.noContacts}</p>}
               <div className="mizan-chat-new-modal-actions"><button type="button" className="mizan-chat-modal-cancel" onClick={() => setNewModalOpen(false)}>{labels.cancel}</button><button type="submit" disabled={busy || contactsLoading || !contacts.length || newSubject.trim().length < 3 || !newRecipient}>{busy ? (ar ? "جارٍ الإنشاء..." : "Creating...") : labels.start}</button></div>
             </form>
