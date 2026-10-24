@@ -96,7 +96,7 @@ begin
       then 'Appointment time: ' || ltrim(body_text)
       else 'موعد: ' || ltrim(body_text)
     end,
-    '/ar/dashboard/appointments',
+    case when recipient_locale = 'en' then '/en/dashboard/appointments' else '/ar/dashboard/appointments' end,
     null
   );
 
