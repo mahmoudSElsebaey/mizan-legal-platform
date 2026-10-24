@@ -88,6 +88,8 @@ jobs:
         run: psql "postgresql://postgres:postgres@localhost:5432/mizan_test" -v ON_ERROR_STOP=1 -f supabase/migrations/20261023000100_phase7_realtime_messaging.sql
       - name: Apply appointment notifications migration
         run: psql "postgresql://postgres:postgres@localhost:5432/mizan_test" -v ON_ERROR_STOP=1 -f supabase/migrations/20261024000300_appointment_notifications.sql
+      - name: Apply conversation and notification deletion migration
+        run: psql "postgresql://postgres:postgres@localhost:5432/mizan_test" -v ON_ERROR_STOP=1 -f supabase/migrations/20261024000400_conversation_and_notification_deletion.sql
       - name: Verify appointment notification delivery
         run: psql "postgresql://postgres:postgres@localhost:5432/mizan_test" -v ON_ERROR_STOP=1 -f scripts/ci-appointment-notifications-smoke-test.sql
       - name: Apply private staff conversations migration
