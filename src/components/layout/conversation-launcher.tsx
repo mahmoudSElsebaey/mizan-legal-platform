@@ -234,14 +234,33 @@ export function ConversationLauncher({ locale }: { locale: Locale }) {
   async function openNewConversation() {
     setNewModalOpen(true);
     setError("");
-    if (contacts.length || contactsLoading) return;
+    if (!userId || contactsLoading) return;
     setContactsLoading(true);
-    const { data, error: contactsError } = await createClient().rpc(currentStaffRole ? "list_contactable_staff_recipients" : "list_contactable_staff");
-    if (contactsError) setError(labels.failed + " " + describeError(contactsError));
-    else {
+    const supabase = createClient();
+    const { data: ownStaff, error: staffError } = await supabase.from("staff_members")
+      .select("role,status").eq("profile_id", userId).maybeSingle();
+    if (staffError) {
+      setError(labels.failed + " " + describeError(staffError));
+      setContactsLoading(false);
+      return;
+    }
+    if (ownStaff && ownStaff.status !== "active") {
+      setCurrentStaffRole("");
+      setContacts([]);
+      setNewRecipient("");
+      setError(ar ? "حساب الموظف غير نشط، ولا يمكنه بدء محادثات جديدة." : "Your staff account is inactive and cannot start conversations.");
+      setContactsLoading(false);
+      return;
+    }
+    const activeRole = ownStaff?.status === "active" ? ownStaff.role : "";
+    setCurrentStaffRole(activeRole);
+    const { data, error: contactsError } = await supabase.rpc(activeRole ? "list_contactable_staff_recipients" : "list_contactable_staff");
+    if (contactsError) {
+      setError(labels.failed + " " + describeError(contactsError));
+    } else {
       const available = (data || []) as Contact[];
       setContacts(available);
-      if (available[0]) setNewRecipient(available[0].profile_id);
+      setNewRecipient(available[0]?.profile_id || "");
     }
     setContactsLoading(false);
   }
@@ -252,8 +271,23 @@ export function ConversationLauncher({ locale }: { locale: Locale }) {
     if (!userId || subject.length < 3 || subject.length > 160 || !newRecipient || busy) return;
     setBusy(true);
     setError("");
-    const { data, error: createError } = await createClient().from("conversations")
-      .insert({ client_id: userId, staff_id: newRecipient, subject, status: "open", conversation_type: currentStaffRole ? "staff" : "client" })
+    const supabase = createClient();
+    const { data: ownStaff, error: staffError } = await supabase.from("staff_members")
+      .select("role,status").eq("profile_id", userId).maybeSingle();
+    if (staffError) {
+      setError(labels.failed + " " + describeError(staffError));
+      setBusy(false);
+      return;
+    }
+    if (ownStaff && ownStaff.status !== "active") {
+      setError(ar ? "حساب الموظف غير نشط، ولا يمكنه بدء محادثات جديدة." : "Your staff account is inactive and cannot start conversations.");
+      setBusy(false);
+      return;
+    }
+    const activeRole = ownStaff?.status === "active" ? ownStaff.role : "";
+    setCurrentStaffRole(activeRole);
+    const { data, error: createError } = await supabase.from("conversations")
+      .insert({ client_id: userId, staff_id: newRecipient, subject, status: "open", conversation_type: activeRole ? "staff" : "client" })
       .select("id,client_id,staff_id,subject,status,conversation_type,last_message_at").single();
     if (createError || !data) {
       setError(labels.failed + (createError ? " " + describeError(createError) : " No conversation record was returned."));
