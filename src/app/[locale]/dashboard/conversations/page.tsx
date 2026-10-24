@@ -3,7 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { isLocale } from "@/lib/i18n/config";
 import { createClient } from "@/lib/supabase/server";
 import { ConfirmSubmitButton } from "@/components/ui/confirm-submit-button";
-import { deleteAllNotifications, deleteNotification, hideConversation, markNotificationsRead, startConversation } from "./actions";
+import { deleteAllNotifications, deleteNotification, hideConversation, markNotificationsRead, startConversation, startStaffConversation } from "./actions";
 
 export default async function ConversationsPage({
   params,
@@ -20,12 +20,13 @@ export default async function ConversationsPage({
   const { data: { user }, error: authError } = await supabase.auth.getUser();
   if (authError || !user) redirect("/" + locale + "/login");
 
-  const [{ data: staff }, { data: conversations, error: conversationsError }, { data: notifications }, { data: contacts }, { data: hiddenConversations }] = await Promise.all([
+  const [{ data: staff }, { data: conversations, error: conversationsError }, { data: notifications }, { data: contacts }, { data: hiddenConversations }, { data: staffRecipients }] = await Promise.all([
     supabase.from("staff_members").select("role,status").eq("profile_id", user.id).maybeSingle(),
-    supabase.from("conversations").select("id,client_id,staff_id,subject,status,last_message_at,created_at").order("last_message_at", { ascending: false }).limit(100),
+    supabase.from("conversations").select("id,client_id,staff_id,subject,status,conversation_type,last_message_at,created_at").order("last_message_at", { ascending: false }).limit(100),
     supabase.from("notifications").select("id,kind,title,body,href,created_at,read_at").order("created_at", { ascending: false }).limit(10),
     supabase.rpc("list_contactable_staff"),
     supabase.from("conversation_hidden_for_user").select("conversation_id").eq("user_id", user.id),
+    supabase.rpc("list_contactable_staff_recipients"),
   ]);
   const hiddenConversationIds = new Set((hiddenConversations || []).map((item) => item.conversation_id));
   const visibleConversations = (conversations || []).filter((conversation) => !hiddenConversationIds.has(conversation.id));
@@ -39,9 +40,9 @@ export default async function ConversationsPage({
     empty: "لا توجد محادثات حتى الآن.", office: "فريق المكتب", client: "العميل",
     open: "مفتوحة", closed: "مغلقة", last: "آخر نشاط", view: "فتح المحادثة",
     notifications: "آخر الإشعارات", noNotifications: "لا توجد إشعارات حتى الآن.",
-    markRead: "تحديد الكل كمقروء", unread: "جديد", deleteConversation: "حذف المحادثة من حسابي", deleteNotification: "حذف الإشعار", deleteAllNotifications: "مسح كل الإشعارات", confirmDeleteConversation: "هل تريد إخفاء هذه المحادثة من حسابك؟ ستظل ظاهرة للطرف الآخر.", confirmDeleteNotification: "هل تريد حذف هذا الإشعار؟", confirmDeleteAllNotifications: "هل تريد حذف جميع إشعارات حسابك؟", loadingError: "تعذر تحميل المحادثات. تحقق من ترحيل المرحلة السابعة.",
+    markRead: "تحديد الكل كمقروء", unread: "جديد", deleteConversation: "حذف المحادثة من حسابي", deleteNotification: "حذف الإشعار", deleteAllNotifications: "مسح كل الإشعارات", staffPrivateTitle: "محادثة داخلية خاصة", staffPrivateIntro: "ابدأ محادثة خاصة مع المدير أو مالك المكتب أو أحد أعضاء الفريق. لا يمكن لبقية الموظفين الاطلاع على هذه المحادثة.", staffRecipient: "اختر عضو فريق المكتب", noStaffRecipients: "لا يوجد أعضاء فريق آخرون نشطون متاحون حاليًا.", confirmDeleteConversation: "هل تريد إخفاء هذه المحادثة من حسابك؟ ستظل ظاهرة للطرف الآخر.", confirmDeleteNotification: "هل تريد حذف هذا الإشعار؟", confirmDeleteAllNotifications: "هل تريد حذف جميع إشعارات حسابك؟", loadingError: "تعذر تحميل المحادثات. تحقق من ترحيل المرحلة السابعة.",
     inactive: "حساب الموظف غير نشط. تواصل مع مالك المكتب لمراجعة الصلاحيات.",
-    results: { "start-failed":"تعذر بدء المحادثة. تأكد من اختيار موظف نشط.", "notifications-failed":"تعذر تحديث الإشعارات.", "notifications-read":"تم تحديد الإشعارات كمقروءة.", "conversation-hidden":"تم إخفاء المحادثة من حسابك.", "conversation-delete-failed":"تعذر حذف المحادثة من حسابك.", "notification-deleted":"تم حذف الإشعار.", "notification-delete-failed":"تعذر حذف الإشعار.", "notifications-deleted":"تم مسح الإشعارات.", "notifications-delete-failed":"تعذر مسح الإشعارات." } as Record<string,string>,
+    results: { "start-failed":"تعذر بدء المحادثة. تأكد من اختيار موظف نشط.", "notifications-failed":"تعذر تحديث الإشعارات.", "notifications-read":"تم تحديد الإشعارات كمقروءة.", "conversation-hidden":"تم إخفاء المحادثة من حسابك.", "conversation-delete-failed":"تعذر حذف المحادثة من حسابك.", "notification-deleted":"تم حذف الإشعار.", "notification-delete-failed":"تعذر حذف الإشعار.", "notifications-deleted":"تم مسح الإشعارات.", "notifications-delete-failed":"تعذر مسح الإشعارات.", "staff-conversation-failed":"تعذر إنشاء المحادثة الداخلية. تأكد من صلاحيات الحساب وأن المستلم نشط." } as Record<string,string>,
     subjectPlaceholder: "مثال: استفسار عن موعد الاستشارة",
   } : {
     title: "Conversations & notifications", intro: "Secure client-to-office communication with in-account notifications.",
@@ -50,9 +51,9 @@ export default async function ConversationsPage({
     empty: "No conversations yet.", office: "Office team", client: "Client",
     open: "Open", closed: "Closed", last: "Last activity", view: "Open conversation",
     notifications: "Recent notifications", noNotifications: "No notifications yet.",
-    markRead: "Mark all as read", unread: "New", deleteConversation: "Remove from my account", deleteNotification: "Delete notification", deleteAllNotifications: "Clear all notifications", confirmDeleteConversation: "Hide this conversation from your account? It will remain visible to the other participant.", confirmDeleteNotification: "Delete this notification?", confirmDeleteAllNotifications: "Delete all notifications in your account?", loadingError: "Could not load conversations. Confirm the Phase 7 migration is applied.",
+    markRead: "Mark all as read", unread: "New", deleteConversation: "Remove from my account", deleteNotification: "Delete notification", deleteAllNotifications: "Clear all notifications", staffPrivateTitle: "Private staff conversation", staffPrivateIntro: "Start a private conversation with the office owner, manager, or another active team member. Other staff cannot read this conversation.", staffRecipient: "Choose a staff member", noStaffRecipients: "No other active staff members are available.", confirmDeleteConversation: "Hide this conversation from your account? It will remain visible to the other participant.", confirmDeleteNotification: "Delete this notification?", confirmDeleteAllNotifications: "Delete all notifications in your account?", loadingError: "Could not load conversations. Confirm the Phase 7 migration is applied.",
     inactive: "Your staff account is inactive. Contact the office owner to review access.",
-    results: { "start-failed":"Could not start the conversation. Choose an active staff member.", "notifications-failed":"Could not update notifications.", "notifications-read":"Notifications marked as read.", "conversation-hidden":"Conversation hidden from your account.", "conversation-delete-failed":"Could not hide the conversation.", "notification-deleted":"Notification deleted.", "notification-delete-failed":"Could not delete the notification.", "notifications-deleted":"Notifications cleared.", "notifications-delete-failed":"Could not clear notifications." } as Record<string,string>,
+    results: { "start-failed":"Could not start the conversation. Choose an active staff member.", "notifications-failed":"Could not update notifications.", "notifications-read":"Notifications marked as read.", "conversation-hidden":"Conversation hidden from your account.", "conversation-delete-failed":"Could not hide the conversation.", "notification-deleted":"Notification deleted.", "notification-delete-failed":"Could not delete the notification.", "notifications-deleted":"Notifications cleared.", "notifications-delete-failed":"Could not clear notifications.", "staff-conversation-failed":"Could not create the private staff conversation. Confirm your access and that the recipient is active." } as Record<string,string>,
     subjectPlaceholder: "e.g. Question about my consultation",
   };
   const unreadCount = (notifications || []).filter(n => !n.read_at).length;
@@ -84,13 +85,30 @@ export default async function ConversationsPage({
         </form>
       </section>}
       {isStaff && !activeStaff && <p className="mt-6 rounded-xl bg-amber-50 p-4 text-sm text-amber-900">{t.inactive}</p>}
+      {isStaff && activeStaff && <section className="mt-8 rounded-2xl border border-[#176b67]/20 bg-[#f0f7f4] p-5 sm:p-7">
+        <div className="flex items-start gap-3"><span aria-hidden="true" className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#14263d] text-lg text-white">🔒</span><div><h2 className="text-xl font-black text-[#14263d]">{t.staffPrivateTitle}</h2><p className="mt-2 max-w-3xl text-sm leading-6 text-[#657184]">{t.staffPrivateIntro}</p></div></div>
+        <form action={startStaffConversation} className="mt-5 grid gap-4 sm:grid-cols-2">
+          <input type="hidden" name="locale" value={locale}/>
+          <label className="text-sm font-bold text-[#14263d]">{t.subject}
+            <input required minLength={3} maxLength={160} name="subject" placeholder={t.subjectPlaceholder} className="mt-2 w-full rounded-xl border border-[#14263d]/15 bg-white px-3 py-3 font-normal" />
+          </label>
+          <label className="text-sm font-bold text-[#14263d]">{t.staffRecipient}
+            <select required name="recipientId" defaultValue="" className="mt-2 w-full rounded-xl border border-[#14263d]/15 bg-white px-3 py-3 font-normal">
+              <option value="" disabled>{t.staffRecipient}</option>
+              {(staffRecipients || []).map((contact: {profile_id:string;full_name:string;role:string}) => <option key={contact.profile_id} value={contact.profile_id}>{contact.full_name || (ar ? "عضو فريق المكتب" : "Office team member")} · {contact.role === "owner" ? (ar ? "رئيس المكتب" : "Office owner") : contact.role === "admin" ? (ar ? "مدير" : "Manager") : contact.role === "lawyer" ? (ar ? "محامٍ" : "Lawyer") : (ar ? "مساعد" : "Assistant")}</option>)}
+            </select>
+          </label>
+          <div className="sm:col-span-2"><button type="submit" disabled={!staffRecipients?.length} className="rounded-xl bg-[#14263d] px-5 py-3 text-sm font-bold text-white transition hover:bg-[#176b67] disabled:cursor-not-allowed disabled:opacity-50">{t.start}</button></div>
+          {!staffRecipients?.length && <p className="sm:col-span-2 text-sm text-[#657184]">{t.noStaffRecipients}</p>}
+        </form>
+      </section>}
       <section className="mt-8">
         <h2 className="text-xl font-black text-[#14263d]">{t.conversations}</h2>
         {!visibleConversations.length ? <div className="mt-4 rounded-2xl border border-dashed border-[#14263d]/20 bg-white/70 p-8 text-center text-sm text-[#657184]">{t.empty}</div> :
           <div className="mt-4 grid gap-3 md:grid-cols-2">
             {visibleConversations.map((conversation) => <article key={conversation.id} className="rounded-2xl border border-[#14263d]/10 bg-white p-5 transition hover:border-[#176b67]/40">
               <div className="flex items-start justify-between gap-3"><h3 className="font-extrabold text-[#14263d]">{conversation.subject}</h3><span className={"shrink-0 rounded-full px-3 py-1 text-xs font-bold " + (conversation.status === "open" ? "bg-emerald-50 text-emerald-800" : "bg-slate-100 text-slate-600")}>{conversation.status === "open" ? t.open : t.closed}</span></div>
-              <p className="mt-2 text-sm text-[#657184]">{isClient ? t.office : t.client}</p>
+              <p className="mt-2 text-sm text-[#657184]">{conversation.conversation_type === "staff" ? t.staffPrivateTitle : (isClient ? t.office : t.client)}</p>
               <p className="mt-4 text-xs text-[#657184]">{t.last}: {new Intl.DateTimeFormat(ar ? "ar-EG" : "en-GB", { dateStyle: "medium", timeStyle: "short", timeZone: "Africa/Cairo" }).format(new Date(conversation.last_message_at))}</p>
               <Link href={"/" + locale + "/dashboard/conversations/" + conversation.id} className="mt-3 inline-flex text-sm font-bold text-[#176b67] hover:underline">{t.view} →</Link>
               <form action={hideConversation} className="mt-4 border-t border-[#14263d]/10 pt-3">
