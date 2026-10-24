@@ -87,3 +87,45 @@ export async function markNotificationsRead(formData: FormData) {
   if (error) back(locale.data, "?result=notifications-failed");
   back(locale.data, "?result=notifications-read");
 }
+
+
+const conversationDeleteSchema = z.object({
+  locale: localeSchema,
+  conversationId: z.string().uuid(),
+});
+
+const notificationDeleteSchema = z.object({
+  locale: localeSchema,
+  notificationId: z.string().uuid().optional(),
+  deleteAll: z.enum(["true", "false"]).optional(),
+});
+
+export async function hideConversation(formData: FormData) {
+  const parsed = conversationDeleteSchema.safeParse(Object.fromEntries(formData));
+  if (!parsed.success) throw new Error("Invalid conversation details.");
+  const { locale, conversationId } = parsed.data;
+  const { supabase, user } = await requireUser(locale);
+  const { error } = await supabase.from("conversation_hidden_for_user")
+    .upsert({ conversation_id: conversationId, user_id: user.id }, { onConflict: "conversation_id,user_id", ignoreDuplicates: true });
+  if (error) back(locale, "?result=conversation-delete-failed");
+  back(locale, "?result=conversation-hidden");
+}
+
+export async function deleteNotification(formData: FormData) {
+  const parsed = notificationDeleteSchema.safeParse(Object.fromEntries(formData));
+  if (!parsed.success || !parsed.data.notificationId) throw new Error("Invalid notification details.");
+  const { locale, notificationId } = parsed.data;
+  const { supabase, user } = await requireUser(locale);
+  const { error } = await supabase.from("notifications").delete().eq("id", notificationId).eq("user_id", user.id);
+  if (error) back(locale, "?result=notification-delete-failed");
+  back(locale, "?result=notification-deleted");
+}
+
+export async function deleteAllNotifications(formData: FormData) {
+  const parsed = localeSchema.safeParse(formData.get("locale"));
+  if (!parsed.success) throw new Error("Invalid locale.");
+  const { supabase, user } = await requireUser(parsed.data);
+  const { error } = await supabase.from("notifications").delete().eq("user_id", user.id);
+  if (error) back(parsed.data, "?result=notifications-delete-failed");
+  back(parsed.data, "?result=notifications-deleted");
+}
