@@ -352,7 +352,7 @@ export function ConversationLauncher({ locale }: { locale: Locale }) {
     else { setMessages((current) => current.map((item) => item.id === message.id ? { ...item, body, edited_at: editedAt } : item)); setEditingId(""); setEditDraft(""); }
     setBusy(false);
   }
- = threads.find((thread) => thread.id === selected);
+  const active = threads.find((thread) => thread.id === selected);
   const filteredThreads = threads.filter((thread) => {
     const participant = thread.client_id === userId ? thread.staff_id : thread.client_id;
     const query = searchQuery.trim().toLocaleLowerCase(ar ? "ar-EG" : "en-US");
