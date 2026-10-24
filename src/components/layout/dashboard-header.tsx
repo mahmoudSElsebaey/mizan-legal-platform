@@ -17,6 +17,7 @@ export function DashboardHeader({ locale }: { locale: Locale }) {
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [notices, setNotices] = useState<Notice[]>([]);
   const [loading, setLoading] = useState(false);
+  const [markingAllRead, setMarkingAllRead] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
   const languageRef = useRef<HTMLDivElement>(null);
   const notificationRef = useRef<HTMLDivElement>(null);
@@ -33,7 +34,11 @@ export function DashboardHeader({ locale }: { locale: Locale }) {
         if (!alive) return;
         setUserId(user?.id ?? null);
         if (!user) { setNotices([]); return; }
-        const { data, error } = await supabase.from("notifications").select("id,kind,title,body,href,created_at,read_at").order("created_at", { ascending: false }).limit(12);
+        const { data, error } = await supabase
+          .from("notifications")
+          .select("id,kind,title,body,href,created_at,read_at")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false });
         if (error) throw error;
         if (alive) setNotices((data || []) as Notice[]);
       } catch {
@@ -59,14 +64,30 @@ export function DashboardHeader({ locale }: { locale: Locale }) {
   }, []);
 
   async function markAllRead() {
-    if (!userId || unread === 0) return;
-    const ids = notices.filter((notice) => !notice.read_at).map((notice) => notice.id);
+    if (!userId || unread === 0 || markingAllRead) return;
+    setMarkingAllRead(true);
     const readAt = new Date().toISOString();
-    setNotices((current) => current.map((notice) => ids.includes(notice.id) ? { ...notice, read_at: readAt } : notice));
-    const supabase = createClient();
-    const { error } = await supabase.from("notifications").update({ read_at: readAt }).in("id", ids);
-    if (error) {
-      setNotices((current) => current.map((notice) => ids.includes(notice.id) ? { ...notice, read_at: null } : notice));
+    const previousNotices = notices;
+    setNotices((current) => current.map((notice) => notice.read_at ? notice : { ...notice, read_at: readAt }));
+    try {
+      const supabase = createClient();
+      const { error } = await supabase
+        .from("notifications")
+        .update({ read_at: readAt })
+        .eq("user_id", userId)
+        .is("read_at", null);
+      if (error) throw error;
+      const { data, error: reloadError } = await supabase
+        .from("notifications")
+        .select("id,kind,title,body,href,created_at,read_at")
+        .eq("user_id", userId)
+        .order("created_at", { ascending: false });
+      if (reloadError) throw reloadError;
+      setNotices((data || []) as Notice[]);
+    } catch {
+      setNotices(previousNotices);
+    } finally {
+      setMarkingAllRead(false);
     }
   }
 
@@ -103,7 +124,7 @@ export function DashboardHeader({ locale }: { locale: Locale }) {
               <div className="mizan-dashboard-notice-list">
                 {loading ? <p className="mizan-dashboard-notice-empty">{ar ? "جارٍ تحميل الإشعارات..." : "Loading notifications..."}</p> : notices.length === 0 ? <div className="mizan-dashboard-notice-empty"><span>✦</span><strong>{ar ? "لا توجد إشعارات جديدة" : "You're all caught up"}</strong><p>{ar ? "ستظهر هنا تحديثات المواعيد والرسائل وأي تنبيهات جديدة." : "Appointment updates, messages and new alerts will appear here."}</p></div> : notices.map((notice) => <Link key={notice.id} href={noticeHref(notice)} onClick={() => { setNotificationsOpen(false); if (!notice.read_at) { const now = new Date().toISOString(); setNotices((current) => current.map((item) => item.id === notice.id ? { ...item, read_at: now } : item)); void createClient().from("notifications").update({ read_at: now }).eq("id", notice.id); } }} className={notice.read_at ? "mizan-dashboard-notice-item" : "mizan-dashboard-notice-item is-unread"}><span className="mizan-dashboard-notice-indicator"/><span className="mizan-dashboard-notice-copy"><strong>{notice.title}</strong>{notice.body && <small>{notice.body}</small>}<time dateTime={notice.created_at}>{new Date(notice.created_at).toLocaleString(ar ? "ar-EG" : "en-US", { dateStyle: "medium", timeStyle: "short" })}</time></span></Link>)}
               </div>
-              <div className="mizan-dashboard-notification-footer">{unread > 0 && <button type="button" onClick={() => void markAllRead()}>{ar ? "تحديد الكل كمقروء" : "Mark all as read"}</button>}<Link href={`/${locale}/dashboard/conversations`} onClick={() => setNotificationsOpen(false)}>{ar ? "عرض المحادثات والإشعارات" : "View messages & notifications"} ↗</Link></div>
+              <div className="mizan-dashboard-notification-footer">{unread > 0 && <button type="button" disabled={markingAllRead} aria-busy={markingAllRead} onClick={() => void markAllRead()}>{markingAllRead ? (ar ? "جارٍ التحديث..." : "Updating...") : (ar ? "تحديد الكل كمقروء" : "Mark all as read")}</button>}<Link href={`/${locale}/dashboard/conversations`} onClick={() => setNotificationsOpen(false)}>{ar ? "عرض المحادثات والإشعارات" : "View messages & notifications"} ↗</Link></div>
             </div>
           </div>
         </div>
