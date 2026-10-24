@@ -2107,3 +2107,22 @@ pre,code{max-width:100%;overflow-wrap:anywhere}
   .mizan-chat-new-modal-form{padding:1.2rem;gap:.9rem}
 }
 
+
+/* Conversation list: keep natural vertical scrolling without a visible scrollbar */
+.mizan-chat-sidebar{
+  display:flex!important;
+  flex-direction:column!important;
+  min-height:0!important;
+  overflow:hidden!important;
+}
+.mizan-chat-thread-list{
+  flex:1 1 auto!important;
+  min-height:0!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  scrollbar-width:none!important;
+  -ms-overflow-style:none!important;
+  overscroll-behavior-y:contain;
+  -webkit-overflow-scrolling:touch;
+}
+.mizan-chat-thread-list::-webkit-scrollbar{display:none!important;width:0!important;height:0!important}
