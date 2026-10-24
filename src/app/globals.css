@@ -2935,3 +2935,108 @@ pre,code{max-width:100%;overflow-wrap:anywhere}
   }
   .mizan-dashboard-header .mizan-dashboard-language span:nth-child(2) { font-size: .6rem; }
 }
+
+
+/* Dashboard mobile header repair: keep the brand and all three actions visible. */
+.mizan-dashboard-header {
+  position: relative;
+  z-index: 80;
+  width: 100%;
+  min-height: 76px;
+  overflow: visible;
+}
+.mizan-dashboard-header .mizan-dashboard-header-inner {
+  box-sizing: border-box;
+  min-height: 76px;
+  height: auto;
+  padding-block: 10px;
+  align-items: center;
+  overflow: visible;
+}
+.mizan-dashboard-header .mizan-site-brand {
+  display: inline-flex;
+  align-items: center;
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+}
+.mizan-dashboard-header .mizan-site-mark {
+  flex: 0 0 auto;
+}
+.mizan-dashboard-header .mizan-site-brand-copy {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  line-height: 1.35;
+}
+.mizan-dashboard-header .mizan-site-brand-copy strong,
+.mizan-dashboard-header .mizan-site-brand-copy small {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.mizan-dashboard-header .mizan-dashboard-header-actions {
+  align-items: center;
+  align-self: center;
+  flex: 0 0 auto;
+  min-width: max-content;
+  overflow: visible;
+}
+.mizan-dashboard-header .mizan-dashboard-header-actions > *,
+.mizan-dashboard-header .mizan-dashboard-header-actions button {
+  flex-shrink: 0;
+}
+@media (max-width: 760px) {
+  .mizan-dashboard-header {
+    min-height: 68px;
+  }
+  .mizan-dashboard-header .mizan-dashboard-header-inner {
+    min-height: 68px;
+    padding-block: 8px;
+    gap: .5rem;
+  }
+  .mizan-dashboard-header .mizan-site-brand {
+    flex: 1 1 0;
+    gap: .35rem;
+  }
+  .mizan-dashboard-header .mizan-site-mark {
+    width: 30px;
+    height: 30px;
+  }
+  .mizan-dashboard-header .mizan-site-brand-copy strong {
+    font-size: .86rem;
+    white-space: nowrap;
+  }
+  .mizan-dashboard-header .mizan-site-brand-copy small {
+    max-width: clamp(64px, 22vw, 112px);
+    font-size: .52rem;
+    line-height: 1.35;
+    white-space: nowrap;
+  }
+  .mizan-dashboard-header .mizan-dashboard-header-actions {
+    gap: clamp(.15rem, 1vw, .35rem);
+    flex: 0 0 auto;
+  }
+}
+@media (max-width: 380px) {
+  .mizan-dashboard-header .mizan-dashboard-header-inner {
+    width: calc(100% - .75rem);
+    gap: .25rem;
+  }
+  .mizan-dashboard-header .mizan-site-brand {
+    gap: .2rem;
+  }
+  .mizan-dashboard-header .mizan-site-mark {
+    width: 27px;
+    height: 27px;
+  }
+  .mizan-dashboard-header .mizan-site-brand-copy small {
+    display: none;
+  }
+  .mizan-dashboard-header .mizan-dashboard-header-actions {
+    gap: .15rem;
+  }
+}
