@@ -54,19 +54,21 @@ export default async function ConversationDetailPage({
     noMessages:"Could not load messages. Confirm the Phase 7 migration is applied."
   } as Record<string,string>;
   const resultText = result ? t[result] : "";
-  return <main className="min-h-screen bg-[#f7f4ed] px-4 py-10 sm:py-14" dir={ar ? "rtl" : "ltr"}>
-    <div className="mx-auto max-w-4xl">
-      <Link href={"/" + locale + "/dashboard/conversations"} className="text-sm font-bold text-[#176b67] hover:underline">← {t.back}</Link>
-      <p className="mt-5 text-xs font-black tracking-[.18em] text-[#176b67]">MIZAN LEGAL / PRIVATE CONVERSATION</p>
-      <div className="mt-2 flex flex-wrap items-start justify-between gap-4">
+  return <main className="mizan-conversation-page min-h-screen px-4 py-8 sm:py-12" dir={ar ? "rtl" : "ltr"}>
+    <div className="mizan-conversation-shell mx-auto max-w-4xl">
+      <Link href={"/" + locale + "/dashboard/conversations"} className="mizan-conversation-back text-sm font-bold hover:underline">← {t.back}</Link>
+      <header className="mizan-conversation-hero mt-5">
+        <div className="mizan-conversation-brandline"><span className="mizan-conversation-brandmark">م</span><span><small>MIZAN LEGAL</small><strong>{ar ? "مراسلات المكتب القانونية" : "Private legal correspondence"}</strong></span><span className="mizan-conversation-lock">● {ar ? "محادثة خاصة" : "Private conversation"}</span></div>
+        <div className="mizan-conversation-title-row mt-5 flex flex-wrap items-start justify-between gap-4">
         <div><h1 className="text-3xl font-black text-[#14263d]">{conversation.subject}</h1><p className="mt-2 text-sm text-[#657184]">{t.title} · {isClient ? t.office : t.client}</p></div>
-        <span className={"rounded-full px-3 py-1.5 text-xs font-bold " + (conversation.status === "open" ? "bg-emerald-50 text-emerald-800" : "bg-slate-100 text-slate-600")}>{conversation.status === "open" ? t.open : t.closed}</span>
-      </div>
-      <p className="mt-4 max-w-3xl leading-7 text-[#657184]">{t.intro}</p>
+        <span className={"mizan-conversation-status rounded-full px-3 py-1.5 text-xs font-bold " + (conversation.status === "open" ? "is-open" : "is-closed")}>{conversation.status === "open" ? "● " + t.open : "● " + t.closed}</span>
+        </div>
+        <p className="mizan-conversation-intro mt-4 max-w-3xl leading-7">{t.intro}</p>
+      </header>
       {resultText && <p role="status" className={"mt-5 rounded-xl p-4 text-sm font-semibold " + (result?.endsWith("failed") ? "bg-red-50 text-red-800" : "border border-[#176b67]/20 bg-white text-[#176b67]")}>{resultText}</p>}
       {messagesError && <p role="alert" className="mt-5 rounded-xl bg-red-50 p-4 text-sm text-red-800">{t.noMessages}</p>}
-      <section className="mt-7 rounded-2xl border border-[#14263d]/10 bg-white p-4 sm:p-7">
-        <h2 className="text-lg font-black text-[#14263d]">{t.messages}</h2>
+      <section className="mizan-conversation-panel mt-7 rounded-2xl p-4 sm:p-7">
+        <div className="mizan-conversation-panel-heading"><span className="mizan-conversation-panel-icon">✉</span><div><h2 className="text-lg font-black">{t.messages}</h2><p>{ar ? "تواصل مباشر وآمن بينك وبين الطرف الآخر" : "A direct and secure channel between you and the other participant"}</p></div><span className="mizan-conversation-encryption">{ar ? "خاص" : "PRIVATE"}</span></div>
         <ConversationThreadClient locale={locale} conversationId={conversation.id} userId={user.id} currentUserName={currentUserName} otherName={otherName} initialMessages={(messages || []) as Array<{ id: string; conversation_id: string; sender_id: string; body: string; created_at: string; attachments: Array<{ path: string; name: string; mime_type: string; size: number }>; edited_at: string | null; deleted_at: string | null }>} canSend={canSend} />
         {!canSend && <p className="mt-5 rounded-xl bg-slate-50 p-4 text-sm text-slate-600">{t.closedNotice}</p>}
         {(isClient || isActiveStaff) && <form action={changeConversationStatus} className="mt-4 border-t border-[#14263d]/10 pt-4">
