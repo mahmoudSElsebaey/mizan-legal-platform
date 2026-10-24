@@ -2369,3 +2369,36 @@ pre,code{max-width:100%;overflow-wrap:anywhere}
   .mizan-notice-panel-footer>span { max-width:130px; }
 }
 @media(prefers-reduced-motion:reduce) { .mizan-notice-spinner { animation:none; } .mizan-notice-row-arrow { transition:none; } }
+
+
+/* Apply the same redesigned notification center to the public/site header. */
+.mizan-site-header .mizan-notification-menu {
+  width:min(410px,calc(100vw - 1.25rem));
+  max-height:min(76vh,610px);
+  overflow:hidden;
+  border:1px solid rgba(15,45,43,.1);
+  border-radius:20px;
+  background:#fff;
+  color:#1f302c;
+  box-shadow:0 24px 70px rgba(8,35,33,.24),0 3px 10px rgba(8,35,33,.06);
+  transform-origin:top right;
+}
+[dir="rtl"] .mizan-site-header .mizan-notification-menu { transform-origin:top left; }
+.mizan-site-header .mizan-notification-menu .mizan-notice-feed {
+  max-height:min(47vh,390px);
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  scrollbar-width:thin;
+  scrollbar-color:#cbd8ce transparent;
+}
+.mizan-site-header .mizan-notification-menu .mizan-notice-state { min-height:185px; }
+.mizan-site-header .mizan-notification-menu .mizan-notice-panel-footer { margin:0; }
+@media(max-width:520px) {
+  .mizan-site-header .mizan-notification-menu {
+    inset-inline-end:-.1rem;
+    width:min(390px,calc(100vw - 1rem));
+    max-height:calc(100dvh - 5.5rem);
+    border-radius:16px;
+  }
+  .mizan-site-header .mizan-notification-menu .mizan-notice-feed { max-height:calc(100dvh - 18rem); }
+}
