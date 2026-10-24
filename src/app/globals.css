@@ -3083,3 +3083,52 @@ pre,code{max-width:100%;overflow-wrap:anywhere}
 .mizan-chat-thread-wrap:has(.mizan-chat-remove-checkbox) .mizan-chat-thread { flex: 1 1 auto; }
 .mizan-chat-remove-modal .mizan-chat-new-modal-actions { margin-top: 1.25rem; }
 .mizan-chat-remove-modal .mizan-chat-new-modal-actions button:disabled { opacity: .6; cursor: wait; }
+
+
+/* Premium gold treatment for the full conversations-page link in the chat drawer. */
+.mizan-chat-full-link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .55rem;
+  margin: .65rem .8rem .8rem;
+  padding: .9rem 1rem;
+  overflow: hidden;
+  border: 1px solid #b9954b;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #d8bd78 0%, #c5a253 48%, #a9853c 100%);
+  color: #17332d;
+  box-shadow: 0 5px 14px rgba(169, 133, 60, .2), inset 0 1px 0 rgba(255,255,255,.42);
+  font-size: .78rem;
+  font-weight: 900;
+  text-decoration: none;
+  transition: transform .22s ease, background .22s ease, box-shadow .22s ease, border-color .22s ease, color .22s ease;
+}
+.mizan-chat-full-link::before {
+  content: "";
+  position: absolute;
+  inset-block: -40%;
+  inset-inline-start: -45%;
+  width: 28%;
+  transform: skewX(-22deg);
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.48), transparent);
+  transition: inset-inline-start .45s ease;
+  pointer-events: none;
+}
+.mizan-chat-full-link:hover {
+  transform: translateY(-2px);
+  border-color: #e0c780;
+  background: linear-gradient(135deg, #ead69d 0%, #d9bb70 48%, #c6a052 100%);
+  color: #102d27;
+  box-shadow: 0 9px 22px rgba(169, 133, 60, .3), inset 0 1px 0 rgba(255,255,255,.62);
+}
+.mizan-chat-full-link:hover::before { inset-inline-start: 125%; }
+.mizan-chat-full-link:focus-visible {
+  outline: 3px solid rgba(197, 162, 83, .45);
+  outline-offset: 3px;
+}
+.mizan-chat-full-link:active { transform: translateY(0); box-shadow: 0 3px 9px rgba(169, 133, 60, .2); }
+@media (prefers-reduced-motion: reduce) {
+  .mizan-chat-full-link, .mizan-chat-full-link::before { transition: none; }
+}
