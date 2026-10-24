@@ -97,7 +97,7 @@ export function ConversationLauncher({ locale }: { locale: Locale }) {
       supabase.from("conversations").select("id,client_id,staff_id,subject,status,conversation_type,last_message_at").order("last_message_at", { ascending: false }).limit(60),
       supabase.from("conversation_hidden_for_user").select("conversation_id").eq("user_id", uid),
     ]);
-    if (queryError) { setError(labels.failed + " [" + describeError(queryError) + "]"); return; }
+    if (queryError) { console.error("Mizan chat thread query failed", queryError); setError(labels.failed + " [" + (queryError.code || "CHAT_QUERY_FAILED") + "]"); return; }
     const { data: ownStaff } = await supabase.from("staff_members").select("role,status").eq("profile_id", uid).maybeSingle();
     const activeRole = ownStaff?.status === "active" ? ownStaff.role : "";
     setCurrentStaffRole(activeRole);
@@ -136,7 +136,7 @@ export function ConversationLauncher({ locale }: { locale: Locale }) {
     const { data, error: queryError } = await supabase.from("conversation_messages")
       .select("id,conversation_id,sender_id,body,created_at,attachments,edited_at,deleted_at").eq("conversation_id", threadId)
       .order("created_at", { ascending: true }).limit(300);
-    if (queryError) { setError(labels.failed + " [" + describeError(queryError) + "]"); return; }
+    if (queryError) { console.error("Mizan chat thread query failed", queryError); setError(labels.failed + " [" + (queryError.code || "CHAT_QUERY_FAILED") + "]"); return; }
     const next = ((data || []) as Message[]).map((message) => ({ ...message, attachments: message.attachments || [] }));
     const incoming = next.filter((message) => message.sender_id !== uid && !seen.current.has(message.id));
     next.forEach((message) => seen.current.add(message.id));
