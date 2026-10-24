@@ -1700,3 +1700,32 @@ img, svg, video { max-width: 100%; }
   .mizan-dashboard-header .mizan-dashboard-header-actions .mizan-language,
   .mizan-dashboard-header .mizan-dashboard-header-actions .mizan-dashboard-notification-button {width:33px!important;min-width:33px!important;height:33px!important;min-height:33px!important}
 }
+
+
+/* Shared public/dashboard header: consistent circular actions and live notification badges */
+.mizan-site-header .mizan-profile-trigger{border:0!important;box-shadow:none!important;background:transparent!important}
+.mizan-site-header .mizan-profile-trigger:hover,.mizan-site-header .mizan-profile-trigger:focus-visible{background:rgba(255,255,255,.06)!important;outline-offset:3px}
+.mizan-site-header .mizan-chat-launcher{width:42px;height:42px;min-width:42px;flex:0 0 42px;border:1px solid rgba(212,175,124,.25);border-radius:50%;background:rgba(255,255,255,.04);color:#f6f3ec;box-shadow:none;transform:none}
+.mizan-site-header .mizan-chat-launcher:hover{border-color:var(--gold);background:rgba(212,175,124,.1);transform:translateY(-1px)}
+.mizan-site-header .mizan-chat-launcher svg{width:18px;height:18px}
+.mizan-site-header .mizan-chat-launcher-count,.mizan-site-header .mizan-header-unread-count{position:absolute;top:-5px;inset-inline-end:-5px;display:grid;min-width:18px;height:18px;place-items:center;padding-inline:4px;border:2px solid #082321;border-radius:999px;background:#d4af7c;color:#082321;font-size:.6rem;font-weight:900;line-height:1;font-variant-numeric:tabular-nums}
+.mizan-header-notice-list{max-height:min(55vh,360px);overflow:auto}
+.mizan-header-notice-empty{display:flex;min-height:145px;flex-direction:column;align-items:center;justify-content:center;gap:.55rem;padding:1.25rem;text-align:center;color:#65756b}
+.mizan-header-notice-empty>span{display:grid;width:38px;height:38px;place-items:center;border-radius:13px;background:#edf3ed;color:#167a6e;font-size:1.2rem}
+.mizan-header-notice-empty strong{color:#183c35;font-size:.86rem}
+.mizan-header-notice-empty p{max-width:270px;font-size:.75rem;line-height:1.8}
+.mizan-header-notice-item{display:flex;align-items:flex-start;gap:.7rem;border-bottom:1px solid #edf0eb;padding:.9rem 1rem;color:#45574e;transition:background .15s}
+.mizan-header-notice-item:hover{background:#f5f8f3}
+.mizan-header-notice-item.is-unread{background:#f1f7f1}
+.mizan-header-notice-indicator{width:8px;height:8px;flex:0 0 8px;margin-top:.4rem;border-radius:50%;background:transparent}
+.mizan-header-notice-item.is-unread .mizan-header-notice-indicator{background:#167a6e;box-shadow:0 0 0 3px rgba(22,122,110,.1)}
+.mizan-header-notice-copy{display:grid;min-width:0;gap:.28rem}
+.mizan-header-notice-copy strong{font-size:.8rem;line-height:1.6;color:#173d35}
+.mizan-header-notice-copy small{font-size:.73rem;line-height:1.7;color:#6c7b72;overflow-wrap:anywhere}
+.mizan-header-notice-copy time{font-size:.65rem;color:#89958d}
+.mizan-header-notification-footer{display:grid;gap:.15rem;border-top:1px solid #e6ebe4;background:#fbfcfa;padding:.55rem}
+.mizan-header-notification-footer button,.mizan-header-notification-footer a{display:block;border:0;border-radius:9px;background:transparent;padding:.65rem .7rem;text-align:center;color:#167a6e;font-size:.75rem;font-weight:850}
+.mizan-header-notification-footer button:hover,.mizan-header-notification-footer a:hover{background:#edf4ed}
+.mizan-site-header .mizan-notification-menu{width:min(370px,calc(100vw - 1.5rem));max-height:min(70vh,520px);overflow:hidden}
+@media(max-width:760px){.mizan-site-header .mizan-chat-launcher{width:38px;height:38px;min-width:38px;flex-basis:38px}}
+@media(max-width:480px){.mizan-site-header .mizan-chat-launcher{width:36px;height:36px;min-width:36px;flex-basis:36px}.mizan-site-header .mizan-notification-menu{inset-inline-end:-.1rem}}
