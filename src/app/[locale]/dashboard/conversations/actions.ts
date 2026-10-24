@@ -126,13 +126,15 @@ const notificationDeleteSchema = z.object({
   deleteAll: z.enum(["true", "false"]).optional(),
 });
 
-export async function hideConversation(formData: FormData) {
-  const parsed = conversationDeleteSchema.safeParse(Object.fromEntries(formData));
-  if (!parsed.success) throw new Error("Invalid conversation details.");
-  const { locale, conversationId } = parsed.data;
+export async function hideConversations(formData: FormData) {
+  const localeResult = localeSchema.safeParse(formData.get("locale"));
+  const ids = z.array(z.string().uuid()).min(1).max(100).safeParse(formData.getAll("conversationId"));
+  if (!localeResult.success || !ids.success) throw new Error("Invalid conversation selection.");
+  const locale = localeResult.data;
   const { supabase, user } = await requireUser(locale);
+  const rows = [...new Set(ids.data)].map((conversation_id) => ({ conversation_id, user_id: user.id }));
   const { error } = await supabase.from("conversation_hidden_for_user")
-    .upsert({ conversation_id: conversationId, user_id: user.id }, { onConflict: "conversation_id,user_id", ignoreDuplicates: true });
+    .upsert(rows, { onConflict: "conversation_id,user_id", ignoreDuplicates: true });
   if (error) back(locale, "?result=conversation-delete-failed");
   back(locale, "?result=conversation-hidden");
 }
