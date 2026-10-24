@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { isLocale } from "@/lib/i18n/config";
 import { createClient } from "@/lib/supabase/server";
+import { ConfirmSubmitButton } from "@/components/ui/confirm-submit-button";
 import { deleteAllNotifications, deleteNotification, hideConversation, markNotificationsRead, startConversation } from "./actions";
 
 export default async function ConversationsPage({
@@ -94,14 +95,14 @@ export default async function ConversationsPage({
               <Link href={"/" + locale + "/dashboard/conversations/" + conversation.id} className="mt-3 inline-flex text-sm font-bold text-[#176b67] hover:underline">{t.view} →</Link>
               <form action={hideConversation} className="mt-4 border-t border-[#14263d]/10 pt-3">
                 <input type="hidden" name="locale" value={locale}/><input type="hidden" name="conversationId" value={conversation.id}/>
-                <button type="submit" className="text-xs font-bold text-red-700 hover:underline">{t.deleteConversation}</button>
+                <ConfirmSubmitButton message={t.confirmDeleteConversation} className="text-xs font-bold text-red-700 hover:underline">{t.deleteConversation}</ConfirmSubmitButton>
               </form>
             </article>)}
           </div>}
       </section>
       <section className="mt-10 rounded-2xl border border-[#14263d]/10 bg-white p-5 sm:p-7">
         <div className="flex flex-wrap items-center justify-between gap-3"><h2 className="text-xl font-black text-[#14263d]">{t.notifications} {unreadCount > 0 && <span className="ms-2 rounded-full bg-[#176b67]/10 px-2 py-1 text-xs text-[#176b67]">{unreadCount} {t.unread}</span>}</h2>
-          <div className="flex flex-wrap items-center gap-3">{unreadCount > 0 && <form action={markNotificationsRead}><input type="hidden" name="locale" value={locale}/><button className="text-sm font-bold text-[#176b67] hover:underline">{t.markRead}</button></form>}{!!notifications?.length && <form action={deleteAllNotifications}><input type="hidden" name="locale" value={locale}/><button className="text-sm font-bold text-red-700 hover:underline">{t.deleteAllNotifications}</button></form>}</div>
+          <div className="flex flex-wrap items-center gap-3">{unreadCount > 0 && <form action={markNotificationsRead}><input type="hidden" name="locale" value={locale}/><button className="text-sm font-bold text-[#176b67] hover:underline">{t.markRead}</button></form>}{!!notifications?.length && <form action={deleteAllNotifications}><input type="hidden" name="locale" value={locale}/><ConfirmSubmitButton message={t.confirmDeleteAllNotifications} className="text-sm font-bold text-red-700 hover:underline">{t.deleteAllNotifications}</ConfirmSubmitButton></form>}</div>
         </div>
         {!notifications?.length ? <p className="mt-4 text-sm text-[#657184]">{t.noNotifications}</p> : <ul className="mt-4 divide-y divide-[#14263d]/10">
           {notifications.map((notification) => <li key={notification.id} className={"flex items-start justify-between gap-3 py-4 " + (!notification.read_at ? "font-semibold" : "")}>
@@ -109,7 +110,7 @@ export default async function ConversationsPage({
               {notification.body && <p className="mt-1 text-sm font-normal text-[#657184]">{notification.body}</p>}
               <p className="mt-2 text-xs font-normal text-[#657184]">{new Intl.DateTimeFormat(ar ? "ar-EG" : "en-GB", { dateStyle: "medium", timeStyle: "short", timeZone: "Africa/Cairo" }).format(new Date(notification.created_at))}</p>
             </Link>
-            <form action={deleteNotification} className="shrink-0"><input type="hidden" name="locale" value={locale}/><input type="hidden" name="notificationId" value={notification.id}/><button type="submit" aria-label={t.deleteNotification} title={t.deleteNotification} className="rounded-lg px-2 py-1 text-sm font-bold text-red-700 hover:bg-red-50">×</button></form>
+            <form action={deleteNotification} className="shrink-0"><input type="hidden" name="locale" value={locale}/><input type="hidden" name="notificationId" value={notification.id}/><ConfirmSubmitButton message={t.confirmDeleteNotification} ariaLabel={t.deleteNotification} title={t.deleteNotification} className="rounded-lg px-2 py-1 text-sm font-bold text-red-700 hover:bg-red-50">×</ConfirmSubmitButton></form>
           </li>)}
         </ul>}
       </section>
