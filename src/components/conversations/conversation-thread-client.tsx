@@ -4,6 +4,18 @@ import { useEffect, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
 type Locale = "ar" | "en";
+
+function describeError(value: unknown): string {
+  if (value instanceof Error && value.message) return value.message;
+  if (value && typeof value === "object") {
+    const item = value as Record<string, unknown>;
+    const parts = [item.message, item.details, item.hint, item.code ? `code: ${item.code}` : null]
+      .filter((part): part is string => typeof part === "string" && part.trim().length > 0);
+    if (parts.length) return parts.join(" · ");
+    try { return JSON.stringify(value); } catch { return "Unknown error"; }
+  }
+  return typeof value === "string" ? value : "Unknown error";
+}
 type Attachment = { path: string; name: string; mime_type: string; size: number };
 type Message = {
   id: string;
@@ -135,7 +147,7 @@ export function ConversationThreadClient({
       if (fileRef.current) fileRef.current.value = "";
     } catch (caught) {
       if (uploaded.length) void supabase.storage.from("conversation-attachments").remove(uploaded.map((item) => item.path));
-      const detail = caught instanceof Error ? caught.message : String(caught);
+      const detail = describeError(caught);
       setError(t.uploadFailed + (detail ? " " + detail : ""));
     } finally {
       setBusy(false);
