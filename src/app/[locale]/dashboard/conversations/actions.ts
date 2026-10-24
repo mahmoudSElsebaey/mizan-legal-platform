@@ -12,6 +12,11 @@ const startSchema = z.object({
   staffId: z.string().uuid(),
   subject: z.string().trim().min(3).max(160),
 });
+const staffConversationSchema = z.object({
+  locale: localeSchema,
+  recipientId: z.string().uuid(),
+  subject: z.string().trim().min(3).max(160),
+});
 const messageSchema = z.object({
   locale: localeSchema,
   conversationId: z.string().uuid(),
@@ -50,6 +55,27 @@ export async function startConversation(formData: FormData) {
     status: "open",
   }).select("id").single();
   if (error || !data) back(locale, "?result=start-failed");
+  revalidatePath("/" + locale + "/dashboard");
+  redirect("/" + locale + "/dashboard/conversations/" + data.id);
+}
+
+
+export async function startStaffConversation(formData: FormData) {
+  const parsed = staffConversationSchema.safeParse(Object.fromEntries(formData));
+  if (!parsed.success) throw new Error("Invalid private conversation details.");
+  const { locale, recipientId, subject } = parsed.data;
+  const { supabase, user } = await requireUser(locale);
+  const { data: currentStaff } = await supabase.from("staff_members")
+    .select("profile_id,status").eq("profile_id", user.id).eq("status", "active").maybeSingle();
+  if (!currentStaff) back(locale, "?result=staff-conversation-failed");
+  const { data, error } = await supabase.from("conversations").insert({
+    client_id: user.id,
+    staff_id: recipientId,
+    conversation_type: "staff",
+    subject,
+    status: "open",
+  }).select("id").single();
+  if (error || !data) back(locale, "?result=staff-conversation-failed");
   revalidatePath("/" + locale + "/dashboard");
   redirect("/" + locale + "/dashboard/conversations/" + data.id);
 }
