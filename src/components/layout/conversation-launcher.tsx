@@ -286,9 +286,14 @@ export function ConversationLauncher({ locale }: { locale: Locale }) {
     }
     const activeRole = ownStaff?.status === "active" ? ownStaff.role : "";
     setCurrentStaffRole(activeRole);
-    const { data, error: createError } = await supabase.from("conversations")
-      .insert({ client_id: userId, staff_id: newRecipient, subject, status: "open", conversation_type: activeRole ? "staff" : "client" })
-      .select("id,client_id,staff_id,subject,status,conversation_type,last_message_at").single();
+    // Create conversations through a validated SECURITY DEFINER RPC instead of a
+    // direct table insert. The database derives the conversation type from the
+    // caller's trusted staff assignment and validates the recipient server-side.
+    const { data: createdRows, error: createError } = await supabase.rpc("create_conversation", {
+      target_staff_id: newRecipient,
+      conversation_subject: subject,
+    });
+    const data = Array.isArray(createdRows) ? createdRows[0] : createdRows;
     if (createError || !data) {
       setError(labels.failed + (createError ? " " + describeError(createError) : " No conversation record was returned."));
       setBusy(false);
