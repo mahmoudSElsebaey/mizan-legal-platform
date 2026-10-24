@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { usePathname } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
@@ -118,6 +119,7 @@ export function ConversationLauncher({ locale }: { locale: Locale }) {
 
   useEffect(() => {
     const openFromFloatingAction = () => {
+      setSelected("");
       setOpen(true);
       if (userId) void loadThreads(userId);
     };
@@ -263,11 +265,11 @@ export function ConversationLauncher({ locale }: { locale: Locale }) {
   const initials = (name: string) => (name.trim().charAt(0) || "?").toLocaleUpperCase(ar ? "ar-EG" : "en-US");
 
   return <>
-    <button type="button" className="mizan-icon-button mizan-chat-launcher" aria-label={labels.title} onClick={() => { setOpen(true); if (userId) void loadThreads(userId); }}>
+    <button type="button" className="mizan-icon-button mizan-chat-launcher" aria-label={labels.title} onClick={() => { setSelected(""); setOpen(true); if (userId) void loadThreads(userId); }}>
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11.5a7.5 7.5 0 0 1-7.5 7.5H5l-1-4a7.5 7.5 0 1 1 16-3.5Z"/><path d="M8 11h8M8 14h5"/></svg>
       {unread > 0 && <span className="mizan-chat-launcher-count">{unread > 99 ? "99+" : unread}</span>}
     </button>
-    {open && <div className="mizan-chat-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) { setOpen(false); setExpanded(false); } }}>
+    {open && typeof document !== "undefined" && createPortal(<div className="mizan-chat-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) { setOpen(false); setExpanded(false); } }}>
       <section className={"mizan-chat-drawer" + (expanded ? " is-expanded" : "") + (selected ? " has-selected-thread" : "")} dir={ar ? "rtl" : "ltr"} role="dialog" aria-modal="true" aria-label={labels.title} onMouseDown={(event) => event.stopPropagation()}>
         <div className="mizan-chat-drawer-controls"><button type="button" className="mizan-chat-window-control" onClick={() => setExpanded((value) => !value)} aria-label={expanded ? (ar ? "استعادة حجم النافذة" : "Restore panel size") : (ar ? "ملء الشاشة" : "Expand to full screen")} title={expanded ? (ar ? "استعادة الحجم" : "Restore size") : (ar ? "ملء الشاشة" : "Full screen")}>{expanded ? <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3v5H3M16 3v5h5M3 16h5v5M21 16h-5v5"/></svg> : <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H3v5M16 3h5v5M3 16v5h5M21 16v5h-5"/></svg>}</button><button type="button" className="mizan-chat-window-control" onClick={() => { setOpen(false); setExpanded(false); }} aria-label={ar ? "إغلاق نافذة المحادثات" : "Close conversations"} title={ar ? "إغلاق" : "Close"}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>
         <aside className="mizan-chat-sidebar">
@@ -295,6 +297,6 @@ export function ConversationLauncher({ locale }: { locale: Locale }) {
           {error && <p role="alert" className="mizan-chat-error">{error}</p>}
         </div>
       </section>
-    </div>}
+    </div>, document.body)}
   </>;
 }
