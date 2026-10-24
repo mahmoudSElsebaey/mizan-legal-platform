@@ -1,5 +1,5 @@
 import { redirect, notFound } from "next/navigation";
-import { SiteHeader } from "@/components/layout/site-header";
+import { DashboardHeader } from "@/components/layout/dashboard-header";
 import { DashboardSidebar } from "@/components/layout/dashboard-sidebar";
 import { createClient } from "@/lib/supabase/server";
 import { isLocale } from "@/lib/i18n/config";
@@ -14,7 +14,7 @@ export default async function DashboardLayout({ children, params }: Readonly<{ c
   const { data: staff } = await supabase.from("staff_members").select("role,status").eq("profile_id", user.id).maybeSingle();
   const isAdmin = staff?.status === "active" && ["owner", "admin"].includes(staff.role);
   return <div className="mizan-dashboard" dir={ar ? "rtl" : "ltr"} lang={locale}>
-    <SiteHeader locale={locale} />
+    <DashboardHeader locale={locale} />
     <div className="mizan-dashboard-workspace">
       <DashboardSidebar locale={locale} isAdmin={isAdmin} />
       <main className="mizan-dashboard-content">{children}</main>
