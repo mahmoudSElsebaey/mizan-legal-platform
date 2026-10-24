@@ -30,7 +30,7 @@ begin
     select 1 from public.notifications
     where user_id = client_id
       and kind = 'appointment_approved'
-      and href = '/ar/dashboard/appointments'
+      and href = '/en/dashboard/appointments'
   ) then
     raise exception 'Appointment status change did not notify the client';
   end if;
