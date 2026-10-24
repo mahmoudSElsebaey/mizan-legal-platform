@@ -3241,3 +3241,176 @@ pre,code{max-width:100%;overflow-wrap:anywhere}
   .mizan-site-header.mizan-dashboard-header .mizan-site-brand-copy small { display: none; }
   .mizan-site-header.mizan-dashboard-header .mizan-dashboard-header-actions { gap: .12rem; }
 }
+
+
+/* Fix dashboard header explicitly: override the public mobile menu rules. */
+.mizan-site-header.mizan-dashboard-header {
+  background: linear-gradient(115deg, #0c4038 0%, #12584b 52%, #0b3b34 100%) !important;
+  border-bottom: 1px solid rgba(214, 184, 112, .55) !important;
+  box-shadow: 0 8px 24px rgba(5, 34, 29, .2) !important;
+  color: #fff;
+}
+.mizan-site-header.mizan-dashboard-header .mizan-dashboard-header-inner {
+  display: flex !important;
+  flex-direction: row;
+  justify-content: space-between !important;
+  align-items: center !important;
+  width: min(1280px, calc(100% - 2rem));
+  min-width: 0;
+  gap: 1rem;
+}
+.mizan-site-header.mizan-dashboard-header .mizan-site-brand,
+.mizan-site-header.mizan-dashboard-header .mizan-site-brand-copy strong,
+.mizan-site-header.mizan-dashboard-header .mizan-site-brand-copy small {
+  color: #fff !important;
+}
+.mizan-site-header.mizan-dashboard-header .mizan-site-mark {
+  color: #d8bd78;
+}
+.mizan-site-header.mizan-dashboard-header .mizan-dashboard-header-actions {
+  display: flex !important;
+  flex-direction: row;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: .5rem;
+  min-width: 0;
+  flex: 0 0 auto;
+  margin-inline-start: auto;
+  overflow: visible;
+}
+.mizan-site-header.mizan-dashboard-header .mizan-dashboard-header-actions .mizan-dashboard-language,
+.mizan-site-header.mizan-dashboard-header .mizan-dashboard-header-actions .mizan-dashboard-notification-button,
+.mizan-site-header.mizan-dashboard-header .mizan-dashboard-header-actions .mizan-chat-launcher {
+  display: inline-flex !important;
+  flex: 0 0 42px;
+  width: 42px;
+  min-width: 42px;
+  height: 42px;
+  min-height: 42px;
+  align-items: center;
+  justify-content: center;
+  padding: .4rem;
+  border: 1px solid rgba(224, 202, 146, .4);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, .075);
+  color: #fff;
+  box-shadow: none;
+}
+.mizan-site-header.mizan-dashboard-header .mizan-dashboard-header-actions button:hover,
+.mizan-site-header.mizan-dashboard-header .mizan-dashboard-header-actions button[aria-expanded="true"] {
+  border-color: #e1c77f;
+  background: rgba(224, 199, 127, .18);
+  color: #f1d997;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, .12);
+}
+.mizan-site-header.mizan-dashboard-header .mizan-dashboard-header-actions button:active {
+  transform: scale(.96);
+}
+.mizan-site-header.mizan-dashboard-header .mizan-dashboard-language svg,
+.mizan-site-header.mizan-dashboard-header .mizan-dashboard-notification-button > svg {
+  width: 19px;
+  height: 19px;
+  flex: 0 0 auto;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.7;
+}
+.mizan-site-header.mizan-dashboard-header .mizan-dashboard-language span:nth-child(2) {
+  display: inline;
+  color: inherit;
+  font-size: .72rem;
+  font-weight: 800;
+}
+.mizan-site-header.mizan-dashboard-header .mizan-dashboard-notification-count {
+  border: 2px solid #10483e;
+}
+.mizan-site-header.mizan-dashboard-header .mizan-dropdown {
+  color: #173b33;
+}
+@media (max-width: 640px) {
+  .mizan-site-header.mizan-dashboard-header .mizan-dashboard-header-inner {
+    width: calc(100% - 1rem);
+    min-height: 64px;
+    padding-block: .45rem;
+    gap: .35rem;
+  }
+  .mizan-site-header.mizan-dashboard-header .mizan-site-brand {
+    flex: 1 1 0;
+    min-width: 0;
+    gap: .3rem;
+  }
+  .mizan-site-header.mizan-dashboard-header .mizan-site-mark {
+    width: 28px;
+    height: 30px;
+  }
+  .mizan-site-header.mizan-dashboard-header .mizan-site-brand-copy {
+    min-width: 0;
+  }
+  .mizan-site-header.mizan-dashboard-header .mizan-site-brand-copy strong {
+    font-size: .82rem;
+    white-space: nowrap;
+  }
+  .mizan-site-header.mizan-dashboard-header .mizan-site-brand-copy small {
+    max-width: clamp(45px, 17vw, 90px);
+    font-size: .46rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .mizan-site-header.mizan-dashboard-header .mizan-dashboard-header-actions {
+    display: flex !important;
+    flex: 0 0 auto;
+    gap: .2rem;
+  }
+  .mizan-site-header.mizan-dashboard-header .mizan-dashboard-header-actions .mizan-dashboard-language,
+  .mizan-site-header.mizan-dashboard-header .mizan-dashboard-header-actions .mizan-dashboard-notification-button,
+  .mizan-site-header.mizan-dashboard-header .mizan-dashboard-header-actions .mizan-chat-launcher {
+    flex-basis: 34px;
+    width: 34px;
+    min-width: 34px;
+    height: 34px;
+    min-height: 34px;
+    padding: .2rem;
+    border-radius: 10px;
+  }
+  .mizan-site-header.mizan-dashboard-header .mizan-dashboard-language svg,
+  .mizan-site-header.mizan-dashboard-header .mizan-dashboard-notification-button > svg {
+    width: 16px;
+    height: 16px;
+  }
+  .mizan-site-header.mizan-dashboard-header .mizan-dashboard-language span:nth-child(2) {
+    font-size: .59rem;
+  }
+  .mizan-site-header.mizan-dashboard-header .mizan-dashboard-language span:last-child {
+    display: none;
+  }
+}
+@media (max-width: 360px) {
+  .mizan-site-header.mizan-dashboard-header .mizan-dashboard-header-inner {
+    width: calc(100% - .6rem);
+    gap: .2rem;
+  }
+  .mizan-site-header.mizan-dashboard-header .mizan-site-mark {
+    width: 25px;
+    height: 27px;
+  }
+  .mizan-site-header.mizan-dashboard-header .mizan-site-brand-copy strong {
+    font-size: .76rem;
+  }
+  .mizan-site-header.mizan-dashboard-header .mizan-site-brand-copy small {
+    display: none;
+  }
+  .mizan-site-header.mizan-dashboard-header .mizan-dashboard-header-actions {
+    gap: .12rem;
+  }
+  .mizan-site-header.mizan-dashboard-header .mizan-dashboard-header-actions .mizan-dashboard-language,
+  .mizan-site-header.mizan-dashboard-header .mizan-dashboard-header-actions .mizan-dashboard-notification-button,
+  .mizan-site-header.mizan-dashboard-header .mizan-dashboard-header-actions .mizan-chat-launcher {
+    flex-basis: 32px;
+    width: 32px;
+    min-width: 32px;
+    height: 32px;
+    min-height: 32px;
+  }
+}
