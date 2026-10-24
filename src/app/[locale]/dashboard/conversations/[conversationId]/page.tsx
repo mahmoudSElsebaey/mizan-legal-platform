@@ -25,6 +25,11 @@ export default async function ConversationDetailPage({
     supabase.from("conversation_messages").select("id,conversation_id,sender_id,body,created_at,attachments,edited_at,deleted_at").eq("conversation_id", conversationId).order("created_at", { ascending: true }).limit(300),
   ]);
   if (conversationError || !conversation) notFound();
+  const otherParticipantId = conversation.client_id === user.id ? conversation.staff_id : conversation.client_id;
+  const { data: participantProfiles } = await supabase.from("profiles").select("id,full_name").in("id", [user.id, otherParticipantId]);
+  const participantNames = Object.fromEntries((participantProfiles || []).map((profile) => [profile.id, profile.full_name || ""]));
+  const currentUserName = participantNames[user.id] || (ar ? "أنت" : "You");
+  const otherName = participantNames[otherParticipantId] || (ar ? "فريق المكتب" : "Office team");
   const { data: staff } = await supabase.from("staff_members").select("role,status").eq("profile_id", user.id).maybeSingle();
   const isActiveStaff = staff?.status === "active" && ["owner","admin","lawyer","assistant"].includes(staff.role);
   const isClient = conversation.client_id === user.id;
@@ -62,7 +67,7 @@ export default async function ConversationDetailPage({
       {messagesError && <p role="alert" className="mt-5 rounded-xl bg-red-50 p-4 text-sm text-red-800">{t.noMessages}</p>}
       <section className="mt-7 rounded-2xl border border-[#14263d]/10 bg-white p-4 sm:p-7">
         <h2 className="text-lg font-black text-[#14263d]">{t.messages}</h2>
-        <ConversationThreadClient locale={locale} conversationId={conversation.id} userId={user.id} initialMessages={(messages || []) as Array<{ id: string; conversation_id: string; sender_id: string; body: string; created_at: string; attachments: Array<{ path: string; name: string; mime_type: string; size: number }>; edited_at: string | null; deleted_at: string | null }>} canSend={canSend} />
+        <ConversationThreadClient locale={locale} conversationId={conversation.id} userId={user.id} currentUserName={currentUserName} otherName={otherName} initialMessages={(messages || []) as Array<{ id: string; conversation_id: string; sender_id: string; body: string; created_at: string; attachments: Array<{ path: string; name: string; mime_type: string; size: number }>; edited_at: string | null; deleted_at: string | null }>} canSend={canSend} />
         {!canSend && <p className="mt-5 rounded-xl bg-slate-50 p-4 text-sm text-slate-600">{t.closedNotice}</p>}
         {(isClient || isActiveStaff) && <form action={changeConversationStatus} className="mt-4 border-t border-[#14263d]/10 pt-4">
           <input type="hidden" name="locale" value={locale}/><input type="hidden" name="conversationId" value={conversation.id}/>
