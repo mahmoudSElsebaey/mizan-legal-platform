@@ -110,11 +110,7 @@ export default async function ConversationsPage({
               <div className="flex items-start justify-between gap-3"><h3 className="font-extrabold text-[#14263d]">{conversation.subject}</h3><span className={"shrink-0 rounded-full px-3 py-1 text-xs font-bold " + (conversation.status === "open" ? "bg-emerald-50 text-emerald-800" : "bg-slate-100 text-slate-600")}>{conversation.status === "open" ? t.open : t.closed}</span></div>
               <p className="mt-2 text-sm text-[#657184]">{conversation.conversation_type === "staff" ? t.staffPrivateTitle : (isClient ? t.office : t.client)}</p>
               <p className="mt-4 text-xs text-[#657184]">{t.last}: {new Intl.DateTimeFormat(ar ? "ar-EG" : "en-GB", { dateStyle: "medium", timeStyle: "short", timeZone: "Africa/Cairo" }).format(new Date(conversation.last_message_at))}</p>
-              <Link href={"/" + locale + "/dashboard/conversations/" + conversation.id} className="mt-3 inline-flex text-sm font-bold text-[#176b67] hover:underline">{t.view} →</Link>
-              <form action={hideConversation} className="mt-4 border-t border-[#14263d]/10 pt-3">
-                <input type="hidden" name="locale" value={locale}/><input type="hidden" name="conversationId" value={conversation.id}/>
-                <ConfirmSubmitButton message={t.confirmDeleteConversation} className="text-xs font-bold text-red-700 hover:underline">{t.deleteConversation}</ConfirmSubmitButton>
-              </form>
+              <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-[#14263d]/10 pt-3"><Link href={"/" + locale + "/dashboard/conversations/" + conversation.id} className="inline-flex items-center rounded-lg bg-[#176b67]/[.07] px-3 py-2 text-sm font-bold text-[#176b67] transition hover:bg-[#176b67]/[.13]">{t.view} →</Link><form action={hideConversation} className="shrink-0"><input type="hidden" name="locale" value={locale}/><input type="hidden" name="conversationId" value={conversation.id}/><ConfirmSubmitButton message={t.confirmDeleteConversation} className="inline-flex items-center gap-2 rounded-lg border border-red-200 bg-white px-3 py-2 text-xs font-bold text-red-700 transition hover:border-red-300 hover:bg-red-50"><span aria-hidden="true">⌫</span>{t.deleteConversation}</ConfirmSubmitButton></form></div>
             </article>)}
           </div>}
       </section>
