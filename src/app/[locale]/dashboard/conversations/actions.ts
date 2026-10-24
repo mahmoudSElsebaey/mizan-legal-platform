@@ -115,11 +115,6 @@ export async function markNotificationsRead(formData: FormData) {
 }
 
 
-const conversationDeleteSchema = z.object({
-  locale: localeSchema,
-  conversationId: z.string().uuid(),
-});
-
 const notificationDeleteSchema = z.object({
   locale: localeSchema,
   notificationId: z.string().uuid().optional(),
