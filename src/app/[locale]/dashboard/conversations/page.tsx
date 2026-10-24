@@ -3,7 +3,8 @@ import { notFound, redirect } from "next/navigation";
 import { isLocale } from "@/lib/i18n/config";
 import { createClient } from "@/lib/supabase/server";
 import { ConfirmSubmitButton } from "@/components/ui/confirm-submit-button";
-import { deleteAllNotifications, deleteNotification, hideConversation, markNotificationsRead, startConversation, startStaffConversation } from "./actions";
+import { ConversationListClient } from "@/components/conversations/conversation-list-client";
+import { deleteAllNotifications, deleteNotification, hideConversations, markNotificationsRead, startConversation, startStaffConversation } from "./actions";
 
 export default async function ConversationsPage({
   params,
@@ -102,18 +103,33 @@ export default async function ConversationsPage({
           {!staffRecipients?.length && <p className="sm:col-span-2 text-sm text-[#657184]">{t.noStaffRecipients}</p>}
         </form>
       </section>}
-      <section className="mt-8">
-        <h2 className="text-xl font-black text-[#14263d]">{t.conversations}</h2>
-        {!visibleConversations.length ? <div className="mt-4 rounded-2xl border border-dashed border-[#14263d]/20 bg-white/70 p-8 text-center text-sm text-[#657184]">{t.empty}</div> :
-          <div className="mt-4 grid gap-3 md:grid-cols-2">
-            {visibleConversations.map((conversation) => <article key={conversation.id} className="rounded-2xl border border-[#14263d]/10 bg-white p-5 transition hover:border-[#176b67]/40">
-              <div className="flex items-start justify-between gap-3"><h3 className="font-extrabold text-[#14263d]">{conversation.subject}</h3><span className={"shrink-0 rounded-full px-3 py-1 text-xs font-bold " + (conversation.status === "open" ? "bg-emerald-50 text-emerald-800" : "bg-slate-100 text-slate-600")}>{conversation.status === "open" ? t.open : t.closed}</span></div>
-              <p className="mt-2 text-sm text-[#657184]">{conversation.conversation_type === "staff" ? t.staffPrivateTitle : (isClient ? t.office : t.client)}</p>
-              <p className="mt-4 text-xs text-[#657184]">{t.last}: {new Intl.DateTimeFormat(ar ? "ar-EG" : "en-GB", { dateStyle: "medium", timeStyle: "short", timeZone: "Africa/Cairo" }).format(new Date(conversation.last_message_at))}</p>
-              <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-[#14263d]/10 pt-3"><Link href={"/" + locale + "/dashboard/conversations/" + conversation.id} className="inline-flex items-center rounded-lg bg-[#176b67]/[.07] px-3 py-2 text-sm font-bold text-[#176b67] transition hover:bg-[#176b67]/[.13]">{t.view} →</Link><form action={hideConversation} className="shrink-0"><input type="hidden" name="locale" value={locale}/><input type="hidden" name="conversationId" value={conversation.id}/><ConfirmSubmitButton message={t.confirmDeleteConversation} className="inline-flex items-center gap-2 rounded-lg border border-red-200 bg-white px-3 py-2 text-xs font-bold text-red-700 transition hover:border-red-300 hover:bg-red-50"><span aria-hidden="true">⌫</span>{t.deleteConversation}</ConfirmSubmitButton></form></div>
-            </article>)}
-          </div>}
-      </section>
+      <ConversationListClient
+        locale={locale}
+        conversations={visibleConversations}
+        isClient={isClient}
+        hideAction={hideConversations}
+        copy={{
+          title: t.conversations,
+          empty: t.empty,
+          open: t.open,
+          closed: t.closed,
+          last: t.last,
+          view: t.view,
+          staffPrivateTitle: t.staffPrivateTitle,
+          office: t.office,
+          client: t.client,
+          deleteMode: ar ? "تحديد محادثات للحذف" : "Select conversations to delete",
+          cancelSelection: ar ? "إلغاء التحديد" : "Cancel selection",
+          deleteSelected: ar ? "حذف المحدد" : "Delete selected",
+          selectedCount: ar ? "تم تحديد {count} محادثة." : "{count} conversation(s) selected.",
+          confirmTitle: ar ? "تأكيد حذف المحادثات" : "Confirm conversation removal",
+          confirmBody: ar
+            ? "هل تريد إزالة {count} محادثة من حسابك؟ لن تُحذف عند الطرف الآخر، ويمكن أن تظل رسائلها محفوظة لديه."
+            : "Remove {count} conversation(s) from your account? They will remain available to the other participant.",
+          confirmAction: ar ? "نعم، احذف من حسابي" : "Yes, remove from my account",
+          cancel: ar ? "رجوع" : "Cancel",
+        }}
+      />
       <section className="mt-10 rounded-2xl border border-[#14263d]/10 bg-white p-5 sm:p-7">
         <div className="flex flex-wrap items-center justify-between gap-3"><h2 className="text-xl font-black text-[#14263d]">{t.notifications} {unreadCount > 0 && <span className="ms-2 rounded-full bg-[#176b67]/10 px-2 py-1 text-xs text-[#176b67]">{unreadCount} {t.unread}</span>}</h2>
           <div className="flex flex-wrap items-center gap-3">{unreadCount > 0 && <form action={markNotificationsRead}><input type="hidden" name="locale" value={locale}/><button className="text-sm font-bold text-[#176b67] hover:underline">{t.markRead}</button></form>}{!!notifications?.length && <form action={deleteAllNotifications}><input type="hidden" name="locale" value={locale}/><ConfirmSubmitButton message={t.confirmDeleteAllNotifications} className="text-sm font-bold text-red-700 hover:underline">{t.deleteAllNotifications}</ConfirmSubmitButton></form>}</div>
