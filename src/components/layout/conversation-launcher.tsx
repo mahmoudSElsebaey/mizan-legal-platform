@@ -81,7 +81,7 @@ export function ConversationLauncher({ locale }: { locale: Locale }) {
       const { data: profiles } = await supabase.from("profiles").select("id,full_name").in("id", ids);
       setPeople(Object.fromEntries(((profiles || []) as Person[]).map((person) => [person.id, person.full_name || (ar ? "مستخدم" : "User")])));
     }
-    const { count } = await supabase.from("notifications").select("id", { count: "exact", head: true }).eq("kind", "new_message").is("read_at", null);
+    const { count } = await supabase.from("notifications").select("id", { count: "exact", head: true }).eq("user_id", uid).eq("kind", "new_message").is("read_at", null);
     setUnread(count || 0);
     if (!selected && rows[0] && !window.matchMedia("(max-width: 680px)").matches) setSelected(rows[0].id);
     if (playSound && soundOn) playIncomingTone();
@@ -197,9 +197,10 @@ export function ConversationLauncher({ locale }: { locale: Locale }) {
       const message = { ...(data as Message), attachments: (data as Message).attachments || [] };
       setMessages((current) => current.some((item) => item.id === message.id) ? current : [...current, message]);
       setDraft(""); setPendingFiles([]); if (fileInputRef.current) fileInputRef.current.value = ""; void loadThreads(userId);
-    } catch {
+    } catch (caught) {
       if (uploaded.length) void supabase.storage.from("conversation-attachments").remove(uploaded.map((file) => file.path));
-      setError(pendingFiles.length ? labels.uploadFailed : labels.failed);
+      const detail = caught instanceof Error ? caught.message : String(caught);
+      setError((pendingFiles.length ? labels.uploadFailed : labels.failed) + (detail ? " " + detail : ""));
     } finally { setBusy(false); }
   }
 
