@@ -8,7 +8,7 @@
 - Users can view their own notifications and mark their own notifications as read.
 - Conversations and messages use RLS; suspended staff lose participant access. Clients cannot read another client's threads or notifications.
 - The contact picker uses a narrowly scoped SECURITY DEFINER function that returns only active lawyer/assistant IDs, names, and roles, not profile email addresses.
-- Arabic and English routes are supported. Realtime delivery is intentionally not enabled yet; the inbox refreshes through normal page navigation/revalidation.
+- Arabic and English routes are supported. Supabase Realtime publishes conversation messages, notifications, and conversation updates for the floating messenger. Appointment request/status changes also create in-app notifications after migration `20261024000300_appointment_notifications.sql` is applied.
 
 ## Migration
 Apply these migrations in order in the intended development/staging Supabase project: **20261022000500_phase7_conversations_notifications.sql**, then **20261022000600_phase7_security_hardening.sql**. The second migration updates policies and grants for projects where the first migration was already recorded before its final hardening edits. Prefer the controlled migration workflow described in **SUPABASE-MIGRATION-AUTOMATION.md**. Committing a migration does not apply it to Supabase by itself.
@@ -37,7 +37,7 @@ Use separate test accounts in the development/staging Supabase project:
 7. Suspend the assigned staff test account and confirm it can no longer open the thread.
 
 ## Known limitations
-- No Realtime/WebSocket updates yet; refresh or navigate to see new messages.
+- Realtime requires the publication migration to be applied in the target Supabase project and the project's Realtime service to be available. Validate delivery with separate signed-in accounts before production.
 - No email, SMS, push, attachments, typing indicators, message edits/deletes, or automated legal advice.
 - Owner/admin oversight access is broad and should be reviewed against the firm's final confidentiality policy before production.
 - Live acceptance requires real Supabase test accounts; CI's PostgreSQL shim does not replace live RLS/runtime verification.
