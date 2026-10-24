@@ -18,6 +18,8 @@ export function SiteHeader({ locale }: { locale: Locale }) {
   const [notices, setNotices] = useState<Notice[]>([]);
   const [notificationsLoading, setNotificationsLoading] = useState(false);
   const [markingAllNotificationsRead, setMarkingAllNotificationsRead] = useState(false);
+  const [clearingNotifications, setClearingNotifications] = useState(false);
+  const [deletingNotificationId, setDeletingNotificationId] = useState<string | null>(null);
   const [noticeFilter, setNoticeFilter] = useState<"all" | "unread">("all");
   const [userId, setUserId] = useState<string | null>(null);
   const unreadNotifications = notices.filter((notice) => !notice.read_at).length;
@@ -91,6 +93,26 @@ export function SiteHeader({ locale }: { locale: Locale }) {
     const { error } = await createClient().from("notifications").update({ read_at: readAt }).eq("user_id", userId).in("id", ids);
     if (error) setNotices((current) => current.map((notice) => ids.includes(notice.id) ? { ...notice, read_at: null } : notice));
     setMarkingAllNotificationsRead(false);
+  }
+
+  async function deleteOneNotification(notice: Notice) {
+    if (!userId || deletingNotificationId || !window.confirm(ar ? "هل تريد حذف هذا الإشعار؟" : "Delete this notification?")) return;
+    setDeletingNotificationId(notice.id);
+    const previous = notices;
+    setNotices((current) => current.filter((item) => item.id !== notice.id));
+    const { error } = await createClient().from("notifications").delete().eq("id", notice.id).eq("user_id", userId);
+    if (error) setNotices(previous);
+    setDeletingNotificationId(null);
+  }
+
+  async function clearAllNotifications() {
+    if (!userId || clearingNotifications || notices.length === 0 || !window.confirm(ar ? "هل تريد مسح كل إشعارات حسابك؟" : "Clear all notifications in your account?")) return;
+    setClearingNotifications(true);
+    const previous = notices;
+    setNotices([]);
+    const { error } = await createClient().from("notifications").delete().eq("user_id", userId);
+    if (error) setNotices(previous);
+    setClearingNotifications(false);
   }
 
   function notificationHref(notice: Notice) {
@@ -171,17 +193,17 @@ export function SiteHeader({ locale }: { locale: Locale }) {
                   <button type="button" className={noticeFilter === "all" ? "is-active" : ""} aria-pressed={noticeFilter === "all"} onClick={() => setNoticeFilter("all")}>{ar ? "الكل" : "All"} <span>{notices.length}</span></button>
                   <button type="button" className={noticeFilter === "unread" ? "is-active" : ""} aria-pressed={noticeFilter === "unread"} onClick={() => setNoticeFilter("unread")}>{ar ? "غير مقروء" : "Unread"} {unreadNotifications > 0 && <span>{unreadNotifications}</span>}</button>
                 </div>
-                {unreadNotifications > 0 && <button className="mizan-notice-mark-all" type="button" disabled={markingAllNotificationsRead} aria-busy={markingAllNotificationsRead} onClick={() => void markAllNotificationsRead()}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg>{markingAllNotificationsRead ? (ar ? "جارٍ التحديث" : "Updating") : (ar ? "قراءة الكل" : "Mark all read")}</button>}
+                {unreadNotifications > 0 && <button className="mizan-notice-mark-all" type="button" disabled={markingAllNotificationsRead} aria-busy={markingAllNotificationsRead} onClick={() => void markAllNotificationsRead()}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg>{markingAllNotificationsRead ? (ar ? "جارٍ التحديث" : "Updating") : (ar ? "قراءة الكل" : "Mark all read")}</button>}{notices.length > 0 && <button className="mizan-notice-delete-all" type="button" disabled={clearingNotifications} onClick={() => void clearAllNotifications()}>{clearingNotifications ? (ar ? "جارٍ المسح..." : "Clearing...") : (ar ? "مسح الكل" : "Clear all")}</button>}
               </div>
               <div className="mizan-dashboard-notice-list mizan-notice-feed">
                 {notificationsLoading ? <div className="mizan-notice-state"><span className="mizan-notice-spinner" /><strong>{ar ? "جارٍ تحميل الإشعارات" : "Loading notifications"}</strong><p>{ar ? "لحظات ونجهز آخر التحديثات." : "Getting your latest updates ready."}</p></div> : visibleNotices.length === 0 ? <div className="mizan-notice-state"><span className="mizan-notice-empty-icon" aria-hidden="true">✦</span><strong>{noticeFilter === "unread" ? (ar ? "لا توجد إشعارات غير مقروءة" : "No unread notifications") : (ar ? "لا توجد إشعارات حتى الآن" : "No notifications yet")}</strong><p>{ar ? "ستظهر هنا تحديثات المواعيد والرسائل وأي تنبيهات جديدة." : "Appointment updates, messages and important alerts will appear here."}</p>{noticeFilter === "unread" && <button type="button" onClick={() => setNoticeFilter("all")}>{ar ? "عرض كل الإشعارات" : "View all notifications"}</button>}</div> : visibleNotices.map((notice) => {
                   const kind = notice.kind.toLowerCase();
                   const symbol = kind.includes("message") || kind.includes("conversation") ? "✉" : kind.includes("appointment") || kind.includes("booking") ? "◷" : kind.includes("document") || kind.includes("case") ? "§" : "✦";
-                  return <Link key={notice.id} href={notificationHref(notice)} onClick={() => { setNotificationsOpen(false); void markNotificationRead(notice); }} className={notice.read_at ? "mizan-dashboard-notice-item" : "mizan-dashboard-notice-item is-unread"}>
+                  return <div key={notice.id} className="mizan-notice-row-with-delete"><Link href={notificationHref(notice)} onClick={() => { setNotificationsOpen(false); void markNotificationRead(notice); }} className={notice.read_at ? "mizan-dashboard-notice-item" : "mizan-dashboard-notice-item is-unread"}>
                     <span className={`mizan-notice-kind-icon ${notice.read_at ? "" : "is-unread"}`} aria-hidden="true">{symbol}</span>
                     <span className="mizan-dashboard-notice-copy"><span className="mizan-notice-title-line"><strong>{notice.title}</strong>{!notice.read_at && <i aria-label={ar ? "جديد" : "New"} />}</span>{notice.body && <small>{notice.body}</small>}<time dateTime={notice.created_at}><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>{new Date(notice.created_at).toLocaleString(ar ? "ar-EG" : "en-US", { dateStyle: "medium", timeStyle: "short", timeZone: "Africa/Cairo" })}</time></span>
                     <span className="mizan-notice-row-arrow" aria-hidden="true">↗</span>
-                  </Link>;
+                  </Link><button type="button" className="mizan-notice-delete-one" aria-label={ar ? "حذف الإشعار" : "Delete notification"} title={ar ? "حذف الإشعار" : "Delete notification"} disabled={deletingNotificationId === notice.id} onClick={() => void deleteOneNotification(notice)}>×</button></div>;
                 })}
               </div>
               <div className="mizan-dashboard-notification-footer mizan-notice-panel-footer"><span>{ar ? "ميزان · مكتبك القانوني في صورة أوضح" : "MIZAN · Clarity for every legal step"}</span><Link href={`/${locale}/dashboard/conversations`} onClick={() => setNotificationsOpen(false)}>{ar ? "الانتقال إلى الرسائل" : "Go to messages"} <b aria-hidden="true">↗</b></Link></div>
