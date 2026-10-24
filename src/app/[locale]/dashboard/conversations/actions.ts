@@ -121,6 +121,23 @@ const notificationDeleteSchema = z.object({
   deleteAll: z.enum(["true", "false"]).optional(),
 });
 
+const singleConversationDeleteSchema = z.object({
+  locale: localeSchema,
+  conversationId: z.string().uuid(),
+});
+
+/** Keep the existing single-conversation action used by the conversation detail page. */
+export async function hideConversation(formData: FormData) {
+  const parsed = singleConversationDeleteSchema.safeParse(Object.fromEntries(formData));
+  if (!parsed.success) throw new Error("Invalid conversation details.");
+  const { locale, conversationId } = parsed.data;
+  const { supabase, user } = await requireUser(locale);
+  const { error } = await supabase.from("conversation_hidden_for_user")
+    .upsert({ conversation_id: conversationId, user_id: user.id }, { onConflict: "conversation_id,user_id", ignoreDuplicates: true });
+  if (error) back(locale, "/" + conversationId + "?result=conversation-delete-failed");
+  back(locale, "?result=conversation-hidden");
+}
+
 export async function hideConversations(formData: FormData) {
   const localeResult = localeSchema.safeParse(formData.get("locale"));
   const ids = z.array(z.string().uuid()).min(1).max(100).safeParse(formData.getAll("conversationId"));
