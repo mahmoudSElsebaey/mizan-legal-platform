@@ -161,8 +161,10 @@ export function ConversationLauncher({ locale }: { locale: Locale }) {
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "conversation_messages" }, (payload) => {
         const message = payload.new as Message;
         if (message.sender_id !== userId && seen.current.has(message.id) === false) {
-          if (selected !== message.conversation_id && soundOn) playIncomingTone();
-          if (selected === message.conversation_id) void loadMessages(message.conversation_id, userId);
+          // When the drawer is closed, keep notifying even if this thread remains selected.
+          // When open on this thread, the thread-scoped channel plays the sound instead.
+          if ((!open || selected !== message.conversation_id) && soundOn) playIncomingTone();
+          if (open && selected === message.conversation_id) void loadMessages(message.conversation_id, userId);
           else void loadThreads(userId);
         }
       })
@@ -179,7 +181,7 @@ export function ConversationLauncher({ locale }: { locale: Locale }) {
         if (notice.user_id === userId) void loadThreads(userId);
       }).subscribe();
     return () => { alive = false; void supabase.removeChannel(channel); };
-  }, [pathname, loadThreads, loadMessages, selected, soundOn, userId]);
+  }, [pathname, loadThreads, loadMessages, selected, soundOn, userId, open]);
 
   useEffect(() => {
     const closeMessageMenus = (event: MouseEvent) => {
