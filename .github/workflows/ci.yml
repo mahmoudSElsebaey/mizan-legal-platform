@@ -99,4 +99,4 @@ jobs:
       - name: Apply hidden conversation restoration migration
         run: psql "postgresql://postgres:postgres@localhost:5432/mizan_test" -v ON_ERROR_STOP=1 -f supabase/migrations/20261024000600_restore_hidden_conversations_on_new_message.sql
       - name: Verify hidden conversation restoration trigger
-        run: psql "postgresql://postgres:postgres@localhost:5432/mizan_test" -v ON_ERROR_STOP=1 -c "SELECT 1 FROM pg_trigger WHERE tgname = 'conversation_message_restore_visibility' AND NOT tgisinternal"
+        run: psql "postgresql://postgres:postgres@localhost:5432/mizan_test" -v ON_ERROR_STOP=1 -f scripts/ci-hidden-conversation-restoration-smoke-test.sql
