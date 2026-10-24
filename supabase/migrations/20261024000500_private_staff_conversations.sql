@@ -130,6 +130,45 @@ with check (
   )
 );
 
+drop policy if exists "conversations_read_participants" on public.conversations;
+create policy "conversations_read_participants"
+on public.conversations for select to authenticated
+using ((select public.can_access_conversation(id)));
+
+drop policy if exists "participants_close_or_reopen_conversations" on public.conversations;
+create policy "participants_close_or_reopen_conversations"
+on public.conversations for update to authenticated
+using (
+  (
+    conversation_type = 'staff'
+    and (client_id = (select auth.uid()) or staff_id = (select auth.uid()))
+    and (select public.is_active_staff())
+  )
+  or
+  (
+    conversation_type = 'client'
+    and (
+      client_id = (select auth.uid())
+      or (staff_id = (select auth.uid()) and (select public.is_active_staff()))
+    )
+  )
+)
+with check (
+  (
+    conversation_type = 'staff'
+    and (client_id = (select auth.uid()) or staff_id = (select auth.uid()))
+    and (select public.is_active_staff())
+  )
+  or
+  (
+    conversation_type = 'client'
+    and (
+      client_id = (select auth.uid())
+      or (staff_id = (select auth.uid()) and (select public.is_active_staff()))
+    )
+  )
+);
+
 create or replace function public.handle_conversation_message()
 returns trigger
 language plpgsql security definer set search_path = ''
