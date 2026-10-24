@@ -64,6 +64,7 @@ export function ConversationLauncher({ locale }: { locale: Locale }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchVisible, setSearchVisible] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [hidingConversationId, setHidingConversationId] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [soundOn, setSoundOn] = useState(true);
   const [newModalOpen, setNewModalOpen] = useState(false);
@@ -79,24 +80,27 @@ export function ConversationLauncher({ locale }: { locale: Locale }) {
     placeholder: "اكتب رسالتك...", send: "إرسال", loading: "جارٍ تحميل المحادثات...",
     online: "مراسلة آمنة", sound: "صوت الإشعار", openFull: "فتح صفحة المحادثات",
     closed: "مغلقة", newConversation: "بدء محادثة جديدة", noMessages: "ابدأ المحادثة برسالتك الأولى", failed: "تعذر تحميل البيانات أو إرسال الرسالة.",
-    you: "أنت", today: "اليوم", newModalTitle: "ابدأ محادثة جديدة", topic: "موضوع المحادثة", interlocutor: "اختر المحاور", start: "إنشاء المحادثة", noContacts: "لا يوجد محامون أو مساعدين نشطون متاحون حاليًا.", subjectPlaceholder: "مثال: استفسار عن قضية أو موعد", copy: "نسخ", edit: "تعديل", remove: "حذف", save: "حفظ", cancel: "إلغاء", edited: "تم التعديل", deleted: "تم حذف هذه الرسالة", attach: "إرفاق ملفات أو صور", filesLimit: "يمكن إرفاق 5 ملفات كحد أقصى، بحد 10 ميجابايت لكل ملف.", uploadFailed: "تعذر رفع الملف. حاول مرة أخرى.", editFailed: "تعذر تعديل الرسالة.", deleteFailed: "تعذر حذف الرسالة.", copied: "تم نسخ الرسالة", removeConfirm: "هل تريد حذف هذه الرسالة؟",
+    you: "أنت", today: "اليوم", newModalTitle: "ابدأ محادثة جديدة", topic: "موضوع المحادثة", interlocutor: "اختر المحاور", start: "إنشاء المحادثة", noContacts: "لا يوجد محامون أو مساعدين نشطون متاحون حاليًا.", subjectPlaceholder: "مثال: استفسار عن قضية أو موعد", copy: "نسخ", edit: "تعديل", remove: "حذف", save: "حفظ", cancel: "إلغاء", edited: "تم التعديل", deleted: "تم حذف هذه الرسالة", attach: "إرفاق ملفات أو صور", filesLimit: "يمكن إرفاق 5 ملفات كحد أقصى، بحد 10 ميجابايت لكل ملف.", uploadFailed: "تعذر رفع الملف. حاول مرة أخرى.", editFailed: "تعذر تعديل الرسالة.", deleteFailed: "تعذر حذف الرسالة.", copied: "تم نسخ الرسالة", removeConfirm: "هل تريد حذف هذه الرسالة؟", hideConversation: "حذف المحادثة من حسابي", hideConversationConfirm: "هل تريد إخفاء المحادثة من حسابك؟ ستظل ظاهرة للطرف الآخر.", hideConversationFailed: "تعذر إخفاء المحادثة.",
   } : {
     title: "Messages", subtitle: "", search: "Search conversations",
     empty: "No conversations yet", choose: "Choose a conversation to view messages",
     placeholder: "Write a message...", send: "Send", loading: "Loading conversations...",
     online: "Secure messaging", sound: "Notification sound", openFull: "Open conversations page",
     closed: "Closed", newConversation: "Start a new conversation", noMessages: "Start the conversation with your first message", failed: "Could not load data or send the message.",
-    you: "You", today: "Today", newModalTitle: "Start a new conversation", topic: "Conversation subject", interlocutor: "Choose a participant", start: "Create conversation", noContacts: "No active lawyers or assistants are available right now.", subjectPlaceholder: "e.g. Question about a case or appointment", copy: "Copy", edit: "Edit", remove: "Delete", save: "Save", cancel: "Cancel", edited: "Edited", deleted: "This message was deleted", attach: "Attach files or images", filesLimit: "Up to 5 files, 10 MB per file.", uploadFailed: "Could not upload the file. Please try again.", editFailed: "Could not edit this message.", deleteFailed: "Could not delete this message.", copied: "Message copied", removeConfirm: "Delete this message?",
+    you: "You", today: "Today", newModalTitle: "Start a new conversation", topic: "Conversation subject", interlocutor: "Choose a participant", start: "Create conversation", noContacts: "No active lawyers or assistants are available right now.", subjectPlaceholder: "e.g. Question about a case or appointment", copy: "Copy", edit: "Edit", remove: "Delete", save: "Save", cancel: "Cancel", edited: "Edited", deleted: "This message was deleted", attach: "Attach files or images", filesLimit: "Up to 5 files, 10 MB per file.", uploadFailed: "Could not upload the file. Please try again.", editFailed: "Could not edit this message.", deleteFailed: "Could not delete this message.", copied: "Message copied", removeConfirm: "Delete this message?", hideConversation: "Remove conversation", hideConversationConfirm: "Hide this conversation from your account? It will remain visible to the other participant.", hideConversationFailed: "Could not hide the conversation.",
   }, [ar]);
 
   const loadThreads = useCallback(async (uid: string, playSound = false) => {
     const supabase = createClient();
-    const { data, error: queryError } = await supabase.from("conversations")
-      .select("id,client_id,staff_id,subject,status,last_message_at")
-      .order("last_message_at", { ascending: false }).limit(60);
+    const [{ data, error: queryError }, { data: hiddenRows }] = await Promise.all([
+      supabase.from("conversations").select("id,client_id,staff_id,subject,status,last_message_at").order("last_message_at", { ascending: false }).limit(60),
+      supabase.from("conversation_hidden_for_user").select("conversation_id").eq("user_id", uid),
+    ]);
     if (queryError) { setError(labels.failed); return; }
-    const rows = (data || []) as Thread[];
+    const hiddenIds = new Set((hiddenRows || []).map((item) => item.conversation_id));
+    const rows = ((data || []) as Thread[]).filter((thread) => !hiddenIds.has(thread.id));
     setThreads(rows);
+    if (selected && hiddenIds.has(selected)) setSelected("");
     const ids = Array.from(new Set(rows.flatMap((thread) => [thread.client_id, thread.staff_id])));
     if (ids.length) {
       const [profilesResult, staffResult] = await Promise.all([
@@ -264,6 +268,20 @@ export function ConversationLauncher({ locale }: { locale: Locale }) {
     setBusy(false);
   }
 
+  async function hideConversation(thread: Thread) {
+    if (!userId || hidingConversationId || !window.confirm(labels.hideConversationConfirm)) return;
+    setHidingConversationId(thread.id);
+    setError("");
+    const { error: hideError } = await createClient().from("conversation_hidden_for_user")
+      .upsert({ conversation_id: thread.id, user_id: userId }, { onConflict: "conversation_id,user_id", ignoreDuplicates: true });
+    if (hideError) setError(labels.hideConversationFailed);
+    else {
+      setThreads((current) => current.filter((item) => item.id !== thread.id));
+      if (selected === thread.id) { setSelected(""); setMessages([]); }
+    }
+    setHidingConversationId(null);
+  }
+
   async function sendMessage(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const body = draft.trim();
@@ -353,15 +371,15 @@ export function ConversationLauncher({ locale }: { locale: Locale }) {
           </div>
           {searchVisible && <label className="mizan-chat-search-label"><span className="sr-only">{labels.search}</span><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 4.5 4.5"/></svg><input id="mizan-chat-search" value={searchQuery} onChange={(event) => setSearchQuery(event.target.value)} placeholder={labels.search} /></label>}<div className="mizan-chat-thread-list">{filteredThreads.length === 0 ? <p className="mizan-chat-empty">{threads.length === 0 ? labels.empty : (ar ? "لا توجد نتائج مطابقة" : "No matching conversations")}</p> : filteredThreads.map((thread) => {
             const participant = thread.client_id === userId ? thread.staff_id : thread.client_id;
-            return <button type="button" key={thread.id} onClick={() => setSelected(thread.id)} className={"mizan-chat-thread" + (selected === thread.id ? " is-active" : "")}>
+            return <div key={thread.id} className={"mizan-chat-thread-wrap" + (selected === thread.id ? " is-active" : "")}><button type="button" onClick={() => setSelected(thread.id)} className={"mizan-chat-thread" + (selected === thread.id ? " is-active" : "")}>
               <span className="mizan-chat-avatar">{initials(displayPerson(participant))}</span><span className="mizan-chat-thread-copy"><strong>{displayPerson(participant)}</strong><small>{thread.subject}</small><time>{formatTime(thread.last_message_at)}</time></span><span className={"mizan-chat-status-dot" + (thread.status === "open" ? " is-open" : "")}/>
-            </button>;
+            </button><button type="button" className="mizan-chat-hide-thread" title={labels.hideConversation} aria-label={labels.hideConversation} disabled={hidingConversationId === thread.id} onClick={() => void hideConversation(thread)}>×</button></div>;
           })}</div>
           <a className="mizan-chat-full-link" href={"/" + locale + "/dashboard/conversations"}>{labels.openFull} ↗</a>
         </aside>
         <div className="mizan-chat-main">
           {active ? <>
-            <header className="mizan-chat-conversation-head"><span className="mizan-chat-avatar is-large">{initials(otherName)}</span><div className="mizan-chat-conversation-identity"><strong>{otherName}</strong><small>{active.subject}</small></div><button type="button" className="mizan-chat-close mizan-chat-mobile-close" onClick={() => { setSelected(""); setEditingId(""); setEditDraft(""); setError(""); }} aria-label={ar ? "العودة إلى قائمة المحادثات" : "Back to conversation list"} title={ar ? "قائمة المحادثات" : "Conversation list"}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 5-7 7 7 7M7 12h14"/></svg></button></header>
+            <header className="mizan-chat-conversation-head"><span className="mizan-chat-avatar is-large">{initials(otherName)}</span><div className="mizan-chat-conversation-identity"><strong>{otherName}</strong><small>{active.subject}</small></div><button type="button" className="mizan-chat-hide-active" title={labels.hideConversation} aria-label={labels.hideConversation} disabled={hidingConversationId === active.id} onClick={() => void hideConversation(active)}>×</button><button type="button" className="mizan-chat-close mizan-chat-mobile-close" onClick={() => { setSelected(""); setEditingId(""); setEditDraft(""); setError(""); }} aria-label={ar ? "العودة إلى قائمة المحادثات" : "Back to conversation list"} title={ar ? "قائمة المحادثات" : "Conversation list"}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 5-7 7 7 7M7 12h14"/></svg></button></header>
             <div className="mizan-chat-messages">{messages.length === 0 ? <p className="mizan-chat-empty">{labels.noMessages}</p> : messages.map((message) => {
               const own = message.sender_id === userId;
               const senderName = own ? (people[userId]?.trim() || labels.you) : otherName;
