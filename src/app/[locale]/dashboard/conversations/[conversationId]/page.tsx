@@ -2,7 +2,8 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { isLocale } from "@/lib/i18n/config";
 import { createClient } from "@/lib/supabase/server";
-import { changeConversationStatus } from "../actions";
+import { changeConversationStatus, hideConversation } from "../actions";
+import { ConfirmSubmitButton } from "@/components/ui/confirm-submit-button";
 import { ConversationThreadClient } from "@/components/conversations/conversation-thread-client";
 
 export default async function ConversationDetailPage({
@@ -35,7 +36,7 @@ export default async function ConversationDetailPage({
   const isClient = conversation.client_id === user.id;
   const canSend = conversation.status === "open" && (isClient || isActiveStaff);
   const t = ar ? {
-    back:"كل المحادثات", office:"فريق المكتب", client:"العميل", open:"مفتوحة", closed:"مغلقة",
+    back:"كل المحادثات", hideConversation:"حذف المحادثة من حسابي", confirmHideConversation:"هل تريد إخفاء هذه المحادثة من حسابك؟ ستظل ظاهرة للطرف الآخر.", office:"فريق المكتب", client:"العميل", open:"مفتوحة", closed:"مغلقة",
     title:"المحادثة", intro:"استخدم هذه المساحة للتواصل بشأن استفسارك. لا ترسل بيانات دخول أو معلومات دفع حساسة.",
     messages:"الرسائل", empty:"لا توجد رسائل بعد. اكتب رسالتك الأولى أدناه.",
     placeholder:"اكتب رسالتك هنا...", send:"إرسال الرسالة", close:"إغلاق المحادثة", reopen:"إعادة فتح المحادثة",
@@ -44,7 +45,7 @@ export default async function ConversationDetailPage({
     "status-updated":"تم تحديث حالة المحادثة.", "status-failed":"تعذر تحديث حالة المحادثة.",
     noMessages:"تعذر تحميل الرسائل. تحقق من ترحيل المرحلة السابعة."
   } : {
-    back:"All conversations", office:"Office team", client:"Client", open:"Open", closed:"Closed",
+    back:"All conversations", hideConversation:"Remove conversation from my account", confirmHideConversation:"Hide this conversation from your account? It will remain visible to the other participant.", office:"Office team", client:"Client", open:"Open", closed:"Closed",
     title:"Conversation", intro:"Use this space to discuss your inquiry. Do not send passwords or sensitive payment details.",
     messages:"Messages", empty:"No messages yet. Write your first message below.",
     placeholder:"Write your message here...", send:"Send message", close:"Close conversation", reopen:"Reopen conversation",
@@ -56,7 +57,7 @@ export default async function ConversationDetailPage({
   const resultText = result ? t[result] : "";
   return <main className="mizan-conversation-page min-h-screen px-4 py-8 sm:py-12" dir={ar ? "rtl" : "ltr"}>
     <div className="mizan-conversation-shell mx-auto max-w-4xl">
-      <Link href={"/" + locale + "/dashboard/conversations"} className="mizan-conversation-back text-sm font-bold hover:underline">← {t.back}</Link>
+      <div className="flex flex-wrap items-center justify-between gap-3"><Link href={"/" + locale + "/dashboard/conversations"} className="mizan-conversation-back text-sm font-bold hover:underline">← {t.back}</Link><form action={hideConversation}><input type="hidden" name="locale" value={locale}/><input type="hidden" name="conversationId" value={conversation.id}/><ConfirmSubmitButton message={t.confirmHideConversation} className="rounded-xl border border-red-200 px-3 py-2 text-xs font-bold text-red-700 transition hover:bg-red-50">{t.hideConversation}</ConfirmSubmitButton></form></div>
       <header className="mizan-conversation-hero mt-5">
         <div className="mizan-conversation-brandline"><span className="mizan-conversation-brandmark">م</span><span><small>MIZAN LEGAL</small><strong>{ar ? "مراسلات المكتب القانونية" : "Private legal correspondence"}</strong></span><span className="mizan-conversation-lock">● {ar ? "محادثة خاصة" : "Private conversation"}</span></div>
         <div className="mizan-conversation-title-row mt-5 flex flex-wrap items-start justify-between gap-4">
