@@ -2402,3 +2402,92 @@ pre,code{max-width:100%;overflow-wrap:anywhere}
   }
   .mizan-site-header .mizan-notification-menu .mizan-notice-feed { max-height:calc(100dvh - 18rem); }
 }
+
+
+/* Notification and conversation deletion controls */
+.mizan-notice-row-with-delete {
+  display: flex;
+  align-items: stretch;
+  gap: 6px;
+  min-width: 0;
+}
+.mizan-notice-row-with-delete > .mizan-dashboard-notice-item {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.mizan-notice-delete-one,
+.mizan-notice-delete-all {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  border: 1px solid rgba(142, 57, 48, .16);
+  border-radius: 9px;
+  color: #8e3930;
+  background: rgba(255,255,255,.72);
+  font-size: 12px;
+  font-weight: 700;
+  transition: background .18s ease, border-color .18s ease, opacity .18s ease;
+}
+.mizan-notice-delete-one {
+  align-self: center;
+  width: 28px;
+  height: 28px;
+  font-size: 19px;
+  line-height: 1;
+}
+.mizan-notice-delete-all {
+  padding: 7px 9px;
+  white-space: nowrap;
+}
+.mizan-notice-delete-one:hover,
+.mizan-notice-delete-all:hover {
+  background: #fff1ef;
+  border-color: rgba(142, 57, 48, .34);
+}
+.mizan-notice-delete-one:disabled,
+.mizan-notice-delete-all:disabled {
+  cursor: wait;
+  opacity: .55;
+}
+.mizan-chat-thread-wrap {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  padding-inline-end: 6px;
+}
+.mizan-chat-thread-wrap .mizan-chat-thread {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.mizan-chat-hide-thread,
+.mizan-chat-hide-active {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  border: 1px solid rgba(142, 57, 48, .16);
+  border-radius: 9px;
+  color: #8e3930;
+  background: rgba(255,255,255,.78);
+  font-size: 19px;
+  line-height: 1;
+  transition: background .18s ease, border-color .18s ease;
+}
+.mizan-chat-hide-thread:hover,
+.mizan-chat-hide-active:hover {
+  background: #fff1ef;
+  border-color: rgba(142, 57, 48, .34);
+}
+.mizan-chat-hide-active {
+  margin-inline-start: auto;
+  margin-inline-end: 6px;
+}
+.mizan-chat-hide-thread:disabled,
+.mizan-chat-hide-active:disabled {
+  cursor: wait;
+  opacity: .55;
+}
