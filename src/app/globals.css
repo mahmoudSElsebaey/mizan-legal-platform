@@ -1829,3 +1829,64 @@ img, svg, video { max-width: 100%; }
  .mizan-conversation-panel .mizan-thread-composer>button[type=submit]{min-height:40px;padding:.55rem .65rem;font-size:.72rem}
  .mizan-conversation-panel .mizan-thread-composer textarea{font-size:.82rem;padding:.55rem .35rem}
 }
+
+
+/* Live header messenger drawer redesign — applies to the chat users open from the header icon */
+.mizan-chat-drawer{border:1px solid rgba(212,175,124,.38)!important;border-radius:24px!important;overflow:hidden!important;box-shadow:0 30px 100px rgba(5,25,21,.32)!important;background:#fbfcf8!important}
+.mizan-chat-drawer-controls{z-index:20}
+.mizan-chat-sidebar{background:linear-gradient(180deg,#10342f 0%,#0b2825 100%)!important;color:#f6f3ea!important;border-inline-end:1px solid rgba(212,175,124,.18)!important}
+.mizan-chat-sidebar-head{padding:1.45rem 1.2rem 1rem!important}
+.mizan-chat-eyebrow{color:#d9bd8b!important;letter-spacing:.16em!important}
+.mizan-chat-sidebar-head h2{color:#fff8ed!important;font-size:1.45rem!important;letter-spacing:-.03em}
+.mizan-chat-sidebar-head p{color:#bfd0c5!important;line-height:1.7}
+.mizan-chat-sound{margin:0 1rem .8rem!important;border:1px solid rgba(212,175,124,.2);border-radius:12px;background:rgba(255,255,255,.045);padding:.65rem .75rem;color:#d8e2d9!important;font-size:.72rem}
+.mizan-chat-sound input{accent-color:#d4af7c}
+.mizan-chat-search-label{margin:0 1rem .7rem!important;border:1px solid rgba(255,255,255,.13)!important;border-radius:13px!important;background:rgba(255,255,255,.07)!important;color:#d3dfd5!important}
+.mizan-chat-search-label input{color:#fff8ed!important}
+.mizan-chat-search-label input::placeholder{color:#a8bcb0!important}
+.mizan-chat-new-conversation{margin:0 1rem .8rem!important;border:1px solid rgba(212,175,124,.35)!important;border-radius:13px!important;background:rgba(212,175,124,.11)!important;color:#f0d7a8!important}
+.mizan-chat-thread-list{padding:.25rem .65rem!important}
+.mizan-chat-thread{border:1px solid transparent!important;border-radius:14px!important;padding:.7rem!important;transition:background .18s,border-color .18s,transform .18s}
+.mizan-chat-thread:hover{background:rgba(255,255,255,.06)!important;transform:translateY(-1px)}
+.mizan-chat-thread.is-active{border-color:rgba(212,175,124,.35)!important;background:linear-gradient(100deg,rgba(212,175,124,.15),rgba(255,255,255,.055))!important;box-shadow:inset 3px 0 #d4af7c}
+.mizan-chat-thread-copy strong{color:#fff7e9!important}
+.mizan-chat-thread-copy small,.mizan-chat-thread-copy time{color:#b9c9bf!important}
+.mizan-chat-full-link{color:#e2c58f!important;border-top:1px solid rgba(255,255,255,.1)!important}
+.mizan-chat-main{background:#f7f8f3!important}
+.mizan-chat-conversation-head{background:rgba(255,255,255,.94)!important;border-bottom:1px solid #e2e8df!important;padding:1rem 1.25rem!important;box-shadow:0 5px 18px rgba(15,45,43,.035)}
+.mizan-chat-conversation-identity strong{color:#173d35!important;font-size:.95rem}
+.mizan-chat-conversation-identity p{color:#628074!important}
+.mizan-chat-conversation-identity small{color:#8a968c!important}
+.mizan-chat-messages{background:radial-gradient(ellipse at top,#f9fbf7,#eff4ed)!important;padding:1.25rem!important;gap:1.1rem!important;scrollbar-width:thin;scrollbar-color:#bfd0c2 transparent}
+.mizan-chat-message-row{align-items:flex-end!important;gap:.6rem!important}
+.mizan-chat-avatar.is-message-avatar{width:34px!important;height:34px!important;flex:0 0 34px!important;border:1px solid #dce7db!important;background:linear-gradient(145deg,#e7f0e5,#c8ddcf)!important;color:#17665a!important;font-weight:900!important;box-shadow:0 4px 12px rgba(15,45,43,.08)}
+.mizan-chat-message-row.is-own .mizan-chat-avatar.is-message-avatar{border-color:#ead7b1!important;background:linear-gradient(145deg,#f5e4c3,#d9ba83)!important;color:#173d35!important}
+.mizan-chat-bubble{position:relative!important;max-width:min(78%,560px)!important;padding:.85rem 1rem!important;border-radius:19px 19px 19px 5px!important;box-shadow:0 6px 18px rgba(15,45,43,.065)!important}
+.mizan-chat-bubble.is-own{border:1px solid #176e61!important;border-radius:19px 19px 5px 19px!important;background:linear-gradient(145deg,#176e61,#0e5046)!important;color:#fff!important}
+.mizan-chat-bubble.is-other{border:1px solid #e7d4b2!important;background:linear-gradient(145deg,#fffdf8,#f7f0e2)!important;color:#263a31!important}
+.mizan-chat-sender-name{display:block;margin-bottom:.42rem;color:#617a6c;font-size:.67rem;font-weight:900;line-height:1.4}
+.mizan-chat-bubble.is-own .mizan-chat-sender-name{color:#d3e7dd}
+.mizan-chat-bubble>p{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.85;font-size:.88rem}
+.mizan-chat-bubble>time{display:block;margin-top:.65rem;text-align:end;font-size:.61rem;opacity:.76;font-variant-numeric:tabular-nums}
+.mizan-chat-bubble.is-own>time{color:#d5e5dc!important}
+.mizan-chat-message-menu summary{display:grid!important;place-items:center;width:28px;height:28px;border-radius:9px;background:rgba(255,255,255,.45);color:inherit!important}
+.mizan-chat-message-menu>div{border:1px solid #e1e8df!important;border-radius:12px!important;background:#fff!important;padding:.3rem!important;box-shadow:0 12px 32px rgba(15,45,43,.16)!important}
+.mizan-chat-message-menu>div button{border-radius:8px!important;padding:.5rem .7rem!important;color:#304a3e!important}
+.mizan-chat-composer{border-top:1px solid #e1e8df!important;background:#fff!important;padding:.85rem!important;gap:.6rem!important}
+.mizan-chat-composer textarea{border:1px solid #dce5da!important;border-radius:14px!important;background:#f8faf6!important;padding:.75rem!important;line-height:1.7!important}
+.mizan-chat-composer textarea:focus{border-color:#176b60!important;box-shadow:0 0 0 3px rgba(23,107,96,.12)!important;outline:none!important}
+.mizan-chat-composer .mizan-chat-attach-button{width:43px!important;height:43px!important;border:1px solid #dce7db!important;border-radius:13px!important;background:#edf4eb!important;color:#176b60!important}
+.mizan-chat-composer>button[type=submit]{width:44px!important;height:44px!important;border-radius:13px!important;background:linear-gradient(145deg,#176b60,#0f4f46)!important;box-shadow:0 5px 14px rgba(23,107,96,.2)!important}
+.mizan-chat-composer>button[type=submit] svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.mizan-chat-pending-files{color:#557467!important;font-size:.7rem}
+.mizan-chat-error{border:1px solid #f1d0cb!important;border-radius:12px!important;line-height:1.8!important;overflow-wrap:anywhere}
+.mizan-chat-no-selection{background:radial-gradient(ellipse at top,#f9fbf7,#eff4ed)!important}
+.mizan-chat-no-selection>span{color:#c4a16c!important}
+@media(max-width:680px){
+ .mizan-chat-drawer{border-radius:0!important}
+ .mizan-chat-messages{padding:.8rem!important;gap:.85rem!important}
+ .mizan-chat-bubble{max-width:calc(100% - 37px)!important;padding:.75rem!important}
+ .mizan-chat-avatar.is-message-avatar{width:29px!important;height:29px!important;flex-basis:29px!important}
+ .mizan-chat-composer{padding:.55rem!important;gap:.35rem!important}
+ .mizan-chat-composer .mizan-chat-attach-button,.mizan-chat-composer>button[type=submit]{width:38px!important;height:40px!important}
+}
