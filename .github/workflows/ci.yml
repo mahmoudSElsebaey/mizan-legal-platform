@@ -90,3 +90,7 @@ jobs:
         run: psql "postgresql://postgres:postgres@localhost:5432/mizan_test" -v ON_ERROR_STOP=1 -f supabase/migrations/20261024000300_appointment_notifications.sql
       - name: Verify appointment notification delivery
         run: psql "postgresql://postgres:postgres@localhost:5432/mizan_test" -v ON_ERROR_STOP=1 -f scripts/ci-appointment-notifications-smoke-test.sql
+      - name: Apply private staff conversations migration
+        run: psql "postgresql://postgres:postgres@localhost:5432/mizan_test" -v ON_ERROR_STOP=1 -f supabase/migrations/20261024000500_private_staff_conversations.sql
+      - name: Verify private staff conversation access controls
+        run: psql "postgresql://postgres:postgres@localhost:5432/mizan_test" -v ON_ERROR_STOP=1 -f scripts/ci-private-staff-conversations-smoke-test.sql
