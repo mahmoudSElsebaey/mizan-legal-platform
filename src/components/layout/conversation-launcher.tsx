@@ -237,7 +237,7 @@ export function ConversationLauncher({ locale }: { locale: Locale }) {
     if (contacts.length || contactsLoading) return;
     setContactsLoading(true);
     const { data, error: contactsError } = await createClient().rpc(currentStaffRole ? "list_contactable_staff_recipients" : "list_contactable_staff");
-    if (contactsError) setError(labels.failed);
+    if (contactsError) setError(labels.failed + " " + describeError(contactsError));
     else {
       const available = (data || []) as Contact[];
       setContacts(available);
@@ -256,7 +256,7 @@ export function ConversationLauncher({ locale }: { locale: Locale }) {
       .insert({ client_id: userId, staff_id: newRecipient, subject, status: "open", conversation_type: currentStaffRole ? "staff" : "client" })
       .select("id,client_id,staff_id,subject,status,conversation_type,last_message_at").single();
     if (createError || !data) {
-      setError(labels.failed);
+      setError(labels.failed + (createError ? " " + describeError(createError) : " No conversation record was returned."));
       setBusy(false);
       return;
     }
