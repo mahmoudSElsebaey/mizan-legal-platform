@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { isLocale, locales } from "@/lib/i18n/config";
 import { SiteShell } from "@/components/layout/site-shell";
+import { SiteFloatingActions } from "@/components/layout/site-floating-actions";
 export const dynamicParams = false;
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
 export function generateStaticParams() { return locales.map((locale) => ({ locale })); }
@@ -20,5 +21,5 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 export default async function LocaleLayout({ children, params }: Readonly<{ children: React.ReactNode; params: Promise<{ locale: string }> }>) {
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
-  return <div lang={locale} dir={locale === "ar" ? "rtl" : "ltr"} data-locale={locale}><SiteShell>{children}</SiteShell></div>;
+  return <div lang={locale} dir={locale === "ar" ? "rtl" : "ltr"} data-locale={locale}><SiteShell>{children}</SiteShell><SiteFloatingActions locale={locale} /></div>;
 }
