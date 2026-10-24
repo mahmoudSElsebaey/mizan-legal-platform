@@ -17,6 +17,25 @@ function describeError(value: unknown): string {
   return typeof value === "string" ? value : "Unknown error";
 }
 type Attachment = { path: string; name: string; mime_type: string; size: number };
+
+function playIncomingTone() {
+  try {
+    const AudioContextClass = window.AudioContext || (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+    if (!AudioContextClass) return;
+    const context = new AudioContextClass();
+    const oscillator = context.createOscillator();
+    const gain = context.createGain();
+    oscillator.type = "sine";
+    oscillator.frequency.setValueAtTime(740, context.currentTime);
+    oscillator.frequency.setValueAtTime(990, context.currentTime + 0.11);
+    gain.gain.setValueAtTime(0.0001, context.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.12, context.currentTime + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.0001, context.currentTime + 0.28);
+    oscillator.connect(gain); gain.connect(context.destination);
+    oscillator.start(); oscillator.stop(context.currentTime + 0.3);
+    oscillator.onended = () => void context.close();
+  } catch { /* Audio may be unavailable or blocked until a user gesture. */ }
+}
 type Message = {
   id: string;
   conversation_id: string;
@@ -34,12 +53,16 @@ export function ConversationThreadClient({
   userId,
   initialMessages,
   canSend,
+  currentUserName,
+  otherName,
 }: {
   locale: Locale;
   conversationId: string;
   userId: string;
   initialMessages: Message[];
   canSend: boolean;
+  currentUserName: string;
+  otherName: string;
 }) {
   const ar = locale === "ar";
   const [messages, setMessages] = useState<Message[]>(initialMessages.map((m) => ({ ...m, attachments: m.attachments || [] })));
@@ -50,10 +73,11 @@ export function ConversationThreadClient({
   const [editDraft, setEditDraft] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [soundOn, setSoundOn] = useState(true);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const t = ar ? {
-    copy: "نسخ", edit: "تعديل", remove: "حذف", save: "حفظ", cancel: "إلغاء",
+    copy: "نسخ", edit: "تعديل", remove: "حذف", save: "حفظ", cancel: "إلغاء", you: "أنت", sound: "صوت إشعار الرسائل",
     edited: "تم التعديل", deleted: "تم حذف هذه الرسالة", attach: "إرفاق ملفات أو صور",
     placeholder: "اكتب رسالتك هنا...", send: "إرسال الرسالة", filesLimit: "الحد الأقصى 5 ملفات، 10 ميجابايت لكل ملف.",
     uploadFailed: "تعذر رفع المرفق أو إرسال الرسالة.", editFailed: "تعذر تعديل الرسالة.",
@@ -61,7 +85,7 @@ export function ConversationThreadClient({
     noMessages: "لا توجد رسائل بعد. اكتب رسالتك الأولى أدناه.", error: "حدث خطأ. حاول مرة أخرى.",
     filesReady: "ملفات جاهزة", openFile: "فتح الملف"
   } : {
-    copy: "Copy", edit: "Edit", remove: "Delete", save: "Save", cancel: "Cancel",
+    copy: "Copy", edit: "Edit", remove: "Delete", save: "Save", cancel: "Cancel", you: "You", sound: "Message notification sound",
     edited: "Edited", deleted: "This message was deleted", attach: "Attach files or images",
     placeholder: "Write your message here...", send: "Send message", filesLimit: "Up to 5 files, 10 MB each.",
     uploadFailed: "Could not upload the attachment or send the message.", editFailed: "Could not edit the message.",
@@ -72,17 +96,27 @@ export function ConversationThreadClient({
 
   useEffect(() => {
     const supabase = createClient();
+    const markThreadNotificationsRead = async () => {
+      await supabase.from("notifications").update({ read_at: new Date().toISOString() })
+        .eq("user_id", userId).eq("conversation_id", conversationId)
+        .eq("kind", "new_message").is("read_at", null);
+    };
+    void markThreadNotificationsRead();
     const channel = supabase.channel("mizan-full-thread-" + conversationId)
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "conversation_messages", filter: "conversation_id=eq." + conversationId }, (payload) => {
         const incoming = payload.new as Message;
         setMessages((current) => current.some((message) => message.id === incoming.id) ? current : [...current, { ...incoming, attachments: incoming.attachments || [] }]);
+        if (incoming.sender_id !== userId) {
+          if (soundOn) playIncomingTone();
+          void markThreadNotificationsRead();
+        }
       })
       .on("postgres_changes", { event: "UPDATE", schema: "public", table: "conversation_messages", filter: "conversation_id=eq." + conversationId }, (payload) => {
         const updated = payload.new as Message;
         setMessages((current) => current.map((message) => message.id === updated.id ? { ...updated, attachments: updated.attachments || [] } : message));
       }).subscribe();
     return () => { void supabase.removeChannel(channel); };
-  }, [conversationId]);
+  }, [conversationId, userId, soundOn]);
 
   useEffect(() => {
     const closeMessageMenus = (event: MouseEvent) => {
@@ -193,12 +227,18 @@ export function ConversationThreadClient({
     setBusy(false);
   }
 
+  const initials = (name: string) => (name.trim().charAt(0) || "?").toLocaleUpperCase(ar ? "ar-EG" : "en-US");
+
   return <div className="mizan-thread-client">
+    <label className="mizan-thread-sound"><input type="checkbox" checked={soundOn} onChange={(event) => setSoundOn(event.target.checked)}/>{t.sound}</label>
     <div className="mizan-thread-messages">
       {!messages.length ? <p className="mizan-thread-empty">{t.noMessages}</p> : messages.map((message) => {
         const own = message.sender_id === userId;
+        const senderName = own ? currentUserName : otherName;
         return <article key={message.id} className={"mizan-thread-row " + (own ? "is-own" : "is-other")}>
+          <span className="mizan-thread-avatar" aria-label={senderName}>{initials(senderName)}</span>
           <div className={"mizan-thread-bubble " + (own ? "is-own" : "is-other") + (message.deleted_at ? " is-deleted" : "")}>
+            <small className="mizan-thread-sender">{senderName}</small>
             {message.deleted_at ? <p className="mizan-thread-deleted">{t.deleted}</p> : editingId === message.id ? <div className="mizan-thread-edit">
               <textarea value={editDraft} onChange={(event) => setEditDraft(event.target.value)} maxLength={4000} rows={3} aria-label={t.edit}/>
               <div><button type="button" disabled={busy || !editDraft.trim()} onClick={() => void saveEdit(message)}>{t.save}</button><button type="button" disabled={busy} onClick={() => { setEditingId(""); setEditDraft(""); }}>{t.cancel}</button></div>
@@ -212,11 +252,11 @@ export function ConversationThreadClient({
                   <span><strong>{attachment.name}</strong><small>{(attachment.size / 1024 / 1024).toFixed(2)} MB</small></span>
                 </a>;
               })}
-              {own && <details className="mizan-thread-menu"><summary aria-label={ar ? "خيارات الرسالة" : "Message options"}>⋯</summary><div>
+              <details className="mizan-thread-menu"><summary aria-label={ar ? "خيارات الرسالة" : "Message options"}>{ar ? "خيارات" : "Options"}</summary><div>
                 <button type="button" onClick={() => void copyMessage(message)}>{t.copy}</button>
-                <button type="button" onClick={() => { setEditingId(message.id); setEditDraft(message.body); }}>{t.edit}</button>
-                <button type="button" className="is-danger" onClick={() => void deleteMessage(message)}>{t.remove}</button>
-              </div></details>}
+                {own && <button type="button" onClick={() => { setEditingId(message.id); setEditDraft(message.body); }}>{t.edit}</button>}
+                {own && <button type="button" className="is-danger" onClick={() => void deleteMessage(message)}>{t.remove}</button>}
+              </div></details>
             </>}
             {!message.deleted_at && <time>{formatTime(message.created_at)}{message.edited_at ? " · " + t.edited : ""}</time>}
           </div>
