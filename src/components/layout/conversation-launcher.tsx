@@ -64,6 +64,10 @@ export function ConversationLauncher({ locale }: { locale: Locale }) {
   const [unread, setUnread] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchVisible, setSearchVisible] = useState(false);
+  const [removalMode, setRemovalMode] = useState(false);
+  const [removalIds, setRemovalIds] = useState<string[]>([]);
+  const [confirmRemovalOpen, setConfirmRemovalOpen] = useState(false);
+  const [removingConversations, setRemovingConversations] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [soundOn, setSoundOn] = useState(true);
@@ -79,14 +83,14 @@ export function ConversationLauncher({ locale }: { locale: Locale }) {
     empty: "لا توجد محادثات حتى الآن", choose: "اختر محادثة لعرض الرسائل",
     placeholder: "اكتب رسالتك...", send: "إرسال", loading: "جارٍ تحميل المحادثات...",
     online: "مراسلة آمنة", sound: "صوت الإشعار", openFull: "فتح صفحة المحادثات",
-    closed: "مغلقة", newConversation: "بدء محادثة جديدة", noMessages: "ابدأ المحادثة برسالتك الأولى", failed: "تعذر تحميل البيانات أو إرسال الرسالة.",
+    closed: "مغلقة", newConversation: "بدء محادثة جديدة", deleteMode: "تحديد محادثات للحذف", deleteSelected: "حذف المحدد", cancelSelection: "إلغاء التحديد", confirmDeleteTitle: "تأكيد حذف المحادثات", confirmDeleteBody: "هل تريد إزالة المحادثات المحددة من حسابك؟ ستظل ظاهرة للطرف الآخر.", confirmDelete: "نعم، احذف من حسابي", noMessages: "ابدأ المحادثة برسالتك الأولى", failed: "تعذر تحميل البيانات أو إرسال الرسالة.",
     you: "أنت", today: "اليوم", newModalTitle: "ابدأ محادثة جديدة", topic: "موضوع المحادثة", interlocutor: "اختر المحاور", start: "إنشاء المحادثة", noContacts: "لا يوجد أعضاء فريق نشطون متاحون حاليًا.", privateConversation: "محادثة داخلية خاصة", privateHint: "هذه المحادثة خاصة بينك وبين الموظف الذي تختاره فقط.", viewOnly: "يمكنك الاطلاع على هذه المحادثة فقط، ولا يمكن إرسال رسائل إلا من طرفيها.", subjectPlaceholder: "مثال: استفسار عن قضية أو موعد", copy: "نسخ", edit: "تعديل", remove: "حذف", save: "حفظ", cancel: "إلغاء", edited: "تم التعديل", deleted: "تم حذف هذه الرسالة", attach: "إرفاق ملفات أو صور", filesLimit: "يمكن إرفاق 5 ملفات كحد أقصى، بحد 10 ميجابايت لكل ملف.", uploadFailed: "تعذر رفع الملف. حاول مرة أخرى.", editFailed: "تعذر تعديل الرسالة.", deleteFailed: "تعذر حذف الرسالة.", copied: "تم نسخ الرسالة", removeConfirm: "هل تريد حذف هذه الرسالة؟",
   } : {
     title: "Messages", subtitle: "", search: "Search conversations",
     empty: "No conversations yet", choose: "Choose a conversation to view messages",
     placeholder: "Write a message...", send: "Send", loading: "Loading conversations...",
     online: "Secure messaging", sound: "Notification sound", openFull: "Open conversations page",
-    closed: "Closed", newConversation: "Start a new conversation", noMessages: "Start the conversation with your first message", failed: "Could not load data or send the message.",
+    closed: "Closed", newConversation: "Start a new conversation", deleteMode: "Select conversations to remove", deleteSelected: "Delete selected", cancelSelection: "Cancel selection", confirmDeleteTitle: "Confirm conversation removal", confirmDeleteBody: "Remove the selected conversations from your account? They will remain visible to the other participant.", confirmDelete: "Yes, remove from my account", noMessages: "Start the conversation with your first message", failed: "Could not load data or send the message.",
     you: "You", today: "Today", newModalTitle: "Start a new conversation", topic: "Conversation subject", interlocutor: "Choose a participant", start: "Create conversation", noContacts: "No active office team members are available right now.", privateConversation: "Private staff conversation", privateHint: "This conversation is private between you and the selected staff member only.", viewOnly: "You can view this conversation, but only its two participants can send messages.", subjectPlaceholder: "e.g. Question about a case or appointment", copy: "Copy", edit: "Edit", remove: "Delete", save: "Save", cancel: "Cancel", edited: "Edited", deleted: "This message was deleted", attach: "Attach files or images", filesLimit: "Up to 5 files, 10 MB per file.", uploadFailed: "Could not upload the file. Please try again.", editFailed: "Could not edit this message.", deleteFailed: "Could not delete this message.", copied: "Message copied", removeConfirm: "Delete this message?",
   }, [ar]);
 
@@ -352,6 +356,26 @@ export function ConversationLauncher({ locale }: { locale: Locale }) {
     else { setMessages((current) => current.map((item) => item.id === message.id ? { ...item, body, edited_at: editedAt } : item)); setEditingId(""); setEditDraft(""); }
     setBusy(false);
   }
+  async function removeSelectedConversations() {
+    if (!userId || !removalIds.length || removingConversations) return;
+    setRemovingConversations(true);
+    setError("");
+    const { error: removeError } = await createClient().from("conversation_hidden_for_user").upsert(
+      removalIds.map((conversation_id) => ({ conversation_id, user_id: userId })),
+      { onConflict: "conversation_id,user_id", ignoreDuplicates: true },
+    );
+    if (removeError) {
+      setError(ar ? "تعذر حذف المحادثات المحددة من حسابك." : "Could not remove the selected conversations from your account.");
+    } else {
+      setThreads((current) => current.filter((thread) => !removalIds.includes(thread.id)));
+      if (removalIds.includes(selected)) { setSelected(""); setMessages([]); }
+      setRemovalIds([]);
+      setRemovalMode(false);
+      setConfirmRemovalOpen(false);
+    }
+    setRemovingConversations(false);
+  }
+
   const active = threads.find((thread) => thread.id === selected);
   const filteredThreads = threads.filter((thread) => {
     const participant = thread.client_id === userId ? thread.staff_id : thread.client_id;
@@ -383,12 +407,13 @@ export function ConversationLauncher({ locale }: { locale: Locale }) {
           <div className="mizan-chat-sidebar-head"><div><h2>{labels.title}</h2></div><button type="button" className="mizan-chat-close mizan-chat-sidebar-close" aria-label={ar ? "إغلاق" : "Close"} onClick={() => { setOpen(false); setExpanded(false); }}>×</button></div>
           <div className="mizan-chat-sidebar-tools">
             <button type="button" className={"mizan-chat-tool-icon" + (soundOn ? " is-enabled" : "")} aria-label={labels.sound} title={labels.sound} onClick={() => setSoundOn((value) => { const next = !value; if (next) playIncomingTone(); return next; })}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4h4l5 4V6l-5 4H4Z"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a7.5 7.5 0 0 1 0 11"/></svg><span className="sr-only">{labels.sound}</span></button>
-            <button type="button" className="mizan-chat-tool-icon" aria-label={labels.search} title={labels.search} onClick={() => { setSearchVisible((value) => !value); if (!searchVisible) window.setTimeout(() => document.getElementById("mizan-chat-search")?.focus(), 0); }}><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 4.5 4.5"/></svg><span className="sr-only">{labels.search}</span></button>
+            <button type="button" className={"mizan-chat-tool-icon" + (searchVisible ? " is-enabled" : "")} aria-label={labels.search} title={labels.search} onClick={() => { setRemovalMode(false); setRemovalIds([]); setSearchVisible((value) => !value); if (!searchVisible) window.setTimeout(() => document.getElementById("mizan-chat-search")?.focus(), 0); }}><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 4.5 4.5"/></svg><span className="sr-only">{labels.search}</span></button>
+            <button type="button" className={"mizan-chat-tool-icon" + (removalMode ? " is-enabled" : "")} aria-label={removalMode ? labels.cancelSelection : labels.deleteMode} title={removalMode ? labels.cancelSelection : labels.deleteMode} onClick={() => { setRemovalMode((value) => !value); setRemovalIds([]); setSearchVisible(false); }}><svg viewBox="0 0 24 24" aria-hidden="true">{removalMode ? <path d="m6 6 12 12M18 6 6 18"/> : <path d="M4 7h16M10 11v6m4-6v6M5 7l1 13h12l1-13M9 7V4h6v3"/>}</svg><span className="sr-only">{labels.deleteMode}</span></button>
             <button type="button" className="mizan-chat-tool-icon is-primary" aria-label={labels.newConversation} title={labels.newConversation} onClick={() => void openNewConversation()}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span className="sr-only">{labels.newConversation}</span></button>
           </div>
-          {searchVisible && <label className="mizan-chat-search-label"><span className="sr-only">{labels.search}</span><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 4.5 4.5"/></svg><input id="mizan-chat-search" value={searchQuery} onChange={(event) => setSearchQuery(event.target.value)} placeholder={labels.search} /></label>}<div className="mizan-chat-thread-list">{filteredThreads.length === 0 ? <p className="mizan-chat-empty">{threads.length === 0 ? labels.empty : (ar ? "لا توجد نتائج مطابقة" : "No matching conversations")}</p> : filteredThreads.map((thread) => {
+          {searchVisible && !removalMode && <label className="mizan-chat-search-label"><span className="sr-only">{labels.search}</span><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 4.5 4.5"/></svg><input id="mizan-chat-search" value={searchQuery} onChange={(event) => setSearchQuery(event.target.value)} placeholder={labels.search} /></label>}{removalMode && <div className="mizan-chat-removal-toolbar"><span>{removalIds.length ? (ar ? `تم تحديد ${removalIds.length} محادثة` : `${removalIds.length} selected`) : (ar ? "حدد المحادثات التي تريد حذفها من حسابك" : "Select conversations to remove from your account")}</span>{removalIds.length > 0 && <button type="button" disabled={removingConversations} onClick={() => setConfirmRemovalOpen(true)}>{labels.deleteSelected} ({removalIds.length})</button>}</div>}<div className="mizan-chat-thread-list">{filteredThreads.length === 0 ? <p className="mizan-chat-empty">{threads.length === 0 ? labels.empty : (ar ? "لا توجد نتائج مطابقة" : "No matching conversations")}</p> : filteredThreads.map((thread) => {
             const participant = thread.client_id === userId ? thread.staff_id : thread.client_id;
-            return <div key={thread.id} className={"mizan-chat-thread-wrap" + (selected === thread.id ? " is-active" : "")}><button type="button" onClick={() => setSelected(thread.id)} className={"mizan-chat-thread" + (selected === thread.id ? " is-active" : "")}>
+            return <div key={thread.id} className={"mizan-chat-thread-wrap" + (selected === thread.id ? " is-active" : "")}>{removalMode && <input type="checkbox" className="mizan-chat-remove-checkbox" checked={removalIds.includes(thread.id)} aria-label={(ar ? "تحديد محادثة " : "Select conversation ") + thread.subject} onChange={() => setRemovalIds((current) => current.includes(thread.id) ? current.filter((id) => id !== thread.id) : [...current, thread.id])}/>}<button type="button" onClick={() => { if (removalMode) setRemovalIds((current) => current.includes(thread.id) ? current.filter((id) => id !== thread.id) : [...current, thread.id]); else setSelected(thread.id); }} className={"mizan-chat-thread" + (selected === thread.id ? " is-active" : "")}>
               <span className="mizan-chat-avatar">{initials(displayPerson(participant))}</span><span className="mizan-chat-thread-copy"><strong>{displayPerson(participant)}</strong><small>{thread.conversation_type === "staff" ? labels.privateConversation + " · " : ""}{thread.subject}</small><time>{formatTime(thread.last_message_at)}</time></span><span className={"mizan-chat-status-dot" + (thread.status === "open" ? " is-open" : "")}/>
             </button></div>;
           })}</div>
@@ -406,6 +431,12 @@ export function ConversationLauncher({ locale }: { locale: Locale }) {
           </> : <div className="mizan-chat-no-selection"><span>✦</span><h3>{labels.choose}</h3><p>{labels.online}</p></div>}
           {error && <p role="alert" className="mizan-chat-error">{error}</p>}
         </div>
+        {confirmRemovalOpen && <div className="mizan-chat-modal-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) setConfirmRemovalOpen(false); }}>
+          <section className="mizan-chat-new-modal mizan-chat-remove-modal" role="dialog" aria-modal="true" aria-labelledby="mizan-delete-conversations-title" dir={ar ? "rtl" : "ltr"} onMouseDown={(event) => event.stopPropagation()}>
+            <div className="mizan-chat-new-modal-head"><span className="mizan-chat-modal-symbol"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6m4-6v6M5 7l1 13h12l1-13M9 7V4h6v3"/></svg></span><button type="button" className="mizan-chat-close" onClick={() => setConfirmRemovalOpen(false)} aria-label={ar ? "إغلاق" : "Close"}>×</button><h2 id="mizan-delete-conversations-title">{labels.confirmDeleteTitle}</h2><p>{labels.confirmDeleteBody}</p></div>
+            <div className="mizan-chat-new-modal-actions"><button type="button" className="mizan-chat-modal-cancel" disabled={removingConversations} onClick={() => setConfirmRemovalOpen(false)}>{labels.cancel}</button><button type="button" disabled={removingConversations} onClick={() => void removeSelectedConversations()}>{removingConversations ? (ar ? "جارٍ الحذف..." : "Removing...") : labels.confirmDelete}</button></div>
+          </section>
+        </div>}
         {newModalOpen && <div className="mizan-chat-modal-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) setNewModalOpen(false); }}>
           <section className="mizan-chat-new-modal" role="dialog" aria-modal="true" aria-labelledby="mizan-new-conversation-title" dir={ar ? "rtl" : "ltr"} onMouseDown={(event) => event.stopPropagation()}>
             <div className="mizan-chat-new-modal-head"><span className="mizan-chat-modal-symbol"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11.5a7.5 7.5 0 0 1-7.5 7.5H5l-1-4a7.5 7.5 0 1 1 16-3.5Z"/><path d="M12 8v7M8.5 11.5h7"/></svg></span><button type="button" className="mizan-chat-close" onClick={() => setNewModalOpen(false)} aria-label={ar ? "إغلاق" : "Close"}>×</button><h2 id="mizan-new-conversation-title">{labels.newModalTitle}</h2><p>{currentStaffRole ? labels.privateHint : (ar ? "اختر موضوعًا وعضوًا من فريق المكتب لبدء تواصل آمن." : "Choose a topic and an office team member to start a secure conversation.")}</p></div>
