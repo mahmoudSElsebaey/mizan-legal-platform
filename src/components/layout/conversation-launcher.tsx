@@ -262,7 +262,7 @@ export function ConversationLauncher({ locale }: { locale: Locale }) {
   const initials = (name: string) => (name.trim().charAt(0) || "?").toLocaleUpperCase(ar ? "ar-EG" : "en-US");
 
   return <>
-    <button type="button" className="mizan-chat-launcher" aria-label={labels.title} onClick={() => { setOpen(true); if (userId) void loadThreads(userId); }}>
+    <button type="button" className="mizan-icon-button mizan-chat-launcher" aria-label={labels.title} onClick={() => { setOpen(true); if (userId) void loadThreads(userId); }}>
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11.5a7.5 7.5 0 0 1-7.5 7.5H5l-1-4a7.5 7.5 0 1 1 16-3.5Z"/><path d="M8 11h8M8 14h5"/></svg>
       {unread > 0 && <span className="mizan-chat-launcher-count">{unread > 99 ? "99+" : unread}</span>}
     </button>
