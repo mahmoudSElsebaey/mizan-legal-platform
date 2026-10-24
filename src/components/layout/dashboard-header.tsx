@@ -151,7 +151,7 @@ export function DashboardHeader({ locale }: { locale: Locale }) {
         </Link>
         <div className="mizan-site-actions mizan-dashboard-header-actions">
           <ConversationLauncher locale={locale} />
-          <div className="mizan-popover-anchor" ref={languageRef}>
+          <div className="mizan-popover-anchor mizan-dashboard-language-anchor" ref={languageRef}>
             <button type="button" className="mizan-language mizan-dashboard-language" aria-label={ar ? "تغيير اللغة" : "Change language"} aria-expanded={languageOpen} onClick={() => { setLanguageOpen((value) => !value); setNotificationsOpen(false); }}>
               <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg><span>{ar ? "AR" : "EN"}</span><span aria-hidden="true">⌄</span>
             </button>
@@ -160,7 +160,7 @@ export function DashboardHeader({ locale }: { locale: Locale }) {
               <Link href={switchPath("en")} onClick={() => setLanguageOpen(false)} className={!ar ? "is-selected" : ""}><span>A</span><span>English<small>English</small></span>{!ar && <b>✓</b>}</Link>
             </div>
           </div>
-          <div className="mizan-popover-anchor mizan-notification-anchor" ref={notificationRef}>
+          <div className="mizan-popover-anchor mizan-notification-anchor mizan-dashboard-notifications-anchor" ref={notificationRef}>
             <button type="button" className="mizan-icon-button mizan-dashboard-notification-button" aria-label={ar ? `الإشعارات، ${unread} غير مقروء` : `Notifications, ${unread} unread`} aria-expanded={notificationsOpen} onClick={() => { setNotificationsOpen((value) => !value); setLanguageOpen(false); }}>
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg>
               {unread > 0 && <span className="mizan-dashboard-notification-count">{unread > 99 ? "99+" : unread}</span>}
