@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 import { ConversationLauncher } from "@/components/layout/conversation-launcher";
 
 type Locale = "ar" | "en";
+type Notice = { id: string; kind: string; title: string; body: string | null; href: string | null; created_at: string; read_at: string | null };
 export function SiteHeader({ locale }: { locale: Locale }) {
   const ar = locale === "ar";
   const pathname = usePathname() || `/${locale}`;
@@ -14,6 +15,10 @@ export function SiteHeader({ locale }: { locale: Locale }) {
   const [languageOpen, setLanguageOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [notices, setNotices] = useState<Notice[]>([]);
+  const [notificationsLoading, setNotificationsLoading] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
+  const unreadNotifications = notices.filter((notice) => !notice.read_at).length;
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [user, setUser] = useState<{ email?: string; name?: string } | null>(null);
   const [busy, setBusy] = useState(false);
@@ -26,11 +31,11 @@ export function SiteHeader({ locale }: { locale: Locale }) {
     let alive = true;
     const supabase = createClient();
     supabase.auth.getUser().then(({ data }) => {
-      if (alive && data.user) setUser({ email: data.user.email, name: String(data.user.user_metadata?.full_name || data.user.user_metadata?.name || "") });
+      if (alive && data.user) { setUser({ email: data.user.email, name: String(data.user.user_metadata?.full_name || data.user.user_metadata?.name || "") }); setUserId(data.user.id); }
     }).catch(() => {});
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
       if (!alive) return;
-      setUser(session?.user ? { email: session.user.email, name: String(session.user.user_metadata?.full_name || session.user.user_metadata?.name || "") } : null);
+      setUser(session?.user ? { email: session.user.email, name: String(session.user.user_metadata?.full_name || session.user.user_metadata?.name || "") } : null); setUserId(session?.user?.id ?? null); if (!session?.user) setNotices([]);
     });
     return () => { alive = false; listener.subscription.unsubscribe(); };
   }, []);
@@ -45,6 +50,49 @@ export function SiteHeader({ locale }: { locale: Locale }) {
     document.addEventListener("mousedown", close); document.addEventListener("keydown", key);
     return () => { document.removeEventListener("mousedown", close); document.removeEventListener("keydown", key); };
   }, []);
+  useEffect(() => {
+    if (!userId) { setNotices([]); return; }
+    let alive = true;
+    const supabase = createClient();
+    const loadNotifications = async () => {
+      setNotificationsLoading(true);
+      const { data, error } = await supabase.from("notifications")
+        .select("id,kind,title,body,href,created_at,read_at")
+        .eq("user_id", userId).order("created_at", { ascending: false }).limit(20);
+      if (alive) {
+        if (!error) setNotices((data || []) as Notice[]);
+        setNotificationsLoading(false);
+      }
+    };
+    void loadNotifications();
+    const channel = supabase.channel("mizan-header-notifications-" + userId)
+      .on("postgres_changes", { event: "*", schema: "public", table: "notifications", filter: "user_id=eq." + userId }, () => { void loadNotifications(); })
+      .subscribe();
+    return () => { alive = false; void supabase.removeChannel(channel); };
+  }, [userId]);
+
+  async function markNotificationRead(notice: Notice) {
+    if (!userId || notice.read_at) return;
+    const readAt = new Date().toISOString();
+    setNotices((current) => current.map((item) => item.id === notice.id ? { ...item, read_at: readAt } : item));
+    const { error } = await createClient().from("notifications").update({ read_at: readAt }).eq("id", notice.id).eq("user_id", userId);
+    if (error) setNotices((current) => current.map((item) => item.id === notice.id ? { ...item, read_at: null } : item));
+  }
+
+  async function markAllNotificationsRead() {
+    if (!userId || unreadNotifications === 0) return;
+    const ids = notices.filter((notice) => !notice.read_at).map((notice) => notice.id);
+    const readAt = new Date().toISOString();
+    setNotices((current) => current.map((notice) => ids.includes(notice.id) ? { ...notice, read_at: readAt } : notice));
+    const { error } = await createClient().from("notifications").update({ read_at: readAt }).eq("user_id", userId).in("id", ids);
+    if (error) setNotices((current) => current.map((notice) => ids.includes(notice.id) ? { ...notice, read_at: null } : notice));
+  }
+
+  function notificationHref(notice: Notice) {
+    const fallback = `/${locale}/dashboard/conversations`;
+    if (!notice.href || !notice.href.startsWith("/") || notice.href.startsWith("//")) return fallback;
+    return notice.href.startsWith("/ar/") || notice.href.startsWith("/en/") ? notice.href.replace(/^\/(ar|en)(?=\/|$)/, `/${locale}`) : fallback;
+  }
   const items = [
     { href: `/${locale}`, label: ar ? "الرئيسية" : "Home", active: pathname === `/${locale}` },
     { href: `/${locale}/services`, label: ar ? "الخدمات" : "Services", active: pathname.includes("/services") },
@@ -99,7 +147,19 @@ export function SiteHeader({ locale }: { locale: Locale }) {
         </div>
         {user ? <>
           <ConversationLauncher locale={locale} />
-          <div className="mizan-popover-anchor mizan-notification-anchor" ref={notificationRef}><button type="button" className="mizan-icon-button" aria-label={ar ? "الإشعارات" : "Notifications"} aria-expanded={notificationsOpen} onClick={() => { setNotificationsOpen(v => !v); setProfileOpen(false); setLanguageOpen(false); }}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg><span className="mizan-notification-dot"/></button><div className={notificationsOpen ? "mizan-dropdown mizan-notification-menu is-open" : "mizan-dropdown mizan-notification-menu"} aria-hidden={!notificationsOpen}><div className="mizan-dropdown-heading"><strong>{ar ? "الإشعارات" : "Notifications"}</strong><span>{ar ? "آخر التحديثات" : "Latest updates"}</span></div><div className="mizan-empty-notifications"><span>✦</span><strong>{ar ? "أنت على اطلاع" : "You're all caught up"}</strong><p>{ar ? "ستظهر هنا تحديثات المواعيد والرسائل الجديدة." : "Appointment updates and new messages will appear here."}</p></div><Link className="mizan-dropdown-bottom-link" href={`/${locale}/dashboard/conversations`} onClick={() => setNotificationsOpen(false)}>{ar ? "فتح المحادثات" : "Open messages"} ↗</Link></div></div>
+          <div className="mizan-popover-anchor mizan-notification-anchor" ref={notificationRef}>
+            <button type="button" className="mizan-icon-button" aria-label={ar ? `الإشعارات، ${unreadNotifications} غير مقروء` : `Notifications, ${unreadNotifications} unread`} aria-expanded={notificationsOpen} onClick={() => { setNotificationsOpen(v => !v); setProfileOpen(false); setLanguageOpen(false); }}>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg>
+              {unreadNotifications > 0 && <span className="mizan-header-unread-count">{unreadNotifications > 99 ? "99+" : unreadNotifications}</span>}
+            </button>
+            <div className={notificationsOpen ? "mizan-dropdown mizan-notification-menu is-open" : "mizan-dropdown mizan-notification-menu"} aria-hidden={!notificationsOpen}>
+              <div className="mizan-dropdown-heading"><strong>{ar ? "الإشعارات" : "Notifications"}</strong><span>{unreadNotifications ? (ar ? `${unreadNotifications} غير مقروء` : `${unreadNotifications} unread`) : (ar ? "آخر التحديثات" : "Latest updates")}</span></div>
+              <div className="mizan-header-notice-list">
+                {notificationsLoading ? <p className="mizan-header-notice-empty">{ar ? "جارٍ تحميل الإشعارات..." : "Loading notifications..."}</p> : notices.length === 0 ? <div className="mizan-header-notice-empty"><span>✦</span><strong>{ar ? "لا توجد إشعارات جديدة" : "You're all caught up"}</strong><p>{ar ? "ستظهر هنا الرسائل وتحديثات المكتب والمواعيد." : "Messages, office updates and appointment alerts will appear here."}</p></div> : notices.map((notice) => <Link key={notice.id} href={notificationHref(notice)} onClick={() => { setNotificationsOpen(false); void markNotificationRead(notice); }} className={notice.read_at ? "mizan-header-notice-item" : "mizan-header-notice-item is-unread"}><span className="mizan-header-notice-indicator"/><span className="mizan-header-notice-copy"><strong>{notice.title}</strong>{notice.body && <small>{notice.body}</small>}<time dateTime={notice.created_at}>{new Date(notice.created_at).toLocaleString(ar ? "ar-EG" : "en-US", { dateStyle: "medium", timeStyle: "short", timeZone: "Africa/Cairo" })}</time></span></Link>)}
+              </div>
+              <div className="mizan-header-notification-footer">{unreadNotifications > 0 && <button type="button" onClick={() => void markAllNotificationsRead()}>{ar ? "تحديد الكل كمقروء" : "Mark all as read"}</button>}<Link href={`/${locale}/dashboard/conversations`} onClick={() => setNotificationsOpen(false)}>{ar ? "عرض الرسائل" : "View messages"} ↗</Link></div>
+            </div>
+          </div>
           <div className="mizan-popover-anchor" ref={profileRef}><button type="button" className="mizan-profile-trigger" aria-expanded={profileOpen} onClick={() => { setProfileOpen(v => !v); setNotificationsOpen(false); setLanguageOpen(false); }}><span className="mizan-avatar" aria-hidden="true">{(firstName || user.email || "M").slice(0,1).toLocaleUpperCase()}</span><span className="mizan-profile-copy"><strong>{firstName || (ar ? "حسابي" : "Account")}</strong></span><svg className={profileOpen ? "mizan-chevron-icon is-open" : "mizan-chevron-icon"} viewBox="0 0 20 20" aria-hidden="true"><path d="m5 7 5 5 5-5"/></svg></button><div className={profileOpen ? "mizan-dropdown mizan-profile-menu is-open" : "mizan-dropdown mizan-profile-menu"} aria-hidden={!profileOpen}><div className="mizan-profile-menu-user"><span className="mizan-avatar">{(user.name || user.email || "M").slice(0,1).toLocaleUpperCase()}</span><span><strong>{user.name || (ar ? "حسابي" : "My account")}</strong><small>{user.email}</small></span></div><Link href={`/${locale}/dashboard`} onClick={() => setProfileOpen(false)}><span>▦</span>{ar ? "لوحة التحكم" : "Dashboard"}<b>↗</b></Link><Link href={`/${locale}/dashboard/conversations`} onClick={() => setProfileOpen(false)}><span>◌</span>{ar ? "المحادثات" : "Messages"}<b>↗</b></Link><Link href={`/${locale}/dashboard/appointments`} onClick={() => setProfileOpen(false)}><span>▣</span>{ar ? "المواعيد" : "Appointments"}<b>↗</b></Link><div className="mizan-profile-divider"/><button type="button" disabled={busy} onClick={signOut}><span>↪</span>{busy ? (ar ? "جارٍ الخروج..." : "Signing out...") : (ar ? "تسجيل الخروج" : "Sign out")}</button></div></div>
         </> : <Link className="mizan-login" href={`/${locale}/login`}>{ar ? "تسجيل الدخول" : "Sign in"}</Link>}
       </div>
