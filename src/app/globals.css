@@ -3040,3 +3040,46 @@ pre,code{max-width:100%;overflow-wrap:anywhere}
     gap: .15rem;
   }
 }
+
+
+/* Bulk conversation removal in the floating chat drawer. */
+.mizan-chat-removal-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .65rem;
+  margin: .65rem 0 .25rem;
+  padding: .7rem .75rem;
+  border: 1px solid rgba(23,107,103,.18);
+  border-radius: 12px;
+  background: #f0f7f4;
+  color: #315d54;
+  font-size: .72rem;
+  line-height: 1.6;
+}
+.mizan-chat-removal-toolbar > span { min-width: 0; }
+.mizan-chat-removal-toolbar > button {
+  flex: 0 0 auto;
+  border: 0;
+  border-radius: 9px;
+  background: #b42318;
+  padding: .55rem .7rem;
+  color: #fff;
+  font-size: .72rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+.mizan-chat-removal-toolbar > button:disabled { opacity: .6; cursor: wait; }
+.mizan-chat-remove-checkbox {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+  align-self: center;
+  margin-inline-end: .45rem;
+  accent-color: #176b67;
+  cursor: pointer;
+}
+.mizan-chat-thread-wrap:has(.mizan-chat-remove-checkbox) { align-items: center; }
+.mizan-chat-thread-wrap:has(.mizan-chat-remove-checkbox) .mizan-chat-thread { flex: 1 1 auto; }
+.mizan-chat-remove-modal .mizan-chat-new-modal-actions { margin-top: 1.25rem; }
+.mizan-chat-remove-modal .mizan-chat-new-modal-actions button:disabled { opacity: .6; cursor: wait; }
