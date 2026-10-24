@@ -99,7 +99,7 @@ export function ConversationLauncher({ locale }: { locale: Locale }) {
     const ids = Array.from(new Set(rows.flatMap((thread) => [thread.client_id, thread.staff_id])));
     if (ids.length) {
       const { data: profiles } = await supabase.from("profiles").select("id,full_name").in("id", ids);
-      setPeople(Object.fromEntries(((profiles || []) as Person[]).map((person) => [person.id, person.full_name || (ar ? "مستخدم" : "User")])));
+      setPeople(Object.fromEntries(((profiles || []) as Person[]).map((person) => [person.id, person.full_name || ""])));
     }
     const { count } = await supabase.from("notifications").select("id", { count: "exact", head: true }).eq("user_id", uid).eq("kind", "new_message").is("read_at", null);
     setUnread(count || 0);
