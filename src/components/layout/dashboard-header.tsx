@@ -52,6 +52,28 @@ export function DashboardHeader({ locale }: { locale: Locale }) {
   }, [pathname]);
 
   useEffect(() => {
+    if (!userId) return;
+    const supabase = createClient();
+    const channel = supabase
+      .channel(`dashboard-notifications-${userId}`)
+      .on("postgres_changes", {
+        event: "*",
+        schema: "public",
+        table: "notifications",
+        filter: `user_id=eq.${userId}`,
+      }, async () => {
+        const { data, error } = await supabase
+          .from("notifications")
+          .select("id,kind,title,body,href,created_at,read_at")
+          .eq("user_id", userId)
+          .order("created_at", { ascending: false });
+        if (!error) setNotices((data || []) as Notice[]);
+      })
+      .subscribe();
+    return () => { void supabase.removeChannel(channel); };
+  }, [userId]);
+
+  useEffect(() => {
     const close = (event: MouseEvent) => {
       const target = event.target as Node;
       if (!languageRef.current?.contains(target)) setLanguageOpen(false);
