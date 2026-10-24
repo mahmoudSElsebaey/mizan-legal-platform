@@ -1890,3 +1890,56 @@ img, svg, video { max-width: 100%; }
  .mizan-chat-composer{padding:.55rem!important;gap:.35rem!important}
  .mizan-chat-composer .mizan-chat-attach-button,.mizan-chat-composer>button[type=submit]{width:38px!important;height:40px!important}
 }
+
+
+/* Responsive overflow guard: prevent any page section from widening small viewports */
+html,body{width:100%;max-width:100%;overflow-x:clip}
+body{min-width:0}
+*,*::before,*::after{box-sizing:border-box}
+img,video,canvas,svg{max-width:100%}
+main,section,article,header,footer,nav,aside{min-width:0}
+pre,code{max-width:100%;overflow-wrap:anywhere}
+@supports not (overflow:clip){html,body{overflow-x:hidden}}
+
+/* Desktop messenger: floating panel anchored to the bottom-right */
+@media(min-width:681px){
+ .mizan-chat-backdrop{align-items:flex-end!important;justify-content:flex-end!important;inset:0!important;overflow:hidden!important}
+ .mizan-chat-drawer{width:min(60vw,1100px)!important;max-width:calc(100vw - 2rem)!important;min-width:min(620px,calc(100vw - 2rem))!important;height:75dvh!important;max-height:820px!important;min-height:420px!important;margin-inline-end:1.25rem!important;border:1px solid rgba(212,175,124,.38)!important;border-bottom:0!important;border-radius:24px 24px 0 0!important;grid-template-columns:minmax(235px,34%) minmax(0,1fr)!important}
+ .mizan-chat-drawer.is-expanded{width:calc(100vw - 2.5rem)!important;height:calc(100dvh - 1.25rem)!important;max-height:none!important;min-height:0!important;margin-inline-end:1.25rem!important;border-radius:24px 24px 0 0!important}
+ .mizan-chat-drawer-controls{top:.7rem!important;inset-inline-end:.7rem!important}
+ .mizan-chat-sidebar,.mizan-chat-main{min-width:0!important}
+ .mizan-chat-main{display:flex;flex-direction:column}
+ .mizan-chat-messages{min-width:0;overflow-x:hidden}
+ .mizan-chat-message-row{min-width:0}
+ .mizan-chat-bubble{min-width:0;overflow-wrap:anywhere}
+}
+
+/* Small screens: true full-screen chat with a clear back-to-list control */
+@media(max-width:680px){
+ .mizan-chat-backdrop{align-items:stretch!important;justify-content:stretch!important;inset:0!important;width:100%;height:100dvh;overflow:hidden!important}
+ .mizan-chat-drawer,.mizan-chat-drawer.is-expanded{position:relative!important;display:grid!important;grid-template-columns:minmax(0,1fr)!important;width:100%!important;min-width:0!important;max-width:100%!important;height:100dvh!important;min-height:0!important;max-height:100dvh!important;margin:0!important;border:0!important;border-radius:0!important;overflow:hidden!important}
+ .mizan-chat-drawer-controls{top:max(.65rem,env(safe-area-inset-top))!important;inset-inline-end:.65rem!important}
+ .mizan-chat-sidebar,.mizan-chat-main{width:100%;min-width:0!important;height:100%;max-height:100%;min-height:0!important}
+ .mizan-chat-sidebar{padding-top:env(safe-area-inset-top)}
+ .mizan-chat-drawer.has-selected-thread .mizan-chat-sidebar{display:none!important}
+ .mizan-chat-drawer:not(.has-selected-thread) .mizan-chat-main{display:none!important}
+ .mizan-chat-drawer.has-selected-thread .mizan-chat-main{display:flex!important;flex-direction:column!important;grid-column:1;grid-row:1}
+ .mizan-chat-drawer:not(.has-selected-thread) .mizan-chat-sidebar{display:flex!important;grid-column:1;grid-row:1}
+ .mizan-chat-conversation-head{flex:0 0 auto;min-width:0;padding-inline:3.25rem 1rem!important}
+ .mizan-chat-conversation-identity{min-width:0;overflow:hidden}
+ .mizan-chat-conversation-identity strong,.mizan-chat-conversation-identity p,.mizan-chat-conversation-identity small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+ .mizan-chat-mobile-close{display:grid!important;position:absolute;inset-inline-start:.7rem;top:.7rem;z-index:3;width:38px;height:38px;place-items:center;border:1px solid #dce7dc;border-radius:12px;background:#f5f8f2;color:#245449}
+ .mizan-chat-mobile-close svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+ .mizan-chat-messages{flex:1 1 0!important;width:100%;min-width:0;min-height:0;overflow-y:auto!important;overflow-x:hidden!important;padding:1rem .7rem!important;padding-bottom:.8rem!important}
+ .mizan-chat-message-row{max-width:100%!important;width:auto;min-width:0}
+ .mizan-chat-bubble{max-width:calc(100vw - 6rem)!important;min-width:0;overflow-wrap:anywhere}
+ .mizan-chat-composer{flex:0 0 auto;min-width:0;gap:.4rem!important;padding:.6rem!important;padding-bottom:max(.6rem,env(safe-area-inset-bottom))!important}
+ .mizan-chat-composer textarea{width:0;min-width:0;max-width:100%;resize:none}
+ .mizan-chat-composer .mizan-chat-attach-button,.mizan-chat-composer>button[type=submit]{flex:0 0 38px;width:38px!important;min-width:38px;height:40px!important}
+ .mizan-chat-error{flex:0 0 auto;margin:.35rem .6rem max(.35rem,env(safe-area-inset-bottom));max-width:calc(100% - 1.2rem);overflow-wrap:anywhere}
+ .mizan-chat-thread-list{min-width:0;overflow-x:hidden}
+ .mizan-chat-thread{min-width:0}
+ .mizan-chat-thread-copy{min-width:0;overflow:hidden}
+ .mizan-chat-thread-copy strong,.mizan-chat-thread-copy small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+ .mizan-chat-pending-files{min-width:0;max-width:100%;overflow-wrap:anywhere}
+}
