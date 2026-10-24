@@ -4,6 +4,8 @@ alter table public.conversations
   add column if not exists conversation_type text not null default 'client'
   check (conversation_type in ('client','staff'));
 
+grant insert (conversation_type) on public.conversations to authenticated;
+
 create index if not exists conversations_type_last_message_idx
   on public.conversations(conversation_type,last_message_at desc);
 
