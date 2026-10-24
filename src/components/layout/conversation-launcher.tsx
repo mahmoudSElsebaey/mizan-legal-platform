@@ -10,6 +10,18 @@ type Attachment = { path: string; name: string; mime_type: string; size: number 
 type Message = { id: string; conversation_id: string; sender_id: string; body: string; created_at: string; attachments: Attachment[]; edited_at: string | null; deleted_at: string | null };
 type Person = { id: string; full_name: string | null };
 
+function describeError(value: unknown): string {
+  if (value instanceof Error && value.message) return value.message;
+  if (value && typeof value === "object") {
+    const item = value as Record<string, unknown>;
+    const parts = [item.message, item.details, item.hint, item.code ? `code: ${item.code}` : null]
+      .filter((part): part is string => typeof part === "string" && part.trim().length > 0);
+    if (parts.length) return parts.join(" · ");
+    try { return JSON.stringify(value); } catch { return "Unknown error"; }
+  }
+  return typeof value === "string" ? value : "Unknown error";
+}
+
 function playIncomingTone() {
   try {
     const AudioContextClass = window.AudioContext || (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
@@ -103,6 +115,15 @@ export function ConversationLauncher({ locale }: { locale: Locale }) {
       .eq("user_id", uid).eq("conversation_id", threadId).is("read_at", null).eq("kind", "new_message");
     void loadThreads(uid);
   }, [labels.failed, loadThreads, soundOn]);
+
+  useEffect(() => {
+    const openFromFloatingAction = () => {
+      setOpen(true);
+      if (userId) void loadThreads(userId);
+    };
+    window.addEventListener("mizan:open-conversations", openFromFloatingAction);
+    return () => window.removeEventListener("mizan:open-conversations", openFromFloatingAction);
+  }, [userId, loadThreads]);
 
   useEffect(() => {
     let alive = true;
@@ -199,7 +220,7 @@ export function ConversationLauncher({ locale }: { locale: Locale }) {
       setDraft(""); setPendingFiles([]); if (fileInputRef.current) fileInputRef.current.value = ""; void loadThreads(userId);
     } catch (caught) {
       if (uploaded.length) void supabase.storage.from("conversation-attachments").remove(uploaded.map((file) => file.path));
-      const detail = caught instanceof Error ? caught.message : String(caught);
+      const detail = describeError(caught);
       setError((pendingFiles.length ? labels.uploadFailed : labels.failed) + (detail ? " " + detail : ""));
     } finally { setBusy(false); }
   }
