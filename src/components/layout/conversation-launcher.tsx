@@ -313,7 +313,7 @@ export function ConversationLauncher({ locale }: { locale: Locale }) {
     setNewRecipient("");
     setBusy(false);
   }
-(event: React.FormEvent<HTMLFormElement>) {
+async function sendMessage(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const body = draft.trim();
     if ((!body && pendingFiles.length === 0) || !selected || !userId || busy) return;
