@@ -61,6 +61,7 @@ export function ConversationLauncher({ locale }: { locale: Locale }) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [unread, setUnread] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
+  const [searchVisible, setSearchVisible] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [soundOn, setSoundOn] = useState(true);
@@ -72,14 +73,14 @@ export function ConversationLauncher({ locale }: { locale: Locale }) {
   const seen = useRef(new Set<string>());
   const bottomRef = useRef<HTMLDivElement>(null);
   const labels = useMemo(() => ar ? {
-    title: "المحادثات", subtitle: "تواصل مباشر وآمن مع فريق المكتب", search: "ابحث في المحادثات",
+    title: "الرسائل", subtitle: "", search: "ابحث في المحادثات",
     empty: "لا توجد محادثات حتى الآن", choose: "اختر محادثة لعرض الرسائل",
     placeholder: "اكتب رسالتك...", send: "إرسال", loading: "جارٍ تحميل المحادثات...",
     online: "مراسلة آمنة", sound: "صوت الإشعار", openFull: "فتح صفحة المحادثات",
     closed: "مغلقة", newConversation: "بدء محادثة جديدة", noMessages: "ابدأ المحادثة برسالتك الأولى", failed: "تعذر تحميل البيانات أو إرسال الرسالة.",
     you: "أنت", today: "اليوم", newModalTitle: "ابدأ محادثة جديدة", topic: "موضوع المحادثة", interlocutor: "اختر المحاور", start: "إنشاء المحادثة", noContacts: "لا يوجد محامون أو مساعدين نشطون متاحون حاليًا.", subjectPlaceholder: "مثال: استفسار عن قضية أو موعد", copy: "نسخ", edit: "تعديل", remove: "حذف", save: "حفظ", cancel: "إلغاء", edited: "تم التعديل", deleted: "تم حذف هذه الرسالة", attach: "إرفاق ملفات أو صور", filesLimit: "يمكن إرفاق 5 ملفات كحد أقصى، بحد 10 ميجابايت لكل ملف.", uploadFailed: "تعذر رفع الملف. حاول مرة أخرى.", editFailed: "تعذر تعديل الرسالة.", deleteFailed: "تعذر حذف الرسالة.", copied: "تم نسخ الرسالة", removeConfirm: "هل تريد حذف هذه الرسالة؟",
   } : {
-    title: "Messages", subtitle: "A private, direct line to your legal team", search: "Search conversations",
+    title: "Messages", subtitle: "", search: "Search conversations",
     empty: "No conversations yet", choose: "Choose a conversation to view messages",
     placeholder: "Write a message...", send: "Send", loading: "Loading conversations...",
     online: "Secure messaging", sound: "Notification sound", openFull: "Open conversations page",
@@ -307,7 +308,7 @@ export function ConversationLauncher({ locale }: { locale: Locale }) {
     return !query || `${people[participant] || ""} ${thread.subject}`.toLocaleLowerCase(ar ? "ar-EG" : "en-US").includes(query);
   });
   const otherId = active ? (active.client_id === userId ? active.staff_id : active.client_id) : "";
-  const otherName = people[otherId] || (ar ? "المحامي / العميل" : "Lawyer / Client");
+  const otherName = people[otherId] || (ar ? "اسم غير متاح" : "Name unavailable");
   const formatTime = (value: string) => new Intl.DateTimeFormat(ar ? "ar-EG" : "en-GB", { dateStyle: "medium", timeStyle: "short", timeZone: "Africa/Cairo" }).format(new Date(value));
   const initials = (name: string) => (name.trim().charAt(0) || "?").toLocaleUpperCase(ar ? "ar-EG" : "en-US");
 
@@ -320,23 +321,23 @@ export function ConversationLauncher({ locale }: { locale: Locale }) {
       <section className={"mizan-chat-drawer" + (expanded ? " is-expanded" : "") + (selected ? " has-selected-thread" : "")} dir={ar ? "rtl" : "ltr"} role="dialog" aria-modal="true" aria-label={labels.title} onMouseDown={(event) => event.stopPropagation()}>
         <div className="mizan-chat-drawer-controls"><button type="button" className="mizan-chat-window-control" onClick={() => setExpanded((value) => !value)} aria-label={expanded ? (ar ? "استعادة حجم النافذة" : "Restore panel size") : (ar ? "ملء الشاشة" : "Expand to full screen")} title={expanded ? (ar ? "استعادة الحجم" : "Restore size") : (ar ? "ملء الشاشة" : "Full screen")}>{expanded ? <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3v5H3M16 3v5h5M3 16h5v5M21 16h-5v5"/></svg> : <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H3v5M16 3h5v5M3 16v5h5M21 16v5h-5"/></svg>}</button><button type="button" className="mizan-chat-window-control" onClick={() => { setOpen(false); setExpanded(false); }} aria-label={ar ? "إغلاق نافذة المحادثات" : "Close conversations"} title={ar ? "إغلاق" : "Close"}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>
         <aside className="mizan-chat-sidebar">
-          <div className="mizan-chat-sidebar-head"><div><span className="mizan-chat-eyebrow">MIZAN · PRIVATE</span><h2>{labels.title}</h2><p>{labels.subtitle}</p></div><button type="button" className="mizan-chat-close" aria-label={ar ? "إغلاق" : "Close"} onClick={() => { setOpen(false); setExpanded(false); }}>×</button></div>
+          <div className="mizan-chat-sidebar-head"><div><h2>{labels.title}</h2></div><button type="button" className="mizan-chat-close mizan-chat-sidebar-close" aria-label={ar ? "إغلاق" : "Close"} onClick={() => { setOpen(false); setExpanded(false); }}>×</button></div>
           <div className="mizan-chat-sidebar-tools">
-            <button type="button" className={"mizan-chat-tool-icon" + (soundOn ? " is-enabled" : "")} aria-label={labels.sound} title={labels.sound} onClick={() => setSoundOn((value) => !value)}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4h4l5 4V6l-5 4H4Z"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a7.5 7.5 0 0 1 0 11"/></svg><span className="sr-only">{labels.sound}</span></button>
-            <button type="button" className="mizan-chat-tool-icon" aria-label={labels.search} title={labels.search} onClick={() => document.getElementById("mizan-chat-search")?.focus()}><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 4.5 4.5"/></svg><span className="sr-only">{labels.search}</span></button>
+            <button type="button" className={"mizan-chat-tool-icon" + (soundOn ? " is-enabled" : "")} aria-label={labels.sound} title={labels.sound} onClick={() => setSoundOn((value) => { const next = !value; if (next) playIncomingTone(); return next; })}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4h4l5 4V6l-5 4H4Z"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a7.5 7.5 0 0 1 0 11"/></svg><span className="sr-only">{labels.sound}</span></button>
+            <button type="button" className="mizan-chat-tool-icon" aria-label={labels.search} title={labels.search} onClick={() => { setSearchVisible((value) => !value); if (!searchVisible) window.setTimeout(() => document.getElementById("mizan-chat-search")?.focus(), 0); }}><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 4.5 4.5"/></svg><span className="sr-only">{labels.search}</span></button>
             <button type="button" className="mizan-chat-tool-icon is-primary" aria-label={labels.newConversation} title={labels.newConversation} onClick={() => void openNewConversation()}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span className="sr-only">{labels.newConversation}</span></button>
           </div>
-          <label className="mizan-chat-search-label"><span className="sr-only">{labels.search}</span><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 4.5 4.5"/></svg><input id="mizan-chat-search" value={searchQuery} onChange={(event) => setSearchQuery(event.target.value)} placeholder={labels.search} /></label><div className="mizan-chat-thread-list">{filteredThreads.length === 0 ? <p className="mizan-chat-empty">{threads.length === 0 ? labels.empty : (ar ? "لا توجد نتائج مطابقة" : "No matching conversations")}</p> : filteredThreads.map((thread) => {
+          {searchVisible && <label className="mizan-chat-search-label"><span className="sr-only">{labels.search}</span><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 4.5 4.5"/></svg><input id="mizan-chat-search" value={searchQuery} onChange={(event) => setSearchQuery(event.target.value)} placeholder={labels.search} /></label>}<div className="mizan-chat-thread-list">{filteredThreads.length === 0 ? <p className="mizan-chat-empty">{threads.length === 0 ? labels.empty : (ar ? "لا توجد نتائج مطابقة" : "No matching conversations")}</p> : filteredThreads.map((thread) => {
             const participant = thread.client_id === userId ? thread.staff_id : thread.client_id;
             return <button type="button" key={thread.id} onClick={() => setSelected(thread.id)} className={"mizan-chat-thread" + (selected === thread.id ? " is-active" : "")}>
-              <span className="mizan-chat-avatar">{initials(people[participant] || (ar ? "م" : "M"))}</span><span className="mizan-chat-thread-copy"><strong>{people[participant] || (ar ? "مستخدم" : "User")}</strong><small>{thread.subject}</small><time>{formatTime(thread.last_message_at)}</time></span><span className={"mizan-chat-status-dot" + (thread.status === "open" ? " is-open" : "")}/>
+              <span className="mizan-chat-avatar">{initials(people[participant] || (ar ? "م" : "M"))}</span><span className="mizan-chat-thread-copy"><strong>{people[participant] || (ar ? "اسم غير متاح" : "Name unavailable")}</strong><small>{thread.subject}</small><time>{formatTime(thread.last_message_at)}</time></span><span className={"mizan-chat-status-dot" + (thread.status === "open" ? " is-open" : "")}/>
             </button>;
           })}</div>
           <a className="mizan-chat-full-link" href={"/" + locale + "/dashboard/conversations"}>{labels.openFull} ↗</a>
         </aside>
         <div className="mizan-chat-main">
           {active ? <>
-            <header className="mizan-chat-conversation-head"><span className="mizan-chat-avatar is-large">{initials(otherName)}</span><div className="mizan-chat-conversation-identity"><strong>{otherName}</strong><p><span className={"mizan-chat-status-dot" + (active.status === "open" ? " is-open" : "")}/>{active.status === "open" ? labels.online : labels.closed}</p><small>{active.subject}</small></div><button type="button" className="mizan-chat-close mizan-chat-mobile-close" onClick={() => { setSelected(""); setEditingId(""); setEditDraft(""); setError(""); }} aria-label={ar ? "العودة إلى قائمة المحادثات" : "Back to conversation list"} title={ar ? "قائمة المحادثات" : "Conversation list"}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 5-7 7 7 7M7 12h14"/></svg></button></header>
+            <header className="mizan-chat-conversation-head"><span className="mizan-chat-avatar is-large">{initials(otherName)}</span><div className="mizan-chat-conversation-identity"><strong>{otherName}</strong><small>{active.subject}</small></div><button type="button" className="mizan-chat-close mizan-chat-mobile-close" onClick={() => { setSelected(""); setEditingId(""); setEditDraft(""); setError(""); }} aria-label={ar ? "العودة إلى قائمة المحادثات" : "Back to conversation list"} title={ar ? "قائمة المحادثات" : "Conversation list"}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 5-7 7 7 7M7 12h14"/></svg></button></header>
             <div className="mizan-chat-messages">{messages.length === 0 ? <p className="mizan-chat-empty">{labels.noMessages}</p> : messages.map((message) => {
               const own = message.sender_id === userId;
               const senderName = own ? (people[userId] || labels.you) : otherName;
