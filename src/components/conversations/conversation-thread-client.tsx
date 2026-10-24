@@ -133,9 +133,10 @@ export function ConversationThreadClient({
       setDraft("");
       setFiles([]);
       if (fileRef.current) fileRef.current.value = "";
-    } catch {
+    } catch (caught) {
       if (uploaded.length) void supabase.storage.from("conversation-attachments").remove(uploaded.map((item) => item.path));
-      setError(t.uploadFailed);
+      const detail = caught instanceof Error ? caught.message : String(caught);
+      setError(t.uploadFailed + (detail ? " " + detail : ""));
     } finally {
       setBusy(false);
     }
