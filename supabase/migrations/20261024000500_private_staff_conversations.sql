@@ -65,11 +65,11 @@ begin
     end if;
     select sm.role, sm.status into client_role, client_status
       from public.staff_members sm where sm.profile_id = new.client_id;
-    select sm.role, sm.status into staff_role_value, staff_status
+    select sm.role, sm.status into staff_role_value, staff_status_value
       from public.staff_members sm where sm.profile_id = new.staff_id;
     if new.client_id = new.staff_id
       or client_status is distinct from 'active'
-      or staff_status is distinct from 'active'
+      or staff_status_value is distinct from 'active'
       or client_role is null
       or staff_role_value is null then
       raise exception 'Staff conversations require two different active staff members';
