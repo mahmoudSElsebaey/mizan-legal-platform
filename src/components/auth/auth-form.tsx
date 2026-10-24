@@ -142,25 +142,26 @@ export function AuthForm({ locale, mode, demoAccounts = [] }: { locale: Locale; 
       </form>
 
       {mode === "login" && demoAccounts.length > 0 && (
-        <div className="mt-6 rounded-2xl border border-[var(--border)] bg-[var(--surface-muted)] p-4">
-          <div className="mb-3">
-            <h2 className="font-semibold text-[var(--forest)]">{locale === "ar" ? "حسابات التجربة" : "Demo accounts"}</h2>
-            <p className="mt-1 text-xs leading-5 text-[var(--slate)]">{locale === "ar" ? "حسابات تجريبية لعرض وظائف المنصة فقط. اضغط على الحساب لملء بيانات الدخول." : "Demo accounts for portfolio testing only. Select an account to fill in its credentials."}</p>
-          </div>
-          <div className="grid gap-2 sm:grid-cols-2">
+        <details className="mt-6 rounded-2xl border border-[var(--border)] bg-[var(--surface-muted)] p-4">
+          <summary className="flex cursor-pointer list-none items-center justify-between gap-3 font-semibold text-[var(--forest)]">
+            <span>{locale === "ar" ? "حسابات التجربة" : "Demo accounts"}</span>
+            <span aria-hidden="true" className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-[var(--border)] bg-white">⌄</span>
+          </summary>
+          <p className="mb-3 mt-2 text-xs leading-5 text-[var(--slate)]">{locale === "ar" ? "افتح القائمة عند الحاجة. اضغط على أي حساب لملء بيانات الدخول تلقائيًا." : "Expand this section when needed. Select an account to fill in its credentials."}</p>
+          <div className="flex flex-col gap-2">
             {demoAccounts.map((account) => (
               <button
                 key={account.email}
                 type="button"
                 onClick={() => { setEmailValue(account.email); setPasswordValue(account.password); setError(""); setMessage(""); }}
-                className="rounded-xl border border-[var(--border)] bg-white px-3 py-3 text-start text-sm transition hover:border-[var(--teal)] hover:bg-emerald-50"
+                className="w-full rounded-xl border border-[var(--border)] bg-white px-3 py-3 text-start text-sm transition hover:border-[var(--teal)] hover:bg-emerald-50"
               >
                 <span className="block font-semibold text-[var(--forest)]">{account.label}</span>
                 <span className="mt-1 block break-all text-xs text-[var(--slate)]">{account.email}</span>
               </button>
             ))}
           </div>
-        </div>
+        </details>
       )}
 
       <div className="mt-6 flex flex-wrap items-center justify-between gap-3 text-sm text-[var(--slate)]">
