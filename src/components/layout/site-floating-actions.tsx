@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -47,9 +46,9 @@ export function SiteFloatingActions({ locale }: { locale: "ar" | "en" }) {
     <button type="button" className={"mizan-back-to-top" + (scrolled ? " is-visible" : "")} aria-label={ar ? "العودة إلى أعلى الصفحة" : "Back to top"} title={ar ? "إلى أعلى الصفحة" : "Back to top"} onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 14 6-6 6 6"/><path d="M12 8v12"/></svg>
     </button>
-    <Link href={"/" + locale + "/dashboard/conversations"} className="mizan-floating-messages" aria-label={ar ? "فتح الرسائل" : "Open messages"} title={ar ? "الرسائل" : "Messages"}>
+    <button type="button" className="mizan-floating-messages" aria-label={ar ? "فتح الرسائل" : "Open messages"} title={ar ? "الرسائل" : "Messages"} onClick={() => window.dispatchEvent(new Event("mizan:open-conversations"))}>
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11.5a7.5 7.5 0 0 1-7.5 7.5H5l-1-4a7.5 7.5 0 1 1 16-3.5Z"/><path d="M8 11h8M8 14h5"/></svg>
       {unread > 0 && <span>{unread > 99 ? "99+" : unread}</span>}
-    </Link>
+    </button>
   </div>;
 }
