@@ -71,7 +71,6 @@ export function ConversationLauncher({ locale }: { locale: Locale }) {
   const [newModalOpen, setNewModalOpen] = useState(false);
   const [newSubject, setNewSubject] = useState("");
   const [newRecipient, setNewRecipient] = useState("");
-  const [newConversationType, setNewConversationType] = useState<"client" | "staff">("client");
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [contactsLoading, setContactsLoading] = useState(false);
   const seen = useRef(new Set<string>());
@@ -241,7 +240,6 @@ export function ConversationLauncher({ locale }: { locale: Locale }) {
     if (contactsError) setError(labels.failed);
     else {
       const available = (data || []) as Contact[];
-      setNewConversationType(currentStaffRole ? "staff" : "client");
       setContacts(available);
       if (available[0]) setNewRecipient(available[0].profile_id);
     }
