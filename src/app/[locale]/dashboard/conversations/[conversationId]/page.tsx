@@ -22,7 +22,7 @@ export default async function ConversationDetailPage({
   if (authError || !user) redirect("/" + locale + "/login");
 
   const [{ data: conversation, error: conversationError }, { data: messages, error: messagesError }, { data: hiddenEntry }] = await Promise.all([
-    supabase.from("conversations").select("id,client_id,staff_id,subject,status,created_at,last_message_at").eq("id", conversationId).maybeSingle(),
+    supabase.from("conversations").select("id,client_id,staff_id,subject,status,conversation_type,created_at,last_message_at").eq("id", conversationId).maybeSingle(),
     supabase.from("conversation_messages").select("id,conversation_id,sender_id,body,created_at,attachments,edited_at,deleted_at").eq("conversation_id", conversationId).order("created_at", { ascending: true }).limit(300),
     supabase.from("conversation_hidden_for_user").select("conversation_id").eq("conversation_id", conversationId).eq("user_id", user.id).maybeSingle(),
   ]);
@@ -34,10 +34,13 @@ export default async function ConversationDetailPage({
   const otherName = participantNames[otherParticipantId] || (ar ? "فريق المكتب" : "Office team");
   const { data: staff } = await supabase.from("staff_members").select("role,status").eq("profile_id", user.id).maybeSingle();
   const isActiveStaff = staff?.status === "active" && ["owner","admin","lawyer","assistant"].includes(staff.role);
-  const isClient = conversation.client_id === user.id;
-  const canSend = conversation.status === "open" && (isClient || isActiveStaff);
+  const isStaffConversation = conversation.conversation_type === "staff";
+  const isClient = !isStaffConversation && conversation.client_id === user.id;
+  const isParticipant = conversation.client_id === user.id || conversation.staff_id === user.id;
+  const canSend = conversation.status === "open" && (isStaffConversation ? (isParticipant && isActiveStaff) : (isClient || (conversation.staff_id === user.id && isActiveStaff)));
+  const canChangeStatus = isStaffConversation ? (isParticipant && isActiveStaff) : (isClient || (conversation.staff_id === user.id && isActiveStaff));
   const t = ar ? {
-    back:"كل المحادثات", hideConversation:"حذف المحادثة من حسابي", confirmHideConversation:"هل تريد إخفاء هذه المحادثة من حسابك؟ ستظل ظاهرة للطرف الآخر.", office:"فريق المكتب", client:"العميل", open:"مفتوحة", closed:"مغلقة",
+    back:"كل المحادثات", staffPrivate:"محادثة داخلية خاصة بين أعضاء المكتب", viewOnly:"لديك صلاحية الاطلاع على هذه المحادثة فقط، ولا يمكن إرسال رسائل إلا من طرفي المحادثة.", hideConversation:"حذف المحادثة من حسابي", confirmHideConversation:"هل تريد إخفاء هذه المحادثة من حسابك؟ ستظل ظاهرة للطرف الآخر.", office:"فريق المكتب", client:"العميل", open:"مفتوحة", closed:"مغلقة",
     title:"المحادثة", intro:"استخدم هذه المساحة للتواصل بشأن استفسارك. لا ترسل بيانات دخول أو معلومات دفع حساسة.",
     messages:"الرسائل", empty:"لا توجد رسائل بعد. اكتب رسالتك الأولى أدناه.",
     placeholder:"اكتب رسالتك هنا...", send:"إرسال الرسالة", close:"إغلاق المحادثة", reopen:"إعادة فتح المحادثة",
@@ -46,7 +49,7 @@ export default async function ConversationDetailPage({
     "status-updated":"تم تحديث حالة المحادثة.", "status-failed":"تعذر تحديث حالة المحادثة.",
     noMessages:"تعذر تحميل الرسائل. تحقق من ترحيل المرحلة السابعة."
   } : {
-    back:"All conversations", hideConversation:"Remove conversation from my account", confirmHideConversation:"Hide this conversation from your account? It will remain visible to the other participant.", office:"Office team", client:"Client", open:"Open", closed:"Closed",
+    back:"All conversations", staffPrivate:"Private internal conversation between staff members", viewOnly:"You can view this conversation, but only its two participants can send messages.", hideConversation:"Remove conversation from my account", confirmHideConversation:"Hide this conversation from your account? It will remain visible to the other participant.", office:"Office team", client:"Client", open:"Open", closed:"Closed",
     title:"Conversation", intro:"Use this space to discuss your inquiry. Do not send passwords or sensitive payment details.",
     messages:"Messages", empty:"No messages yet. Write your first message below.",
     placeholder:"Write your message here...", send:"Send message", close:"Close conversation", reopen:"Reopen conversation",
@@ -62,7 +65,7 @@ export default async function ConversationDetailPage({
       <header className="mizan-conversation-hero mt-5">
         <div className="mizan-conversation-brandline"><span className="mizan-conversation-brandmark">م</span><span><small>MIZAN LEGAL</small><strong>{ar ? "مراسلات المكتب القانونية" : "Private legal correspondence"}</strong></span><span className="mizan-conversation-lock">● {ar ? "محادثة خاصة" : "Private conversation"}</span></div>
         <div className="mizan-conversation-title-row mt-5 flex flex-wrap items-start justify-between gap-4">
-        <div><h1 className="text-3xl font-black text-[#14263d]">{conversation.subject}</h1><p className="mt-2 text-sm text-[#657184]">{t.title} · {isClient ? t.office : t.client}</p></div>
+        <div><h1 className="text-3xl font-black text-[#14263d]">{conversation.subject}</h1><p className="mt-2 text-sm text-[#657184]">{isStaffConversation ? t.staffPrivate : t.title + " · " + (isClient ? t.office : t.client)}</p></div>
         <span className={"mizan-conversation-status rounded-full px-3 py-1.5 text-xs font-bold " + (conversation.status === "open" ? "is-open" : "is-closed")}>{conversation.status === "open" ? "● " + t.open : "● " + t.closed}</span>
         </div>
         <p className="mizan-conversation-intro mt-4 max-w-3xl leading-7">{t.intro}</p>
@@ -72,8 +75,8 @@ export default async function ConversationDetailPage({
       <section className="mizan-conversation-panel mt-7 rounded-2xl p-4 sm:p-7">
         <div className="mizan-conversation-panel-heading"><span className="mizan-conversation-panel-icon">✉</span><div><h2 className="text-lg font-black">{t.messages}</h2><p>{ar ? "تواصل مباشر وآمن بينك وبين الطرف الآخر" : "A direct and secure channel between you and the other participant"}</p></div><span className="mizan-conversation-encryption">{ar ? "خاص" : "PRIVATE"}</span></div>
         <ConversationThreadClient locale={locale} conversationId={conversation.id} userId={user.id} currentUserName={currentUserName} otherName={otherName} initialMessages={(messages || []) as Array<{ id: string; conversation_id: string; sender_id: string; body: string; created_at: string; attachments: Array<{ path: string; name: string; mime_type: string; size: number }>; edited_at: string | null; deleted_at: string | null }>} canSend={canSend} />
-        {!canSend && <p className="mt-5 rounded-xl bg-slate-50 p-4 text-sm text-slate-600">{t.closedNotice}</p>}
-        {(isClient || isActiveStaff) && <form action={changeConversationStatus} className="mt-4 border-t border-[#14263d]/10 pt-4">
+        {!canSend && <p className="mt-5 rounded-xl bg-slate-50 p-4 text-sm text-slate-600">{conversation.status !== "open" ? t.closedNotice : t.viewOnly}</p>}
+        {canChangeStatus && <form action={changeConversationStatus} className="mt-4 border-t border-[#14263d]/10 pt-4">
           <input type="hidden" name="locale" value={locale}/><input type="hidden" name="conversationId" value={conversation.id}/>
           <input type="hidden" name="status" value={conversation.status === "open" ? "closed" : "open"}/>
           <button className="rounded-xl border border-[#14263d]/15 px-4 py-2.5 text-sm font-bold text-[#14263d] hover:border-[#176b67]">{conversation.status === "open" ? t.close : t.reopen}</button>
