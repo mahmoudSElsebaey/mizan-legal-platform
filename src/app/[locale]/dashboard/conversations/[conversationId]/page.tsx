@@ -21,11 +21,12 @@ export default async function ConversationDetailPage({
   const { data: { user }, error: authError } = await supabase.auth.getUser();
   if (authError || !user) redirect("/" + locale + "/login");
 
-  const [{ data: conversation, error: conversationError }, { data: messages, error: messagesError }] = await Promise.all([
+  const [{ data: conversation, error: conversationError }, { data: messages, error: messagesError }, { data: hiddenEntry }] = await Promise.all([
     supabase.from("conversations").select("id,client_id,staff_id,subject,status,created_at,last_message_at").eq("id", conversationId).maybeSingle(),
     supabase.from("conversation_messages").select("id,conversation_id,sender_id,body,created_at,attachments,edited_at,deleted_at").eq("conversation_id", conversationId).order("created_at", { ascending: true }).limit(300),
+    supabase.from("conversation_hidden_for_user").select("conversation_id").eq("conversation_id", conversationId).eq("user_id", user.id).maybeSingle(),
   ]);
-  if (conversationError || !conversation) notFound();
+  if (conversationError || !conversation || hiddenEntry) notFound();
   const otherParticipantId = conversation.client_id === user.id ? conversation.staff_id : conversation.client_id;
   const { data: participantProfiles } = await supabase.from("profiles").select("id,full_name").in("id", [user.id, otherParticipantId]);
   const participantNames = Object.fromEntries((participantProfiles || []).map((profile) => [profile.id, profile.full_name || ""]));
