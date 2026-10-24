@@ -1629,3 +1629,8 @@ img, svg, video { max-width: 100%; }
 .mizan-site-header:not(.mizan-dashboard-header) .mizan-chat-launcher{border-color:rgba(212,175,124,.65);background:rgba(212,175,124,.1);color:#f0d4a3}
 .mizan-site-header:not(.mizan-dashboard-header) .mizan-chat-launcher:hover{background:rgba(212,175,124,.2);border-color:#d4af7c}
 .mizan-site-header:not(.mizan-dashboard-header) .mizan-chat-launcher-count{border-color:#082321;background:#d4af7c;color:#082321}
+
+@media(max-width:760px){
+ .mizan-chat-backdrop{height:100dvh!important;min-height:100dvh}
+ .mizan-chat-drawer{height:100dvh!important;max-height:100dvh}
+}
