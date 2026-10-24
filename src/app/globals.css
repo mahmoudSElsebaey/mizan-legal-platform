@@ -2235,3 +2235,43 @@ pre,code{max-width:100%;overflow-wrap:anywhere}
   .mizan-chat-composer{margin-inline:.3rem!important}
   .mizan-chat-full-link{margin-inline:.9rem!important}
 }
+
+
+/* Notification dropdown: full-width unread rows and a clearly visible footer action. */
+.mizan-dashboard-notice-item,
+.mizan-dashboard-notice-item.is-unread {
+  width: 100%;
+  margin: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+.mizan-dashboard-notice-item.is-unread {
+  background: #e2f0e6 !important;
+  border-inline-start: 4px solid #167a6e;
+}
+.mizan-dashboard-notice-item.is-unread:hover {
+  background: #d6e9dd !important;
+}
+.mizan-dashboard-notification-footer {
+  gap: .45rem !important;
+  padding: .65rem .65rem 1.1rem !important;
+}
+.mizan-dashboard-notification-footer button {
+  min-height: 42px;
+  padding: .8rem .9rem !important;
+  background: #e8f3ec !important;
+  color: #105b4e !important;
+  border: 1px solid #c6e0d0 !important;
+  cursor: pointer;
+}
+.mizan-dashboard-notification-footer button:hover {
+  background: #d8ebdf !important;
+}
+.mizan-dashboard-notification-footer button:disabled {
+  opacity: .65;
+  cursor: wait;
+}
+.mizan-dashboard-notification-footer a {
+  min-height: 40px;
+  padding: .8rem .9rem !important;
+}
