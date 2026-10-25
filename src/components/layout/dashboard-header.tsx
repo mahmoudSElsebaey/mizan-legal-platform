@@ -150,17 +150,7 @@ export function DashboardHeader({ locale }: { locale: Locale }) {
           <span className="mizan-site-mark" aria-hidden="true"><svg viewBox="0 0 64 64" fill="none"><path d="M32 8v40M19 16h26M12 20l-7 16h14L12 20Zm40 0-7 16h14L52 20ZM5 36c1.2 5 13.8 5 14 0m26 0c1.2 5 13.8 5 14 0M20 48h24M24 53h16M28 58h8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/><path d="M32 5l3 3-3 3-3-3 3-3Z" fill="currentColor"/><circle cx="32" cy="48" r="2" fill="currentColor"/></svg></span><span className="mizan-site-brand-copy"><strong className={ar ? "mizan-arabic-wordmark" : ""}>{ar ? "مِـــــــــــــــيــــــــزَان" : "MIZAN"}</strong><small>{ar ? "مكتب محاماة واستشارات قانونية" : "LAW FIRM & LEGAL CONSULTANCY"}</small></span>
         </Link>
         {/* <div className="mizan-site-actions mizan-dashboard-header-actions "> */}
-        <div className="flex gap-2"> 
-          <div className="mizan-popover-anchor mizan-dashboard-language-anchor" ref={languageRef}>
-            <button type="button" className="mizan-language mizan-dashboard-language px-3!" aria-label={ar ? "تغيير اللغة" : "Change language"} aria-expanded={languageOpen} onClick={() => { setLanguageOpen((value) => !value); setNotificationsOpen(false); }}>
-              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg>
-            </button>
-            <div className={languageOpen ? "mizan-dropdown mizan-language-menu is-open" : "mizan-dropdown mizan-language-menu"} aria-hidden={!languageOpen}>
-              <Link href={switchPath("ar")} onClick={() => setLanguageOpen(false)} className={ar ? "is-selected" : ""}><span>ع</span><span>العربية<small>Arabic</small></span>{ar && <b>✓</b>}</Link>
-              <Link href={switchPath("en")} onClick={() => setLanguageOpen(false)} className={!ar ? "is-selected" : ""}><span>A</span><span>English<small>English</small></span>{!ar && <b>✓</b>}</Link>
-            </div>
-          </div>
-          <ConversationLauncher locale={locale} />
+        <div className="flex items-center gap-3 sm:gap-4"> 
           <div className="mizan-popover-anchor mizan-notification-anchor mizan-dashboard-notifications-anchor" ref={notificationRef}>
             <button type="button" className="mizan-icon-button mizan-dashboard-notification-button" aria-label={ar ? `الإشعارات، ${unread} غير مقروء` : `Notifications, ${unread} unread`} aria-expanded={notificationsOpen} onClick={() => { setNotificationsOpen((value) => !value); setLanguageOpen(false); }}>
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg>
@@ -194,6 +184,16 @@ export function DashboardHeader({ locale }: { locale: Locale }) {
                 })}
               </div>
               <div className="mizan-dashboard-notification-footer mizan-notice-panel-footer"><span>{ar ? "ميزان · مكتبك القانوني في صورة أوضح" : "MIZAN · Clarity for every legal step"}</span><Link href={`/${locale}/dashboard/conversations`} onClick={() => setNotificationsOpen(false)}>{ar ? "الانتقال إلى الرسائل" : "Go to messages"} <b aria-hidden="true">↗</b></Link></div>
+            </div>
+          </div>
+          <ConversationLauncher locale={locale} />
+          <div className="mizan-popover-anchor mizan-dashboard-language-anchor" ref={languageRef}>
+            <button type="button" className="mizan-language mizan-dashboard-language px-3!" aria-label={ar ? "تغيير اللغة" : "Change language"} aria-expanded={languageOpen} onClick={() => { setLanguageOpen((value) => !value); setNotificationsOpen(false); }}>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg>
+            </button>
+            <div className={languageOpen ? "mizan-dropdown mizan-language-menu is-open" : "mizan-dropdown mizan-language-menu"} aria-hidden={!languageOpen}>
+              <Link href={switchPath("ar")} onClick={() => setLanguageOpen(false)} className={ar ? "is-selected" : ""}><span>ع</span><span>العربية<small>Arabic</small></span>{ar && <b>✓</b>}</Link>
+              <Link href={switchPath("en")} onClick={() => setLanguageOpen(false)} className={!ar ? "is-selected" : ""}><span>A</span><span>English<small>English</small></span>{!ar && <b>✓</b>}</Link>
             </div>
           </div>
         </div>
