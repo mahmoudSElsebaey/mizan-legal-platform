@@ -43,6 +43,13 @@ function back(locale: "ar"|"en", path = ""): never {
   redirect("/" + locale + "/dashboard/conversations" + path);
 }
 
+function notificationsBack(locale: "ar"|"en", path = ""): never {
+  revalidatePath("/" + locale + "/dashboard");
+  revalidatePath("/" + locale + "/dashboard/conversations");
+  revalidatePath("/" + locale + "/dashboard/notifications");
+  redirect("/" + locale + "/dashboard/notifications" + path);
+}
+
 export async function startConversation(formData: FormData) {
   const parsed = startSchema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) throw new Error("Invalid conversation details.");
@@ -110,8 +117,8 @@ export async function markNotificationsRead(formData: FormData) {
   const { supabase, user } = await requireUser(locale.data);
   const { error } = await supabase.from("notifications").update({ read_at: new Date().toISOString() })
     .eq("user_id", user.id).is("read_at", null);
-  if (error) back(locale.data, "?result=notifications-failed");
-  back(locale.data, "?result=notifications-read");
+  if (error) notificationsBack(locale.data, "?result=notifications-failed");
+  notificationsBack(locale.data, "?result=notifications-read");
 }
 
 
@@ -134,8 +141,8 @@ export async function hideConversation(formData: FormData) {
   const { supabase, user } = await requireUser(locale);
   const { error } = await supabase.from("conversation_hidden_for_user")
     .upsert({ conversation_id: conversationId, user_id: user.id }, { onConflict: "conversation_id,user_id", ignoreDuplicates: true });
-  if (error) back(locale, "/" + conversationId + "?result=conversation-delete-failed");
-  back(locale, "?result=conversation-hidden");
+  if (error) notificationsBack(locale, "/" + conversationId + "?result=conversation-delete-failed");
+  notificationsBack(locale, "?result=conversation-hidden");
 }
 
 export async function hideConversations(formData: FormData) {
@@ -147,8 +154,8 @@ export async function hideConversations(formData: FormData) {
   const rows = [...new Set(ids.data)].map((conversation_id) => ({ conversation_id, user_id: user.id }));
   const { error } = await supabase.from("conversation_hidden_for_user")
     .upsert(rows, { onConflict: "conversation_id,user_id", ignoreDuplicates: true });
-  if (error) back(locale, "?result=conversation-delete-failed");
-  back(locale, "?result=conversation-hidden");
+  if (error) notificationsBack(locale, "?result=conversation-delete-failed");
+  notificationsBack(locale, "?result=conversation-hidden");
 }
 
 export async function deleteNotification(formData: FormData) {
@@ -157,8 +164,8 @@ export async function deleteNotification(formData: FormData) {
   const { locale, notificationId } = parsed.data;
   const { supabase, user } = await requireUser(locale);
   const { error } = await supabase.from("notifications").delete().eq("id", notificationId).eq("user_id", user.id);
-  if (error) back(locale, "?result=notification-delete-failed");
-  back(locale, "?result=notification-deleted");
+  if (error) notificationsBack(locale, "?result=notification-delete-failed");
+  notificationsBack(locale, "?result=notification-deleted");
 }
 
 export async function deleteAllNotifications(formData: FormData) {
@@ -166,6 +173,6 @@ export async function deleteAllNotifications(formData: FormData) {
   if (!parsed.success) throw new Error("Invalid locale.");
   const { supabase, user } = await requireUser(parsed.data);
   const { error } = await supabase.from("notifications").delete().eq("user_id", user.id);
-  if (error) back(parsed.data, "?result=notifications-delete-failed");
-  back(parsed.data, "?result=notifications-deleted");
+  if (error) notificationsBack(parsed.data, "?result=notifications-delete-failed");
+  notificationsBack(parsed.data, "?result=notifications-deleted");
 }
