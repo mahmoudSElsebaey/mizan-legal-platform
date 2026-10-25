@@ -3547,15 +3547,15 @@ pre,code{max-width:100%;overflow-wrap:anywhere}
   box-shadow: none !important;
 }
 .mizan-site-header.mizan-dashboard-header .mizan-chat-launcher > svg {
-  display: block;
-  width: 23px !important;
-  height: 23px !important;
-  flex: 0 0 auto;
-  fill: none !important;
-  stroke: currentColor !important;
-  stroke-width: 1.7 !important;
-  stroke-linecap: round;
-  stroke-linejoin: round;
+  display: block !important;
+  width: 23px !important !important;
+  height: 23px !important !important;
+  flex: 0 0 auto !important;
+  fill: none !important !important;
+  stroke: currentColor !important !important;
+  stroke-width: 1.7 !important !important;
+  stroke-linecap: round !important;
+  stroke-linejoin: round !important;
 }
 .mizan-site-header.mizan-dashboard-header .mizan-chat-launcher:hover,
 .mizan-site-header.mizan-dashboard-header .mizan-chat-launcher[aria-expanded="true"] {
