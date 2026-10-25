@@ -141,8 +141,8 @@ export async function hideConversation(formData: FormData) {
   const { supabase, user } = await requireUser(locale);
   const { error } = await supabase.from("conversation_hidden_for_user")
     .upsert({ conversation_id: conversationId, user_id: user.id }, { onConflict: "conversation_id,user_id", ignoreDuplicates: true });
-  if (error) notificationsBack(locale, "/" + conversationId + "?result=conversation-delete-failed");
-  notificationsBack(locale, "?result=conversation-hidden");
+  if (error) back(locale, "/" + conversationId + "?result=conversation-delete-failed");
+  back(locale, "?result=conversation-hidden");
 }
 
 export async function hideConversations(formData: FormData) {
@@ -154,8 +154,8 @@ export async function hideConversations(formData: FormData) {
   const rows = [...new Set(ids.data)].map((conversation_id) => ({ conversation_id, user_id: user.id }));
   const { error } = await supabase.from("conversation_hidden_for_user")
     .upsert(rows, { onConflict: "conversation_id,user_id", ignoreDuplicates: true });
-  if (error) notificationsBack(locale, "?result=conversation-delete-failed");
-  notificationsBack(locale, "?result=conversation-hidden");
+  if (error) back(locale, "?result=conversation-delete-failed");
+  back(locale, "?result=conversation-hidden");
 }
 
 export async function deleteNotification(formData: FormData) {
