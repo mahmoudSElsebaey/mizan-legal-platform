@@ -2,9 +2,8 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { isLocale } from "@/lib/i18n/config";
 import { createClient } from "@/lib/supabase/server";
-import { ConfirmSubmitButton } from "@/components/ui/confirm-submit-button";
 import { ConversationListClient } from "@/components/conversations/conversation-list-client";
-import { deleteAllNotifications, deleteNotification, hideConversations, markNotificationsRead, startConversation, startStaffConversation } from "./actions";
+import { hideConversations, startConversation, startStaffConversation } from "./actions";
 
 export default async function ConversationsPage({
   params,
@@ -21,10 +20,9 @@ export default async function ConversationsPage({
   const { data: { user }, error: authError } = await supabase.auth.getUser();
   if (authError || !user) redirect("/" + locale + "/login");
 
-  const [{ data: staff }, { data: conversations, error: conversationsError }, { data: notifications }, { data: contacts }, { data: hiddenConversations }, { data: staffRecipients }] = await Promise.all([
+  const [{ data: staff }, { data: conversations, error: conversationsError }, { data: contacts }, { data: hiddenConversations }, { data: staffRecipients }] = await Promise.all([
     supabase.from("staff_members").select("role,status").eq("profile_id", user.id).maybeSingle(),
     supabase.from("conversations").select("id,client_id,staff_id,subject,status,conversation_type,last_message_at,created_at").order("last_message_at", { ascending: false }).limit(100),
-    supabase.from("notifications").select("id,kind,title,body,href,created_at,read_at").order("created_at", { ascending: false }).limit(10),
     supabase.rpc("list_contactable_staff"),
     supabase.from("conversation_hidden_for_user").select("conversation_id").eq("user_id", user.id),
     supabase.rpc("list_contactable_staff_recipients"),
@@ -35,7 +33,7 @@ export default async function ConversationsPage({
   const activeStaff = staff?.status === "active";
   const isClient = !isStaff;
   const t = ar ? {
-    title: "المحادثات والإشعارات", intro: "تواصل آمن بين العميل وفريق المكتب، مع إشعارات داخل حسابك.",
+    title: "المحادثات", intro: "تواصل آمن ومنظم بين العميل وفريق المكتب، مع مساحة مستقلة لكل محادثة.",
     dashboard: "لوحة التحكم", newTitle: "ابدأ محادثة جديدة", subject: "موضوع المحادثة",
     recipient: "اختر المحامي أو المساعد", start: "بدء المحادثة", conversations: "محادثاتك",
     empty: "لا توجد محادثات حتى الآن.", office: "فريق المكتب", client: "العميل",
@@ -46,7 +44,7 @@ export default async function ConversationsPage({
     results: { "start-failed":"تعذر بدء المحادثة. تأكد من اختيار موظف نشط.", "notifications-failed":"تعذر تحديث الإشعارات.", "notifications-read":"تم تحديد الإشعارات كمقروءة.", "conversation-hidden":"تم إخفاء المحادثة من حسابك.", "conversation-delete-failed":"تعذر حذف المحادثة من حسابك.", "notification-deleted":"تم حذف الإشعار.", "notification-delete-failed":"تعذر حذف الإشعار.", "notifications-deleted":"تم مسح الإشعارات.", "notifications-delete-failed":"تعذر مسح الإشعارات.", "staff-conversation-failed":"تعذر إنشاء المحادثة الداخلية. تأكد من صلاحيات الحساب وأن المستلم نشط." } as Record<string,string>,
     subjectPlaceholder: "مثال: استفسار عن موعد الاستشارة",
   } : {
-    title: "Conversations & notifications", intro: "Secure client-to-office communication with in-account notifications.",
+    title: "Conversations", intro: "Secure, organized communication between clients and the office team, with a dedicated space for each conversation.",
     dashboard: "Dashboard", newTitle: "Start a conversation", subject: "Conversation subject",
     recipient: "Choose a lawyer or assistant", start: "Start conversation", conversations: "Your conversations",
     empty: "No conversations yet.", office: "Office team", client: "Client",
@@ -57,18 +55,17 @@ export default async function ConversationsPage({
     results: { "start-failed":"Could not start the conversation. Choose an active staff member.", "notifications-failed":"Could not update notifications.", "notifications-read":"Notifications marked as read.", "conversation-hidden":"Conversation hidden from your account.", "conversation-delete-failed":"Could not hide the conversation.", "notification-deleted":"Notification deleted.", "notification-delete-failed":"Could not delete the notification.", "notifications-deleted":"Notifications cleared.", "notifications-delete-failed":"Could not clear notifications.", "staff-conversation-failed":"Could not create the private staff conversation. Confirm your access and that the recipient is active." } as Record<string,string>,
     subjectPlaceholder: "e.g. Question about my consultation",
   };
-  const unreadCount = (notifications || []).filter(n => !n.read_at).length;
-  return <main className="mizan-dashboard-page min-h-screen bg-[#f7f4ed] px-4 py-10 sm:py-14" dir={ar ? "rtl" : "ltr"}>
-    <nav className="mizan-dashboard-page-nav" aria-label={ar?"التنقل داخل لوحة التحكم":"Dashboard navigation"}><Link href={"/"+locale+"/dashboard"}>⌂ <span>{ar?"لوحة التحكم":"Overview"}</span></Link><Link href={"/"+locale+"/dashboard/cases"}>▤ <span>{ar?"ملفات القضايا":"Cases"}</span></Link><Link href={"/"+locale+"/dashboard/appointments"}>▦ <span>{ar?"المواعيد":"Appointments"}</span></Link><Link href={"/"+locale+"/dashboard/conversations"}>◌ <span>{ar?"المحادثات":"Messages"}</span></Link>{["owner","admin"].includes(String(staff?.role||""))&&<><Link href={"/"+locale+"/dashboard/staff"}>♙ <span>{ar?"المستخدمون":"Staff"}</span></Link><Link href={"/"+locale+"/dashboard/services"}>⚖ <span>{ar?"الخدمات":"Services"}</span></Link><Link href={"/"+locale+"/dashboard/settings"}>⚙ <span>{ar?"الإعدادات":"Settings"}</span></Link><Link href={"/"+locale+"/dashboard/audit"}>◷ <span>{ar?"سجل التدقيق":"Audit log"}</span></Link></>}</nav>
+  return <main className="mizan-dashboard-page min-h-screen overflow-hidden bg-[#f4f2ec] px-3 py-5 sm:px-6 sm:py-8 lg:px-8" dir={ar ? "rtl" : "ltr"}>
+    <nav className="mizan-dashboard-page-nav mx-auto mb-6 flex max-w-7xl flex-wrap gap-2 rounded-2xl border border-[#14263d]/10 bg-white/90 p-2 shadow-sm" aria-label={ar?"التنقل داخل لوحة التحكم":"Dashboard navigation"}><Link href={"/"+locale+"/dashboard"}>⌂ <span>{ar?"لوحة التحكم":"Overview"}</span></Link><Link href={"/"+locale+"/dashboard/cases"}>▤ <span>{ar?"ملفات القضايا":"Cases"}</span></Link><Link href={"/"+locale+"/dashboard/appointments"}>▦ <span>{ar?"المواعيد":"Appointments"}</span></Link><Link href={"/"+locale+"/dashboard/conversations"}>◌ <span>{ar?"المحادثات":"Messages"}</span></Link>{["owner","admin"].includes(String(staff?.role||""))&&<><Link href={"/"+locale+"/dashboard/staff"}>♙ <span>{ar?"المستخدمون":"Staff"}</span></Link><Link href={"/"+locale+"/dashboard/services"}>⚖ <span>{ar?"الخدمات":"Services"}</span></Link><Link href={"/"+locale+"/dashboard/settings"}>⚙ <span>{ar?"الإعدادات":"Settings"}</span></Link><Link href={"/"+locale+"/dashboard/audit"}>◷ <span>{ar?"سجل التدقيق":"Audit log"}</span></Link></>}</nav>
 
-    <div className="mx-auto max-w-6xl">
-      <Link href={"/" + locale + "/dashboard"} className="text-sm font-bold text-[#176b67] hover:underline">← {t.dashboard}</Link>
-      <p className="mt-5 text-xs font-black tracking-[.18em] text-[#176b67]">MIZAN LEGAL / SECURE MESSAGING</p>
-      <h1 className="mt-2 text-3xl font-black text-[#14263d] sm:text-4xl">{t.title}</h1>
-      <p className="mt-3 max-w-3xl leading-7 text-[#657184]">{t.intro}</p>
+    <div className="mx-auto max-w-7xl">
+      <section className="relative isolate overflow-hidden rounded-[1.75rem] bg-[#14263d] px-5 py-7 text-white shadow-xl sm:px-8 sm:py-9 lg:px-10">
+        <div aria-hidden="true" className="pointer-events-none absolute -end-12 -top-24 h-72 w-72 rounded-full border border-[#d8b878]/25 sm:h-96 sm:w-96"/><div aria-hidden="true" className="pointer-events-none absolute -end-2 -top-14 h-56 w-56 rounded-full border border-[#d8b878]/15 sm:h-72 sm:w-72"/>
+        <div className="relative flex flex-col justify-between gap-6 md:flex-row md:items-end"><div className="max-w-3xl"><Link href={"/"+locale+"/dashboard"} className="inline-flex rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-xs font-bold text-[#e4d1a7] hover:bg-white/10">{ar?"← العودة إلى لوحة التحكم":"← Back to dashboard"}</Link><p className="mt-6 text-[11px] font-black uppercase tracking-[.24em] text-[#d8b878]">MIZAN LEGAL / SECURE MESSAGING</p><h1 className="mt-3 text-3xl font-black leading-tight sm:text-4xl lg:text-5xl">{t.title}</h1><p className="mt-4 max-w-2xl text-sm leading-7 text-slate-300 sm:text-base">{t.intro}</p></div><div className="flex flex-wrap gap-2"><Link href={"/"+locale+"/dashboard/conversations"} className="rounded-xl border border-white/15 bg-white/10 px-4 py-3 text-sm font-bold text-white">{ar?"المحادثات":"Conversations"}</Link><Link href={"/"+locale+"/dashboard/notifications"} className="rounded-xl border border-[#d8b878]/40 bg-[#d8b878]/10 px-4 py-3 text-sm font-bold text-[#f1dfb7]">{ar?"الإشعارات":"Notifications"}</Link></div></div>
+      </section>
       {result && t.results[result] && <p role="status" className="mt-5 rounded-xl border border-[#176b67]/20 bg-white p-4 text-sm font-semibold text-[#176b67]">{t.results[result]}</p>}
       {conversationsError && <p role="alert" className="mt-5 rounded-xl bg-red-50 p-4 text-sm text-red-800">{t.loadingError}</p>}
-      {isClient && <section className="mt-8 rounded-2xl border border-[#14263d]/10 bg-white p-5 sm:p-7">
+      {isClient && <section className="mt-6 rounded-[1.5rem] border border-[#14263d]/10 bg-white p-5 shadow-sm sm:p-7 lg:p-8">
         <h2 className="text-xl font-black text-[#14263d]">{t.newTitle}</h2>
         <form action={startConversation} className="mt-5 grid gap-4 sm:grid-cols-2">
           <input type="hidden" name="locale" value={locale}/>
@@ -86,7 +83,7 @@ export default async function ConversationsPage({
         </form>
       </section>}
       {isStaff && !activeStaff && <p className="mt-6 rounded-xl bg-amber-50 p-4 text-sm text-amber-900">{t.inactive}</p>}
-      {isStaff && activeStaff && <section className="mt-8 rounded-2xl border border-[#176b67]/20 bg-[#f0f7f4] p-5 sm:p-7">
+      {isStaff && activeStaff && <section className="mt-6 rounded-[1.5rem] border border-[#176b67]/20 bg-[#f0f7f4] p-5 shadow-sm sm:p-7 lg:p-8">
         <div className="flex items-start gap-3"><span aria-hidden="true" className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#14263d] text-lg text-white">🔒</span><div><h2 className="text-xl font-black text-[#14263d]">{t.staffPrivateTitle}</h2><p className="mt-2 max-w-3xl text-sm leading-6 text-[#657184]">{t.staffPrivateIntro}</p></div></div>
         <form action={startStaffConversation} className="mt-5 grid gap-4 sm:grid-cols-2">
           <input type="hidden" name="locale" value={locale}/>
@@ -130,20 +127,6 @@ export default async function ConversationsPage({
           cancel: ar ? "رجوع" : "Cancel",
         }}
       />
-      <section className="mt-10 rounded-2xl border border-[#14263d]/10 bg-white p-5 sm:p-7">
-        <div className="flex flex-wrap items-center justify-between gap-3"><h2 className="text-xl font-black text-[#14263d]">{t.notifications} {unreadCount > 0 && <span className="ms-2 rounded-full bg-[#176b67]/10 px-2 py-1 text-xs text-[#176b67]">{unreadCount} {t.unread}</span>}</h2>
-          <div className="flex flex-wrap items-center gap-3">{unreadCount > 0 && <form action={markNotificationsRead}><input type="hidden" name="locale" value={locale}/><button className="text-sm font-bold text-[#176b67] hover:underline">{t.markRead}</button></form>}{!!notifications?.length && <form action={deleteAllNotifications}><input type="hidden" name="locale" value={locale}/><ConfirmSubmitButton message={t.confirmDeleteAllNotifications} className="text-sm font-bold text-red-700 hover:underline">{t.deleteAllNotifications}</ConfirmSubmitButton></form>}</div>
-        </div>
-        {!notifications?.length ? <p className="mt-4 text-sm text-[#657184]">{t.noNotifications}</p> : <ul className="mt-4 divide-y divide-[#14263d]/10">
-          {notifications.map((notification) => <li key={notification.id} className={"flex items-start justify-between gap-3 py-4 " + (!notification.read_at ? "font-semibold" : "")}>
-            <Link href={notification.href} className="block min-w-0 flex-1 rounded-lg hover:text-[#176b67]"><div className="flex items-start justify-between gap-3"><span className="text-sm text-[#14263d]">{notification.title}</span>{!notification.read_at && <span className="rounded-full bg-[#176b67]/10 px-2 py-1 text-[11px] text-[#176b67]">{t.unread}</span>}</div>
-              {notification.body && <p className="mt-1 text-sm font-normal text-[#657184]">{notification.body}</p>}
-              <p className="mt-2 text-xs font-normal text-[#657184]">{new Intl.DateTimeFormat(ar ? "ar-EG" : "en-GB", { dateStyle: "medium", timeStyle: "short", timeZone: "Africa/Cairo" }).format(new Date(notification.created_at))}</p>
-            </Link>
-            <form action={deleteNotification} className="shrink-0"><input type="hidden" name="locale" value={locale}/><input type="hidden" name="notificationId" value={notification.id}/><ConfirmSubmitButton message={t.confirmDeleteNotification} ariaLabel={t.deleteNotification} title={t.deleteNotification} className="rounded-lg px-2 py-1 text-sm font-bold text-red-700 hover:bg-red-50">×</ConfirmSubmitButton></form>
-          </li>)}
-        </ul>}
-      </section>
     </div>
   </main>;
 }
