@@ -3529,64 +3529,57 @@ pre,code{max-width:100%;overflow-wrap:anywhere}
   .mizan-workspace-link { transition: none; }
 }
 
-/* Force the dashboard messages launcher to match the notifications button exactly. */
-.mizan-site-header.mizan-dashboard-header .mizan-dashboard-notification-button,
+/* Keep notifications untouched; make the dashboard messages launcher match the language control. */
 .mizan-site-header.mizan-dashboard-header .mizan-chat-launcher {
-  display: grid !important;
-  flex: 0 0 40px !important;
-  width: 40px !important;
-  min-width: 40px !important;
-  height: 40px !important;
-  min-height: 40px !important;
+  display: inline-flex !important;
+  flex: 0 0 42px !important;
+  width: 42px !important;
+  min-width: 42px !important;
+  height: 42px !important;
+  min-height: 42px !important;
   align-items: center !important;
   justify-content: center !important;
-  padding: 0 !important;
-  border: 1px solid #e0e7df !important;
-  border-radius: 14px !important;
-  background: #fff !important;
-  color: #23453e !important;
+  padding: .4rem !important;
+  border: 1px solid rgba(224, 202, 146, .4) !important;
+  border-radius: 12px !important;
+  background: rgba(255, 255, 255, .075) !important;
+  color: #fff !important;
   box-shadow: none !important;
-  transform: none;
 }
-.mizan-site-header.mizan-dashboard-header .mizan-dashboard-notification-button > svg,
 .mizan-site-header.mizan-dashboard-header .mizan-chat-launcher > svg {
   display: block;
   width: 19px !important;
   height: 19px !important;
+  flex: 0 0 auto;
   fill: none !important;
   stroke: currentColor !important;
   stroke-width: 1.7 !important;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
-.mizan-site-header.mizan-dashboard-header .mizan-dashboard-notification-button:hover,
-.mizan-site-header.mizan-dashboard-header .mizan-dashboard-notification-button[aria-expanded="true"],
 .mizan-site-header.mizan-dashboard-header .mizan-chat-launcher:hover,
 .mizan-site-header.mizan-dashboard-header .mizan-chat-launcher[aria-expanded="true"] {
-  border-color: #b9d0c2 !important;
-  background: #f6faf6 !important;
-  color: #23453e !important;
-  box-shadow: none !important;
-  transform: none;
+  border-color: #e1c77f !important;
+  background: rgba(224, 199, 127, .18) !important;
+  color: #f1d997 !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, .12) !important;
 }
 @media (max-width: 640px) {
-  .mizan-site-header.mizan-dashboard-header .mizan-dashboard-notification-button,
   .mizan-site-header.mizan-dashboard-header .mizan-chat-launcher {
     flex-basis: 34px !important;
     width: 34px !important;
     min-width: 34px !important;
     height: 34px !important;
     min-height: 34px !important;
+    padding: .2rem !important;
     border-radius: 10px !important;
   }
-  .mizan-site-header.mizan-dashboard-header .mizan-dashboard-notification-button > svg,
   .mizan-site-header.mizan-dashboard-header .mizan-chat-launcher > svg {
     width: 16px !important;
     height: 16px !important;
   }
 }
 @media (max-width: 360px) {
-  .mizan-site-header.mizan-dashboard-header .mizan-dashboard-notification-button,
   .mizan-site-header.mizan-dashboard-header .mizan-chat-launcher {
     flex-basis: 32px !important;
     width: 32px !important;
