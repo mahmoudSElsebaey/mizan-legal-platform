@@ -2859,9 +2859,9 @@ pre,code{max-width:100%;overflow-wrap:anywhere}
   margin-inline-start: auto;
   flex: 0 0 auto;
 }
-.mizan-dashboard-header .mizan-dashboard-language-anchor { order: 1; }
+.mizan-dashboard-header .mizan-dashboard-notifications-anchor { order: 1; }
 .mizan-dashboard-header .mizan-dashboard-header-actions > .mizan-chat-launcher { order: 2; }
-.mizan-dashboard-header .mizan-dashboard-notifications-anchor { order: 3; }
+.mizan-dashboard-header .mizan-dashboard-language-anchor { order: 3; }
 .mizan-dashboard-header .mizan-dashboard-language,
 .mizan-dashboard-header .mizan-dashboard-notification-button,
 .mizan-dashboard-header .mizan-chat-launcher {
