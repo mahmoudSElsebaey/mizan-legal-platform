@@ -14,6 +14,7 @@ export function DashboardSidebar({ locale, isAdmin }: { locale: "ar" | "en"; isA
     { href: "/cases", icon: "▤", ar: "ملفات القضايا", en: "Cases" },
     { href: "/appointments", icon: "▦", ar: "المواعيد", en: "Appointments" },
     { href: "/conversations", icon: "◌", ar: "المحادثات", en: "Conversations" },
+    { href: "/notifications", icon: "♧", ar: "الإشعارات", en: "Notifications" },
   ];
   const adminNav: Item[] = [
     { href: "/staff", icon: "♙", ar: "الموظفون والصلاحيات", en: "Staff & access" },
