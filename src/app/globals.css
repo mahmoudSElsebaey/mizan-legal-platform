@@ -3414,3 +3414,117 @@ pre,code{max-width:100%;overflow-wrap:anywhere}
     min-height: 32px;
   }
 }
+
+
+/* Unified MIZAN dashboard sidebar: clear active states and touch-friendly mobile navigation. */
+.mizan-dashboard-workspace {
+  grid-template-columns: 252px minmax(0, 1fr);
+  min-width: 0;
+}
+.mizan-workspace-sidebar {
+  z-index: 15;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(23,107,103,.25) transparent;
+}
+.mizan-workspace-link {
+  position: relative;
+  min-width: 0;
+  line-height: 1.45;
+}
+.mizan-workspace-link:hover {
+  border-color: rgba(23,107,103,.14);
+  background: #f0f6f3;
+  color: #176b67;
+}
+.mizan-workspace-link.is-active {
+  border-color: rgba(216,184,120,.55);
+  background: linear-gradient(105deg, #edf5f1 0%, #f8f5ed 100%);
+  color: #14263d;
+  box-shadow: inset 3px 0 0 #176b67;
+  font-weight: 800;
+}
+[dir="rtl"] .mizan-workspace-link.is-active {
+  box-shadow: inset -3px 0 0 #176b67;
+}
+.mizan-workspace-link.is-active > span:first-child {
+  color: #176b67;
+}
+.mizan-workspace-link:focus-visible {
+  outline: 3px solid rgba(23,107,103,.28);
+  outline-offset: 2px;
+}
+@media (max-width: 800px) {
+  .mizan-dashboard-workspace {
+    display: flex;
+    flex-direction: column;
+    min-height: calc(100vh - 64px);
+  }
+  .mizan-workspace-sidebar {
+    position: sticky;
+    top: 0;
+    z-index: 60;
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    gap: .45rem;
+    width: 100%;
+    min-height: 0;
+    max-height: none;
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-inline: contain;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    border-inline-end: 0;
+    border-bottom: 1px solid rgba(20,38,61,.1);
+    background: rgba(255,255,255,.97);
+    padding: .65rem .75rem;
+    white-space: nowrap;
+    box-shadow: 0 5px 16px rgba(20,38,61,.045);
+    backdrop-filter: blur(12px);
+  }
+  .mizan-workspace-sidebar::-webkit-scrollbar { display: none; }
+  .mizan-workspace-sidebar-label,
+  .mizan-workspace-sidebar-bottom { display: none !important; }
+  .mizan-workspace-link {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    gap: .45rem;
+    min-height: 42px;
+    border: 1px solid #e7ebe6;
+    border-radius: 12px;
+    background: #fff;
+    padding: .55rem .8rem;
+    font-size: .78rem;
+    line-height: 1.2;
+  }
+  .mizan-workspace-link > span:first-child {
+    display: inline-grid;
+    width: 20px;
+    flex: 0 0 20px;
+    place-items: center;
+    font-size: 1rem;
+  }
+  .mizan-workspace-link.is-active {
+    border-color: rgba(23,107,103,.35);
+    background: #eaf3ef;
+    color: #124c46;
+    box-shadow: inset 0 -2px 0 #176b67;
+  }
+  [dir="rtl"] .mizan-workspace-link.is-active {
+    box-shadow: inset 0 -2px 0 #176b67;
+  }
+  .mizan-dashboard-content {
+    min-width: 0;
+    padding: 1rem .75rem 1.75rem;
+  }
+}
+@media (max-width: 380px) {
+  .mizan-workspace-sidebar { gap: .35rem; padding-inline: .55rem; }
+  .mizan-workspace-link { min-height: 40px; gap: .35rem; padding: .5rem .65rem; font-size: .74rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mizan-workspace-link { transition: none; }
+}
