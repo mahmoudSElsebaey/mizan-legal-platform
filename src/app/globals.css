@@ -3543,13 +3543,13 @@ pre,code{max-width:100%;overflow-wrap:anywhere}
   border: 1px solid rgba(224, 202, 146, .4) !important;
   border-radius: 12px !important;
   background: rgba(255, 255, 255, .075) !important;
-  color: #fff !important;
+  color: #e1c77f !important;
   box-shadow: none !important;
 }
 .mizan-site-header.mizan-dashboard-header .mizan-chat-launcher > svg {
   display: block;
-  width: 21px !important;
-  height: 21px !important;
+  width: 23px !important;
+  height: 23px !important;
   flex: 0 0 auto;
   fill: none !important;
   stroke: currentColor !important;
@@ -3575,8 +3575,8 @@ pre,code{max-width:100%;overflow-wrap:anywhere}
     border-radius: 10px !important;
   }
   .mizan-site-header.mizan-dashboard-header .mizan-chat-launcher > svg {
-    width: 18px !important;
-    height: 18px !important;
+    width: 20px !important;
+    height: 20px !important;
   }
 }
 @media (max-width: 360px) {
