@@ -428,7 +428,7 @@ async function sendMessage(event: React.FormEvent<HTMLFormElement>) {
         <div className="mizan-chat-main">
           {active ? <>
             <header className="mizan-chat-conversation-head"><span className="mizan-chat-avatar is-large">{initials(otherName)}</span><div className="mizan-chat-conversation-identity"><strong>{otherName}</strong><small>{active.subject}</small></div><button type="button" className="mizan-chat-close mizan-chat-mobile-close" onClick={() => { setSelected(""); setEditingId(""); setEditDraft(""); setError(""); }} aria-label={ar ? "العودة إلى قائمة المحادثات" : "Back to conversation list"} title={ar ? "قائمة المحادثات" : "Conversation list"}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 5-7 7 7 7M7 12h14"/></svg></button></header>
-            {activeRemovedByOther && <div role="status" className="mizan-chat-removal-notice"><strong>{labels.removedTitle}</strong><p>{labels.removedBody}</p><a href={"/" + locale + "/dashboard/conversations"}>{labels.newConversationLink}</a></div>}
+            {activeRemovedByOther && <div role="status" className="mizan-chat-removal-notice rounded-xl border border-amber-300 bg-amber-50 p-3 text-sm text-amber-950"><strong>{labels.removedTitle}</strong><p>{labels.removedBody}</p><a href={"/" + locale + "/dashboard/conversations"}>{labels.newConversationLink}</a></div>}
             <div className="mizan-chat-messages">{messages.length === 0 ? <p className="mizan-chat-empty">{labels.noMessages}</p> : messages.map((message) => {
               const own = message.sender_id === userId;
               const senderName = own ? (people[userId]?.trim() || labels.you) : otherName;
