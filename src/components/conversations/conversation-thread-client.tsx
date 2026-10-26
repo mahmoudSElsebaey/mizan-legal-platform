@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 
 type Locale = "ar" | "en";
@@ -53,6 +54,7 @@ export function ConversationThreadClient({
   userId,
   initialMessages,
   canSend,
+  conversationRemovedByOther,
   currentUserName,
   otherName,
 }: {
@@ -61,6 +63,7 @@ export function ConversationThreadClient({
   userId: string;
   initialMessages: Message[];
   canSend: boolean;
+  conversationRemovedByOther: boolean;
   currentUserName: string;
   otherName: string;
 }) {
@@ -74,6 +77,7 @@ export function ConversationThreadClient({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [soundOn, setSoundOn] = useState(true);
+  const [removedByOther, setRemovedByOther] = useState(conversationRemovedByOther);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const t = ar ? {
@@ -82,14 +86,14 @@ export function ConversationThreadClient({
     placeholder: "اكتب رسالتك هنا...", send: "إرسال الرسالة", filesLimit: "الحد الأقصى 5 ملفات، 10 ميجابايت لكل ملف.",
     uploadFailed: "تعذر رفع المرفق أو إرسال الرسالة.", editFailed: "تعذر تعديل الرسالة.",
     noMessages: "لا توجد رسائل بعد. اكتب رسالتك الأولى أدناه.", error: "حدث خطأ. حاول مرة أخرى.",
-    filesReady: "ملفات جاهزة", openFile: "فتح الملف"
+    filesReady: "ملفات جاهزة", openFile: "فتح الملف", removedTitle: "تم إنهاء هذه المحادثة من الطرف الآخر", removedBody: "لن تتمكن من إرسال رسائل جديدة في هذه المحادثة. إذا أردت مواصلة التواصل، أنشئ محادثة جديدة معه.", newConversation: "إنشاء محادثة جديدة"
   } : {
     copy: "Copy", edit: "Edit", save: "Save", cancel: "Cancel", you: "You", sound: "Message notification sound",
     edited: "Edited", deleted: "This message was deleted", attach: "Attach files or images",
     placeholder: "Write your message here...", send: "Send message", filesLimit: "Up to 5 files, 10 MB each.",
     uploadFailed: "Could not upload the attachment or send the message.", editFailed: "Could not edit the message.",
     noMessages: "No messages yet. Write your first message below.", error: "Something went wrong. Please try again.",
-    filesReady: "file(s) ready", openFile: "Open file"
+    filesReady: "file(s) ready", openFile: "Open file", removedTitle: "The other participant ended this conversation", removedBody: "You can no longer send messages in this conversation. Start a new conversation with them to continue.", newConversation: "Start a new conversation"
   };
 
   useEffect(() => {
@@ -108,6 +112,10 @@ export function ConversationThreadClient({
           if (soundOn) playIncomingTone();
           void markThreadNotificationsRead();
         }
+      })
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "conversation_hidden_for_user", filter: "conversation_id=eq." + conversationId }, (payload) => {
+        const hidden = payload.new as { user_id?: string };
+        if (hidden.user_id && hidden.user_id !== userId) setRemovedByOther(true);
       })
       .on("postgres_changes", { event: "UPDATE", schema: "public", table: "conversation_messages", filter: "conversation_id=eq." + conversationId }, (payload) => {
         const updated = payload.new as Message;
@@ -211,6 +219,7 @@ export function ConversationThreadClient({
   const initials = (name: string) => (name.trim().charAt(0) || "?").toLocaleUpperCase(ar ? "ar-EG" : "en-US");
 
   return <div className="mizan-thread-client">
+    {removedByOther && <div role="status" className="mb-4 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950"><strong className="block">{t.removedTitle}</strong><p className="mt-1 leading-6">{t.removedBody}</p><Link className="mt-3 inline-flex rounded-lg bg-[#14263d] px-4 py-2 font-bold text-white hover:bg-[#176b67]" href={"/" + locale + "/dashboard/conversations"}>{t.newConversation}</Link></div>}
     <label className="mizan-thread-sound"><input type="checkbox" checked={soundOn} onChange={(event) => setSoundOn(event.target.checked)}/>{t.sound}</label>
     <div className="mizan-thread-messages">
       {!messages.length ? <p className="mizan-thread-empty">{t.noMessages}</p> : messages.map((message) => {
@@ -243,14 +252,14 @@ export function ConversationThreadClient({
         </article>;
       })}
     </div>
-    {canSend && <form className="mizan-thread-composer" onSubmit={sendMessage}>
+    {canSend && !removedByOther && <form className="mizan-thread-composer" onSubmit={sendMessage}>
       <input ref={fileRef} type="file" multiple className="mizan-thread-file-input" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt,.rtf,.odt,.ods,.ppt,.pptx" onChange={(event) => {
         const selected = Array.from(event.target.files || []);
         if (selected.length > 5 || selected.some((file) => file.size > 10 * 1024 * 1024)) { setError(t.filesLimit); event.target.value = ""; return; }
         setFiles(selected); setError("");
       }}/>
       <button type="button" className="mizan-thread-attach-button" aria-label={t.attach} title={t.attach} disabled={busy} onClick={() => fileRef.current?.click()}>＋</button>
-      <textarea value={draft} onChange={(event) => setDraft(event.target.value)} maxLength={4000} rows={3} placeholder={t.placeholder}/>
+      <textarea value={draft} onChange={(event) => setDraft(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter" && !event.shiftKey && !event.nativeEvent.isComposing) { event.preventDefault(); event.currentTarget.form?.requestSubmit(); } }} maxLength={4000} rows={3} placeholder={t.placeholder}/>
       <button type="submit" disabled={busy || (!draft.trim() && !files.length)}>{t.send}</button>
       {files.length > 0 && <span className="mizan-thread-pending">{files.length} {t.filesReady}<button type="button" onClick={() => { setFiles([]); if (fileRef.current) fileRef.current.value = ""; }}>×</button></span>}
     </form>}
