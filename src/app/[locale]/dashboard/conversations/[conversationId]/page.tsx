@@ -21,10 +21,11 @@ export default async function ConversationDetailPage({
   const { data: { user }, error: authError } = await supabase.auth.getUser();
   if (authError || !user) redirect("/" + locale + "/login");
 
-  const [{ data: conversation, error: conversationError }, { data: messages, error: messagesError }, { data: hiddenEntry }] = await Promise.all([
+  const [{ data: conversation, error: conversationError }, { data: messages, error: messagesError }, { data: hiddenEntry }, { data: otherHiddenEntry }] = await Promise.all([
     supabase.from("conversations").select("id,client_id,staff_id,subject,status,conversation_type,created_at,last_message_at").eq("id", conversationId).maybeSingle(),
     supabase.from("conversation_messages").select("id,conversation_id,sender_id,body,created_at,attachments,edited_at,deleted_at").eq("conversation_id", conversationId).order("created_at", { ascending: true }).limit(300),
     supabase.from("conversation_hidden_for_user").select("conversation_id").eq("conversation_id", conversationId).eq("user_id", user.id).maybeSingle(),
+    supabase.from("conversation_hidden_for_user").select("conversation_id").eq("conversation_id", conversationId).neq("user_id", user.id).maybeSingle(),
   ]);
   if (conversationError || !conversation || hiddenEntry) notFound();
   const otherParticipantId = conversation.client_id === user.id ? conversation.staff_id : conversation.client_id;
@@ -37,7 +38,8 @@ export default async function ConversationDetailPage({
   const isStaffConversation = conversation.conversation_type === "staff";
   const isClient = !isStaffConversation && conversation.client_id === user.id;
   const isParticipant = conversation.client_id === user.id || conversation.staff_id === user.id;
-  const canSend = conversation.status === "open" && (isStaffConversation ? (isParticipant && isActiveStaff) : (isClient || (conversation.staff_id === user.id && isActiveStaff)));
+  const conversationRemovedByOther = !!otherHiddenEntry;
+  const canSend = !conversationRemovedByOther && conversation.status === "open" && (isStaffConversation ? (isParticipant && isActiveStaff) : (isClient || (conversation.staff_id === user.id && isActiveStaff)));
   const canChangeStatus = isStaffConversation ? (isParticipant && isActiveStaff) : (isClient || (conversation.staff_id === user.id && isActiveStaff));
   const t = ar ? {
     back:"كل المحادثات", staffPrivate:"محادثة داخلية خاصة بين أعضاء المكتب", viewOnly:"لديك صلاحية الاطلاع على هذه المحادثة فقط، ولا يمكن إرسال رسائل إلا من طرفي المحادثة.", hideConversation:"حذف المحادثة من حسابي", confirmHideConversation:"هل تريد إخفاء هذه المحادثة من حسابك؟ ستظل ظاهرة للطرف الآخر.", office:"فريق المكتب", client:"العميل", open:"مفتوحة", closed:"مغلقة",
@@ -74,8 +76,8 @@ export default async function ConversationDetailPage({
       {messagesError && <p role="alert" className="mt-5 rounded-xl bg-red-50 p-4 text-sm text-red-800">{t.noMessages}</p>}
       <section className="mizan-conversation-panel mt-7 rounded-2xl p-4 sm:p-7">
         <div className="mizan-conversation-panel-heading"><span className="mizan-conversation-panel-icon">✉</span><div><h2 className="text-lg font-black">{t.messages}</h2><p>{ar ? "تواصل مباشر وآمن بينك وبين الطرف الآخر" : "A direct and secure channel between you and the other participant"}</p></div><span className="mizan-conversation-encryption">{ar ? "خاص" : "PRIVATE"}</span></div>
-        <ConversationThreadClient locale={locale} conversationId={conversation.id} userId={user.id} currentUserName={currentUserName} otherName={otherName} initialMessages={(messages || []) as Array<{ id: string; conversation_id: string; sender_id: string; body: string; created_at: string; attachments: Array<{ path: string; name: string; mime_type: string; size: number }>; edited_at: string | null; deleted_at: string | null }>} canSend={canSend} />
-        {!canSend && <p className="mt-5 rounded-xl bg-slate-50 p-4 text-sm text-slate-600">{conversation.status !== "open" ? t.closedNotice : t.viewOnly}</p>}
+        <ConversationThreadClient locale={locale} conversationId={conversation.id} userId={user.id} conversationRemovedByOther={conversationRemovedByOther} currentUserName={currentUserName} otherName={otherName} initialMessages={(messages || []) as Array<{ id: string; conversation_id: string; sender_id: string; body: string; created_at: string; attachments: Array<{ path: string; name: string; mime_type: string; size: number }>; edited_at: string | null; deleted_at: string | null }>} canSend={canSend} />
+        {!canSend && !conversationRemovedByOther && <p className="mt-5 rounded-xl bg-slate-50 p-4 text-sm text-slate-600">{conversation.status !== "open" ? t.closedNotice : t.viewOnly}</p>}
         {canChangeStatus && <form action={changeConversationStatus} className="mt-4 border-t border-[#14263d]/10 pt-4">
           <input type="hidden" name="locale" value={locale}/><input type="hidden" name="conversationId" value={conversation.id}/>
           <input type="hidden" name="status" value={conversation.status === "open" ? "closed" : "open"}/>
